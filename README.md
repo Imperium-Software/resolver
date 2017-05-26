@@ -10,9 +10,11 @@
 
 ## Team Resources
 - [Slack](https://imperium-se.slack.com)
-- [Requirments Document](http://cs.up.ac.za/files/COS301/Download/1905/)
+- [Project Briefing Documentation](http://cs.up.ac.za/files/COS301/Download/1905/)
+- [Requirements Docmumentation](https://www.overleaf.com/9687894kqqdwgmqymsx)
 - [CS Group Page](http://cs.up.ac.za/teams/pages/manage/147/5)
 - [Waffle.io](https://waffle.io/ErnstEksteen/COS301_GA-SATSolver)
+
 
 ## Other Resources
 - [How to use WaffleBot](https://help.waffle.io/wafflebot-basics/getting-started-with-the-wafflebot/how-to-use-the-wafflebot)
