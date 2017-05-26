@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/ErnstEksteen/COS301_GA-SATSolver.png?label=ready&title=Ready)](https://waffle.io/ErnstEksteen/COS301_GA-SATSolver?utm_source=badge)
 # COS301 GA-SATSolver
 > GA-SATSolver is a SAT Solving that is based on a Genetic Algorithm. The program is intended to be integrated  into and replace the University of Pretoria’s current SAT solver. 
 
