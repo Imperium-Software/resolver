@@ -113,22 +113,22 @@ if __name__ == "__main__":
         print("With data: " + str(ind))
         print("  Testing get")
 
-        if ind.get(4) == 1:
-            print("    get(4) == 1 => pass")
+        if ind.get(5) == 1:
+            print("    get(5) == 1 => pass")
         else:
-            print("    get(4) == 1 => fail")
+            print("    get(5) == 1 => fail")
             num_fail += 1
 
-        if ind.get(7) == 0:
-            print("    get(7) == 0 => pass")
+        if ind.get(8) == 0:
+            print("    get(8) == 0 => pass")
         else:
-            print("    get(7) == 0 => fail")
+            print("    get(8) == 0 => fail")
             num_fail += 1
 
-        if ind.get(9) is None:
-            print("    get(9) == None => pass")
+        if ind.get(10) is None:
+            print("    get(10) == None => pass")
         else:
-            print("    get(9) == None => fail")
+            print("    get(10) == None => fail")
             num_fail += 1
         print()
         print("  Testing set")
@@ -139,41 +139,41 @@ if __name__ == "__main__":
             print("    set(2,1) => fail")
             num_fail += 1
 
-        ind.set(6, 0) == 0
+        ind.set(7, 0) == 0
         if ind.get(7) == 0:
-            print("    set(6,0) => pass")
+            print("    set(7,0) => pass")
+        else:
+            print("    set(7,0) => fail")
+            num_fail += 1
+
+        ind.set(6, 1)
+        if ind.get(6) == 1:
+            print("    set(6,1) => pass")
         else:
             print("    set(6,1) => fail")
             num_fail += 1
 
-        ind.set(5, 1)
-        if ind.get(5) == 1:
-            print("    set(5,1) => pass")
-        else:
-            print("    set(5,1) => fail")
-            num_fail += 1
-
         print()
         print("  Testing flip")
-        ind.flip(0)
-        if ind.get(0) == 1:
-            print("    flip(0) => pass")
+        ind.flip(1)
+        if ind.get(1) == 1:
+            print("    flip(1) => pass")
         else:
-            print("    flip(0) => fail")
+            print("    flip(1) => fail")
             num_fail += 1
 
-        ind.flip(7)
-        if ind.get(7) == 1:
-            print("    flip(7) => pass")
+        ind.flip(8)
+        if ind.get(8) == 1:
+            print("    flip(8) => pass")
         else:
-            print("    flip(7) => fail")
+            print("    flip(8) => fail")
             num_fail += 1
 
-        ind.flip(3)
-        if ind.get(3) == 1:
-            print("    flip(3) => pass")
+        ind.flip(4)
+        if ind.get(4) == 1:
+            print("    flip(4) => pass")
         else:
-            print("    flip(3) => fail")
+            print("    flip(4) => fail")
             num_fail += 1
         print()
     print("----------------------")
