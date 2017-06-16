@@ -5,7 +5,7 @@
 """
 import socket
 
-class server():
+class SATServer():
 
     """ Defines a SAT server. """
 
@@ -13,13 +13,14 @@ class server():
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind(("localhost", port))
+        self.conn = None
 
     def accept(self):
 
         """ Initializes a connection  """
 
         self.socket.listen(1)
-        conn,addr = self.socket.accept()
+        conn = self.socket.accept()[0]
         self.conn = conn
 
     def pull(self):
@@ -55,20 +56,16 @@ class server():
 
 # Stand-alone server code, for testing purposes:
 
-if __name__ == "__main__":
-    s = server(0)
-    print("Listening on " + str(s.get_port()))
-    # while True:
-        # try:
-        #     s.accept()
-        #     s.pull()
-        #     s.push("\nHello!\n")
-        #     s.push("This is now an open stream.\n")
-        # except Exception as ex:
-        #     print(ex)
-        #     s.close()
-    s.accept()
+def main():
+
+    """ Main function for module SATServer """
+
+    server = SATServer(0)
+    print("Listening on " + str(server.get_port()))
+    server.accept()
     while True:
-        s.push("\nNEXT MESSAGE PLEASE:\n")
-        s.pull()
-    # s.pull()
+        server.push("\nNEXT MESSAGE PLEASE:\n")
+        server.pull()
+
+if __name__ == "__main__":
+    main()
