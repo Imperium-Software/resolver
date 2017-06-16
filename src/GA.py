@@ -2,7 +2,8 @@
     Module: GA
     Description: Defines the genetic algorithm and all the core functionality of it, including crossover and tabu search
 """
-from individual import individual
+from individual import Individual
+import copy
 
 
 class GA:
@@ -32,7 +33,78 @@ class GA:
                     line += 1
             # clause is now a list of lists, so we need to flatten it and convert it to a list
             self.formula.append(tuple([item for sublist in clause for item in sublist]))
+            
+    def sat(self, individual, clause):
 
+    """
+    sat (X,c) - by literature
+    Indicates whether the clause c is true or false for the individual X i.e. satisfied or not by the assignment
+    corresponding to X.
+    :param individual: Individual class (Implemented by Regan) representing a particular assignment of truth values
+    to variables.
+    :param clause: Python tuple of integers - should be the same tuple as in the DIMACS format.
+    :return: returns a boolean value indicating whether the assignment represented by the individual satisfies the
+    clause.
+    """
+
+    # Iterate over atoms in the clause
+    for atom in clause:
+        # IF the atom is not negated
+        if atom > 0:
+            if individual.get(atom):
+                # The clause is satisfiable on seeing the first true atom
+                return True
+        # IF the atom is negated
+        else:
+            if individual.get(abs(atom)) == 0:
+                # The clause is satisfiable on seeing the first false atom due to it being a negation
+                return True
+    # Clause is unsatisfiable - no true atoms
+    return False
+
+    def evaluate(self, individual):
+
+        """
+        The fitness of individual with respect to the formula.
+        :param individual: Individual class (Implemented by Regan) representing a particular assignment of truth values
+        to variables.
+        :return: the number of clauses of F which are not satisfied by X.
+        """
+
+        # Keeps count of unsatisfied clauses
+        num_unsatisfied_clauses = 0
+
+        # Iterate over clauses in the formula
+        for clause in self.formula:
+
+            # If a clause is unsatisfied increase the unsatisfied counter
+            if self.sat(individual, clause) == 0:
+                num_unsatisfied_clauses = num_unsatisfied_clauses + 1
+
+        return num_unsatisfied_clauses
+
+    def improvement(self, individual, index):
+
+        """
+        The function computes the improvement (difference in unsatisfiable clauses) obtained by the flip of the ith
+        variable of the individual.
+        :param individual: Individual class (Implemented by Regan) representing a particular assignment of truth values
+        to variables.
+        :param index: index of a bit (starts at 1 - as per clause numbering in DIMACS format).
+        :return: computed improvement value.
+        """
+
+        # index is not boundary tested - assuming this is done before a call to this function.
+
+        # Determine fitness of individual before alterations
+        original_individual_fitness = self.evaluate(individual)
+
+        new_individual = copy.deepcopy(individual)
+        # Flips the bit at the specified index
+        new_individual.flip(index)
+
+        # Calculates improvement in fitness
+        return original_individual_fitness - self.evaluate(new_individual)
 
 if __name__ == "__main__":
     # TESTS
