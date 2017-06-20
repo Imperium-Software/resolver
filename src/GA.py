@@ -8,12 +8,13 @@ import copy
 
 class GA:
 
-    def __init__(self, filename):
+    def __init__(self, filename, method):
         f = open(filename, "r")
         # Read all the lines from the file that aren't comments
         lines = [line.replace("\n", "") for line in f.readlines() if line[0] != "c" and line.strip() != ""]
         (self.numberOfVariables, self.numberOfClauses) = int(lines[0].split()[2]), int(lines[0].split()[3])
         self.formula = []
+        self.method = method
         # Go through the lines and create numberOfClauses clauses
         line = 1
         # for line in range(1, len(lines)):
@@ -105,6 +106,30 @@ class GA:
 
         # Calculates improvement in fitness
         return original_individual_fitness - self.evaluate(new_individual)
+
+    def corrective_clause(self, X, Y):
+
+    	"""
+    		Some docstring
+
+    	"""
+
+    	Z = Individual(self.numberOfVariables, self.method, False)
+		for clause in formula:
+    		best_pos = 0
+    		best_improvement = 0
+			if not sat(X, clause) and not sat(Y, clause) and not sat(Z, clause):
+				for i in range(len(clause)):
+					current_improvement = improvement(X, i) + improvement(Y, i) 
+					if current_improvement >= best_improvement:
+						best_improvement = current_improvement
+						best_pos = i
+				Z.set(best_pos, X.get(best_pos))
+				Z.set_defined(best_pos)
+				Z.flip(best_pos)
+				Z.allocate(X,Y)
+    	return Z
+
 
 if __name__ == "__main__":
     # TESTS

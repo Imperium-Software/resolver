@@ -15,7 +15,7 @@ class Individual:
     BIT_VECTOR = 0
     BIT_ARRAY = 1
 
-    def __init__(self, length=0, method=None):
+    def __init__(self, length=0, method=None, defined=False, value=None):
 
         """ Creates a bit string of a certain length, using a certain underlying
         implementation.  """
@@ -30,8 +30,27 @@ class Individual:
         if self.method == Individual.BIT_VECTOR:
             self.data = BitVector(size=length)
             self.data = self.data.gen_random_bits(length)
+            self.defined = BitVector(size=length)
+            
+            if defined:
+                self.defined = None
+            else:
+                self.defined.reset(0)
+
+            if value is not None:
+                self.data = BitVector(bitlist = value)
+
         elif self.method == Individual.BIT_ARRAY:
+            self.defined = bitarray(length)
             self.data = bitarray(length)
+
+            if defined:
+                self.defined = None
+            else:
+                self.defined.setall(False)
+
+            if value is not None:
+                self.data = [bool(x) for x in value]
 
     def __str__(self):
 
@@ -82,6 +101,26 @@ class Individual:
         elif self.method == Individual.BIT_ARRAY:
             self.data[b] = not self.data[b]
 
+    def set_defined(self, b):
+
+        """ Sets """
+
+        b -= 1
+        if b >= self.length or b < 0:
+            return
+
+        if self.method == Individual.BIT_VECTOR:
+            self.defined[b] = 1
+        elif self.method == Individual.BIT_ARRAY:
+            self.defined[b] = not self.data[b]
+
+    def allocate(self, first, second):
+
+        """ Allocates uniformly from either first or second parent. """
+
+        for i in range(self.length):
+            self.set_defined(i)
+
 
 class Factory:
 
@@ -92,8 +131,8 @@ class Factory:
 
         """ Creates an array of individuals. """
 
-        array = [Individual(length, method) for _ in range(amount)]
-        return array
+        array = [Individual(length, method, fa) for _ in range(amount)]
+        return array,
 
 # TESTS
 
