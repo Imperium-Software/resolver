@@ -2,6 +2,7 @@
     Module: GA
     Description: Defines the genetic algorithm and all the core functionality of it, including crossover and tabu search
 """
+
 from individual import Individual
 import copy
 
@@ -80,18 +81,18 @@ class GA:
         # Iterate over atoms in the clause
         for atom in clause:
             # IF the atom is not negated
-        if atom > 0:
+            if atom > 0:
             # The Clause is unsatisfiable on seeing an undefined variable.
-            if individual.get_defined(atom) is False:
-            return False
+                if individual.get_defined(atom) is False:
+                    return False
                 if individual.get(atom):
                     # The clause is satisfiable on seeing the first true atom
                     return True
             # IF the atom is negated
             else:
         # The Clause is unsatisfiable on seeing an undefined variable.
-        if individual.get_defined(abs(atom)) is False:
-            return False
+                if individual.get_defined(abs(atom)) is False:
+                    return False
                 if individual.get(abs(atom)) == 0:		
                     # The clause is satisfiable on seeing the first false atom due to it being a negation
                     return True
@@ -155,7 +156,7 @@ class GA:
             best_improvement = 0
             if not self.sat(X, clause) and not self.sat(Y, clause) and not self.sat_crossover(Z, clause):
                 for i in range(len(clause)):
-                    current_improvement = improvement(X, i) + improvement(Y, i)
+                    current_improvement = self.improvement(X, i) + self.improvement(Y, i)
                     if current_improvement >= best_improvement:
                         best_improvement = current_improvement
                         best_pos = i
