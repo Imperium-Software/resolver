@@ -220,6 +220,16 @@ def fluerent_and_ferland(self, x, y):
     Z.allocate(x,y)
     return Z
 
+def select(self, population, number_of_individuals):
+    population.sort(key=evaluate)
+    sub_population = population[0:number_of_individuals]
+    child_x = random.choice(sub_population)
+    child_y = random.choice(sub_population)
+    while child_x == child_y:
+        child_x = random.choice(sub_population)
+
+    return child_x, child_y   
+
 if __name__ == "__main__":
     # TESTS
     num_fail = 0
