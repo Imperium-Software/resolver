@@ -8,7 +8,6 @@ import copy
 
 
 class GA:
-
     def __init__(self, filename, method):
         f = open(filename, "r")
         # Read all the lines from the file that aren't comments
@@ -35,7 +34,7 @@ class GA:
                     line += 1
             # clause is now a list of lists, so we need to flatten it and convert it to a list
             self.formula.append(tuple([item for sublist in clause for item in sublist]))
-            
+
     def sat(self, individual, clause):
 
         """
@@ -82,7 +81,7 @@ class GA:
         for atom in clause:
             # IF the atom is not negated
             if atom > 0:
-            # The Clause is unsatisfiable on seeing an undefined variable.
+                # The Clause is unsatisfiable on seeing an undefined variable.
                 if individual.get_defined(atom) is False:
                     return False
                 if individual.get(atom):
@@ -90,10 +89,10 @@ class GA:
                     return True
             # IF the atom is negated
             else:
-        # The Clause is unsatisfiable on seeing an undefined variable.
+                # The Clause is unsatisfiable on seeing an undefined variable.
                 if individual.get_defined(abs(atom)) is False:
                     return False
-                if individual.get(abs(atom)) == 0:		
+                if individual.get(abs(atom)) == 0:
                     # The clause is satisfiable on seeing the first false atom due to it being a negation
                     return True
         # Clause is unsatisfiable - no true atoms
@@ -163,7 +162,48 @@ class GA:
                 Z.set(best_pos, X.get(best_pos))
                 Z.set_defined(best_pos)
                 Z.flip(best_pos)
-                Z.allocate(X,Y)
+                Z.allocate(X, Y)
+        return Z
+
+    def corrective_clause_with_truth_maintenance(self, X, Y):
+
+        """
+            See page 9 of the paper
+
+        """
+
+        Z = Individual(self.numberOfVariables, self.method, False)
+        for clause in self.formula:
+            best_pos = 0
+            maximum_improvement = self.improvement(X, 0) + self.improvement(Y, 0)
+            if not self.sat(X, clause) and not self.sat(Y, clause) and not self.sat_crossover(Z, clause):
+                for i in range(len(clause)):
+                    current_improvement = self.improvement(X, i) + self.improvement(Y, i)
+                    if current_improvement >= maximum_improvement:
+                        maximum_improvement = current_improvement
+                        best_pos = i
+                Z.set(best_pos, X.get(best_pos))
+                Z.set_defined(best_pos)
+                Z.flip(best_pos)
+
+        # Truth maintenance - See section 4.2 of the paper
+        for clause in self.formula:
+            best_pos = -1
+            minimum_improvement = self.numberOfClauses + 1
+            if self.sat(X, clause) and self.sat(Y, clause) and not self.sat_crossover(Z, clause):
+                for i in range(len(clause)):
+                    if X.get(i) == 1 or Y.get(i) == 1:
+                        current_improvement = self.improvement(X, i) + self.improvement(Y, i)
+                        z_new = copy.deepcopy(Z)
+                        z_new.set(best_pos, 1)
+                        z_new.set_defined(best_pos, 1)
+                        if current_improvement < minimum_improvement and self.sat_crossover(z_new, clause):
+                            minimum_improvement = current_improvement
+                            best_pos = i
+                if not best_pos == -1:
+                    Z.set(best_pos, 1)
+                    Z.set_defined(best_pos, 1)
+        Z.allocate(X, Y)
         return Z
 
 
