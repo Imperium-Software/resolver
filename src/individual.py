@@ -103,7 +103,7 @@ class Individual:
 
     def set_defined(self, b):
 
-        """ Sets """
+        """ Sets a certain bit b as defined. """
 
         b -= 1
         if b >= self.length or b < 0:
@@ -113,6 +113,19 @@ class Individual:
             self.defined[b] = 1
         elif self.method == Individual.BIT_ARRAY:
             self.defined[b] = not self.data[b]
+
+    def get_defined(self, b):
+
+        """ Gets whether a certain bit is defined or not (boolean) """
+
+        b -= 1
+        if b >= self.length or b < 0:
+            return
+
+        if self.method == Individual.BIT_VECTOR:
+            return True if self.defined[b] == 1 else False
+        else:
+            return self.defined[b]
 
     def allocate(self, first, second):
 
