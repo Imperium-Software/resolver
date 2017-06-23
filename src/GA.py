@@ -63,6 +63,41 @@ class GA:
         # Clause is unsatisfiable - no true atoms
         return False
 
+    def sat_crossover(self, individual, clause):
+
+        """
+        sat (X,c) - by literature
+        Indicates whether the clause c is true or false for the individual X i.e. satisfied or not by the assignment
+        corresponding to X - Particular to crossovers as it takes into account whether there are undefined variables
+	used in the clause - if so, the clause is not satisfied.
+        :param individual: Individual class (Implemented by Regan) representing a particular assignment of truth values
+        to variables.
+        :param clause: Python tuple of integers - should be the same tuple as in the DIMACS format.
+        :return: returns a boolean value indicating whether the assignment represented by the individual satisfies the
+        clause.
+        """
+
+        # Iterate over atoms in the clause
+        for atom in clause:
+            # IF the atom is not negated
+	    if atom > 0:
+	    	# The Clause is unsatisfiable on seeing an undefined variable.	
+	    	if individual.get_defined(atom) is False:
+			return False
+                if individual.get(atom):
+                    # The clause is satisfiable on seeing the first true atom
+                    return True
+            # IF the atom is negated
+            else:
+		# The Clause is unsatisfiable on seeing an undefined variable.	
+		if individual.get_defined(abs(atom)) is False:
+		    return False		
+                if individual.get(abs(atom)) == 0:		
+                    # The clause is satisfiable on seeing the first false atom due to it being a negation
+                    return True
+        # Clause is unsatisfiable - no true atoms
+        return False
+
     def evaluate(self, individual):
 
         """
@@ -109,26 +144,26 @@ class GA:
 
     def corrective_clause(self, X, Y):
 
-        """
-            Some docstring
+    	"""
+    		Some docstring
 
-        """
+    	"""
 
-        Z = Individual(self.numberOfVariables, self.method, False)
-        for clause in self.formula:
-            best_pos = 0
-            best_improvement = 0
-            if not self.sat(X, clause) and not self.sat(Y, clause) and not self.sat(Z, clause):
-                for i in range(len(clause)):
-                    current_improvement = self.improvement(X, i) + self.improvement(Y, i)
-                    if current_improvement >= best_improvement:
-                        best_improvement = current_improvement
-                        best_pos = i
-                Z.set(best_pos, X.get(best_pos))
-                Z.set_defined(best_pos)
-                Z.flip(best_pos)
-                Z.allocate(X, Y)
-        return Z
+    	Z = Individual(self.numberOfVariables, self.method, False)
+		for clause in formula:
+    		best_pos = 0
+    		best_improvement = 0
+			if not sat(X, clause) and not sat(Y, clause) and not sat_crossover(Z, clause):
+				for i in range(len(clause)):
+					current_improvement = improvement(X, i) + improvement(Y, i) 
+					if current_improvement >= best_improvement:
+						best_improvement = current_improvement
+						best_pos = i
+				Z.set(best_pos, X.get(best_pos))
+				Z.set_defined(best_pos)
+				Z.flip(best_pos)
+				Z.allocate(X,Y)
+    	return Z
 
 
 if __name__ == "__main__":
