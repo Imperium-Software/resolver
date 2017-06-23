@@ -109,26 +109,26 @@ class GA:
 
     def corrective_clause(self, X, Y):
 
-    	"""
-    		Some docstring
+        """
+            Some docstring
 
-    	"""
+        """
 
-    	Z = Individual(self.numberOfVariables, self.method, False)
-		for clause in formula:
-    		best_pos = 0
-    		best_improvement = 0
-			if not sat(X, clause) and not sat(Y, clause) and not sat(Z, clause):
-				for i in range(len(clause)):
-					current_improvement = improvement(X, i) + improvement(Y, i) 
-					if current_improvement >= best_improvement:
-						best_improvement = current_improvement
-						best_pos = i
-				Z.set(best_pos, X.get(best_pos))
-				Z.set_defined(best_pos)
-				Z.flip(best_pos)
-				Z.allocate(X,Y)
-    	return Z
+        Z = Individual(self.numberOfVariables, self.method, False)
+        for clause in self.formula:
+            best_pos = 0
+            best_improvement = 0
+            if not self.sat(X, clause) and not self.sat(Y, clause) and not self.sat(Z, clause):
+                for i in range(len(clause)):
+                    current_improvement = self.improvement(X, i) + self.improvement(Y, i)
+                    if current_improvement >= best_improvement:
+                        best_improvement = current_improvement
+                        best_pos = i
+                Z.set(best_pos, X.get(best_pos))
+                Z.set_defined(best_pos)
+                Z.flip(best_pos)
+                Z.allocate(X, Y)
+        return Z
 
 
 if __name__ == "__main__":

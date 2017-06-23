@@ -144,7 +144,7 @@ class Factory:
 
         """ Creates an array of individuals. """
 
-        array = [Individual(length, method, fa) for _ in range(amount)]
+        array = [Individual(length, method, True) for _ in range(amount)]
         return array,
 
 # TESTS
