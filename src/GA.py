@@ -206,6 +206,19 @@ class GA:
         Z.allocate(X, Y)
         return Z
 
+def fluerent_and_ferland(self, x, y):
+    Z = Individual(self.numberOfVariables, self.method, False)
+    for clause in self.formula:
+        if (self.sat(x, clause) and not self.sat(y, clause)):
+            for i in range(len(clause)):
+                Z.set(i, x(i))
+                Z.set_defined(i, 1)
+        elif (not self.sat(x, clause) and self.sat(y, clause)):
+            for i in range(len(clause)):
+                Z.set(i, y(i))
+                Z.set_defined(i, 1)
+    Z.allocate(x,y)
+    return Z
 
 if __name__ == "__main__":
     # TESTS

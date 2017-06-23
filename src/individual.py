@@ -62,6 +62,9 @@ class Individual:
             return self.data.to01()
         return ""
 
+    def __call__(self, b):
+        return self.get(b)
+
     def get(self, b):
 
         """ Returns the value at position b, that is either 1 or 0. """
