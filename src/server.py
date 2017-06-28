@@ -5,6 +5,7 @@
 """
 import socket
 import sys
+import time  # TODO Remove this when testing is moved to the testing framework.
 from threading import Thread
 from threading import Lock
 
@@ -29,15 +30,18 @@ class ClientThread(Thread):
         """ Reads data sent by the client and pass it to the DSL
         interpreter(or whatever the correct term for it is). """
 
-        while self.open:
-            msg_chunk = ""
-            total_msg = ""
-            while msg_chunk == "" or msg_chunk[-1] != '#':
-                msg_chunk = self.conn.recv(1024).strip().decode("utf-8").strip()
-                if msg_chunk == "":
-                    self.kill()
-                total_msg += msg_chunk
-            self.server_thread.process_message_from_client(msg_chunk)
+        try:
+            while self.open:
+                msg_chunk = ""
+                total_msg = ""
+                while msg_chunk == "" or msg_chunk[-1] != '#':
+                    msg_chunk = self.conn.recv(1024).strip().decode("utf-8").strip()
+                    if msg_chunk == "":
+                        self.kill()
+                    total_msg += msg_chunk
+                self.server_thread.process_message_from_client(msg_chunk)
+        except socket.error:
+            return
 
     def send_to_client(self, msg):
         """ Sends a msg to the client """
@@ -45,9 +49,11 @@ class ClientThread(Thread):
         self.conn.sendall(msg.encode())
 
     def kill(self):
-        """ Closes the connection with the client. """
+        """ Closes the connection with client. """
 
-        self.read_thread.join()
+        print(BColors.FAIL + '[-]' + BColors.ENDC + ' Client disconnected: ' + '{0}'.format(self.conn.getpeername()[0])
+              + ':{0}'.format(self.conn.getpeername()[1]))
+        self.server_thread.remove_thread(self.thread_id)
         self.conn.close()
 
 
@@ -72,6 +78,7 @@ class SATServer(Thread):
         super(SATServer, self).__init__()
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.socket.bind((host, port))
             self.socket.listen(5)
             print("Server listening on port: " + str(port))
@@ -85,7 +92,7 @@ class SATServer(Thread):
     def run(self):
         """ Listens for new connections and creates a ClientThread when a client connects and appends it to the threads
         array. """
-        
+
         try:
             while True:
                 client_connection, address = self.socket.accept()
@@ -98,15 +105,17 @@ class SATServer(Thread):
                     self.threads.append(new_thread)
                 finally:
                     self.lock.release()
-                print(BColors.OKGREEN + '[+]' + BColors.ENDC + ' Client connected: {0}'.format(address[0]))
-        except KeyboardInterrupt:
-            sys.exit()
+                print(BColors.OKGREEN + '[+]' + BColors.ENDC + ' Client connected: {0}'.format(address[0]) +
+                      ':{0}'.format(address[1]))
+        except ConnectionAbortedError:
+            return
 
     def push_to_all(self, msg):
         """ Broadcasts a message to all connected clients. """
 
         for thread in self.threads:
-            thread.send_to_client(msg)
+            if thread:
+                thread.send_to_client(msg)
 
     def push_to_one(self, thread_id, msg):
         """ Sends a message to a single client provided the thread's id on which the connection to the client
@@ -118,7 +127,7 @@ class SATServer(Thread):
             index = 0
             while (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
                 index += 1
-            if index < len(self.threads):
+            if (index < len(self.threads)) and (self.threads[index]):
                 self.threads[index].send_to_client(msg)
         finally:
             self.lock.release()
@@ -126,7 +135,7 @@ class SATServer(Thread):
     def process_message_from_client(self, msg):
         """ Passes a message to the DSL interpreter(or whatever the correct term for it is) to be interpreted."""
 
-        # The DSL interpreter still needs to be implemented.
+        # TODO When DSL interpreter is done this function should call it.
         print("From 'process_message_from_client': " + msg)
 
     def get_port(self):
@@ -134,26 +143,46 @@ class SATServer(Thread):
 
         return self.socket.getsockname()[1]
 
+    def remove_thread(self, thread_id):
+        """ Sets a thread given its thread_id in the threads array to None to mark it as closed."""
+        while not self.lock.acquire():
+            self.lock.acquire()
+        try:
+            index = 0
+            while (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
+                index += 1
+            if (index < len(self.threads)) and (self.threads[index]):
+                self.threads[index] = None
+        finally:
+            self.lock.release()
 
     def close(self):
         """ Terminates server operation. """
+
         self.socket.close()
+        for i in range(0, len(self.threads)-1):
+            self.threads[i].kill()
+        print("Server closed.")
 
 
 # Stand-alone server code, for testing purposes:
 def main():
 
     """ Main function for module SATServer """
-
     server_thread = SATServer("localhost", 55555)
     server_thread.start()
     sent = False
-    while True:
+    while not sent:
         if len(server_thread.threads) == 2 and not sent:
             server_thread.push_to_all("Hello you two!")
             server_thread.push_to_one(1, "Hello number 1")
             server_thread.push_to_one(2, "Hello number 2")
             sent = True
+            time.sleep(2)
+            server_thread.threads[1].kill()
+            time.sleep(2)
+            server_thread.push_to_all("Hello you two!")
+            server_thread.close()
 
 if __name__ == "__main__":
     main()
