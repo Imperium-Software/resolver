@@ -6,7 +6,7 @@
 
 from BitVector import BitVector
 from bitarray import bitarray
-
+import random
 
 class Individual:
 
@@ -104,7 +104,7 @@ class Individual:
         elif self.method == Individual.BIT_ARRAY:
             self.data[b] = not self.data[b]
 
-    def set_defined(self, b):
+    def set_defined(self, b, v):
 
         """ Sets a certain bit b as defined. """
 
@@ -113,9 +113,9 @@ class Individual:
             return
 
         if self.method == Individual.BIT_VECTOR:
-            self.defined[b] = 1
+            self.defined[b] = v
         elif self.method == Individual.BIT_ARRAY:
-            self.defined[b] = not self.data[b]
+            self.defined[b] = bool(v)
 
     def get_defined(self, b):
 
@@ -135,7 +135,12 @@ class Individual:
         """ Allocates uniformly from either first or second parent. """
 
         for i in range(self.length):
-            self.set_defined(i)
+            if not self.get_defined(i):
+                if bool(random.getrandbits(1)):
+                    self.set(i, first.get(i))
+                else:
+                    self.set(i, second.get(i))
+                self.set_defined(i)
 
 
 class Factory:
@@ -194,7 +199,7 @@ if __name__ == "__main__":
             print("    set(2,1) => fail")
             num_fail += 1
 
-        ind.set(7, 0) == 0
+        ind.set(7, 0)
         if ind.get(7) == 0:
             print("    set(7,0) => pass")
         else:
