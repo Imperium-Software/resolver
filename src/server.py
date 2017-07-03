@@ -45,7 +45,7 @@ class ClientThread(Thread):
 
     def send_to_client(self, msg):
         """ Sends a msg to the client """
-
+        print("sending:",msg)
         self.conn.sendall(msg.encode())
 
     def kill(self):
@@ -173,10 +173,10 @@ def main():
     server_thread.start()
     sent = False
     while not sent:
-        if len(server_thread.threads) == 2 and not sent:
-            server_thread.push_to_all("Hello you two!")
+        if len(server_thread.threads) >= 1:
+            # server_thread.push_to_all("Hello you two!")
             server_thread.push_to_one(1, "Hello number 1")
-            server_thread.push_to_one(2, "Hello number 2")
+            # server_thread.push_to_one(2, "Hello number 2")
             sent = True
             time.sleep(2)
             server_thread.threads[1].kill()

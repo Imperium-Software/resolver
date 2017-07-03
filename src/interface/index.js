@@ -1,7 +1,6 @@
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const url = require('url')
-const net = require('net')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -51,23 +50,3 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-
-let PORT = 23;
-let ADDR = 'rainmaker.wunderground.com';
-
-var client = new net.Socket();
-client.connect(PORT, ADDR, function() {
-  console.log('hello')
-});
-
-client.on('data', function(data) {
-	console.log('Received: ' + data);
-	client.destroy(); // kill client after server's response
-});
-
-client.on('close', function() {
-	console.log('Connection closed');
-});
