@@ -1,0 +1,27 @@
+.slide-out {
+	align-content: center;
+}
+
+#side-bar-title {
+	color : white;
+	align-content: center;
+	font-size: 16px;
+}
+
+
+.terminal {
+	background-color: #111;
+	color : white;
+	border-style: none;
+  	border-color: Transparent;
+  	font-family: monospace;
+}
+
+#circle {
+
+}
+
+#page-title {
+	width: 60%; 
+	float: left;
+}
