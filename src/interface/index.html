@@ -3,17 +3,57 @@
   <head>
     <meta charset="utf-8">
     <title>SAT</title>
+    <link rel="stylesheet" type="text/css" href="css/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
   </head>
   <body>
-    <textarea id='test-relay' name="name" rows="8" cols="80"></textarea>
-    <br>
-    <button id='test-request' type="button" name="button">Request!</button>
-    <br>
-    <label for="#host-field">HOST:</label>
-    <input id='host-field' type="text" name="" value="">
-    <br>
-    <label for="#port-field">PORT:</label>
-    <input id='port-field' type="text" name="" value="">
+
+
+    <ul id="slide-out" class="side-nav blue darken-4">
+      
+      <div class='container' align='center'>
+        <li><span id='side-bar-title'><b>SAT</b>SOLVER</span></li>
+      </div>
+      <li><div class="divider"></div></li>
+      <li><a href="#">Main</a></li>
+      <li><a href="#!">Playground</a></li>
+      <li><a href="settings.html">Settings</a></li>
+    </ul>
+    <a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">MENU</i></a>
+    <div class='container'>
+
+      <div id='header' style="width: 100%; overflow: hidden;">
+        <div id='page-title'>
+          <h2><b>SAT</b>Home</h2>
+        </div>
+        <div id="circle"></div>
+      </div>
+
+      <ul class="collapsible blue darken-4" data-collapsible="accordion">
+        <li>
+          <div class="collapsible-header">Please Select your SATSolver Input Method</div>
+          <div class="collapsible-body" align='center'>
+          
+              <button id='open-file'class='btn white black-text'>Upload File</button>
+              <button class='btn white black-text'>Enter Text</button>
+
+          </div>
+        </li>
+        <li>
+          <div class="collapsible-header">Command Line Readout</div>
+          <div class="collapsible-body"><textarea class='terminal'>> Solving...</textarea></div>
+        </li>
+        <li>
+          <div class="collapsible-header">Error Log</div>
+          <div class="collapsible-body">
+            <textarea class='terminal'>> Example</textarea>
+          </div>
+        </li>
+      </ul>
+    </div>
   </body>
+  <script src="node_modules/hammerjs/hammer.js"></script>
+  <script src='js/materialize.min.js' type="text/javascript"></script>
+  <script src="node_modules/jquery-circle-progress/dist/circle-progress.js"></script>
   <script src='js/controller.js' type="text/javascript"></script>
 </html>

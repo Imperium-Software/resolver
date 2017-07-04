@@ -7,5 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Imperium",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "hammerjs": "^2.0.8",
+    "jquery": "^3.2.1",
+    "jquery-circle-progress": "^1.2.2"
+  }
 }
