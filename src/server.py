@@ -11,7 +11,9 @@ from threading import Lock
 
 
 class ClientThread(Thread):
-    """ Defines a client thread that will facilitate communication between client and server. """
+    """
+    Defines a client thread that will facilitate communication between client and server.
+    """
 
     def __init__(self, conn, thread_id, server_thread):
         Thread.__init__(self)
@@ -22,13 +24,17 @@ class ClientThread(Thread):
         self.server_thread = server_thread
 
     def run(self):
-        """ Creates a thread that will read data sent by the client and pass it to the server thread for processing. """
+        """
+        Creates a thread that will read data sent by the client and pass it to the server thread for processing.
+        """
 
         self.read_thread = Thread(self.recv_from_client(), self)
 
     def recv_from_client(self):
-        """ Reads data sent by the client and pass it to the DSL
-        interpreter(or whatever the correct term for it is). """
+        """
+        Reads data sent by the client and pass it to the DSL
+        interpreter(or whatever the correct term for it is).
+        """
 
         try:
             while self.open:
@@ -44,12 +50,17 @@ class ClientThread(Thread):
             return
 
     def send_to_client(self, msg):
-        """ Sends a msg to the client """
+        """
+        Sends a msg to the client.
+        :param msg: The data to be sent
+        """
 
         self.conn.sendall(msg.encode())
 
     def kill(self):
-        """ Closes the connection with client. """
+        """
+        Closes the connection with client.
+        """
 
         print(BColors.FAIL + '[-]' + BColors.ENDC + ' Client disconnected: ' + '{0}'.format(self.conn.getpeername()[0])
               + ':{0}'.format(self.conn.getpeername()[1]))
@@ -70,9 +81,11 @@ class BColors:
 
 class SATServer(Thread):
 
-    """ Defines a SAT server. The server listens for new incoming connections and creates a new thread for each new
+    """
+    Defines a SAT server. The server listens for new incoming connections and creates a new thread for each new
     connection. A higher module can request this server to broadcast data to all connected clients or send data to a
-    single client. Clients can also send requests which will then be passed to a higher module."""
+    single client. Clients can also send requests which will then be passed to a higher module.
+    """
 
     def __init__(self, host, port):
         super(SATServer, self).__init__()
@@ -90,8 +103,10 @@ class SATServer(Thread):
         self.threads = []
 
     def run(self):
-        """ Listens for new connections and creates a ClientThread when a client connects and appends it to the threads
-        array. """
+        """
+        Listens for new connections and creates a ClientThread when a client connects and appends it to the threads
+        array.
+        """
 
         try:
             while True:
@@ -111,15 +126,22 @@ class SATServer(Thread):
             return
 
     def push_to_all(self, msg):
-        """ Broadcasts a message to all connected clients. """
+        """
+        Broadcasts a message to all connected clients.
+        :param msg: The data that will be broadcasted.
+        """
 
         for thread in self.threads:
             if thread:
                 thread.send_to_client(msg)
 
     def push_to_one(self, thread_id, msg):
-        """ Sends a message to a single client provided the thread's id on which the connection to the client
-        is open. """
+        """
+        Sends a message to a single client provided the thread's id on which the connection to the client
+        is open.
+        :param thread_id: The ID of the thread that has the socket to which the client is connected.
+        :param msg: The data that will be sent to the client.
+        """
 
         while not self.lock.acquire():
             self.lock.acquire()
@@ -133,18 +155,28 @@ class SATServer(Thread):
             self.lock.release()
 
     def process_message_from_client(self, msg):
-        """ Passes a message to the DSL interpreter(or whatever the correct term for it is) to be interpreted."""
+        """
+        Passes a message to the DSL interpreter(or whatever the correct term for it is) to be interpreted.
+        :param msg: A data sent by a client.
+        """
 
         # TODO When DSL interpreter is done this function should call it.
         print("From 'process_message_from_client': " + msg)
 
     def get_port(self):
-        """ Returns the port on which the server is running on. """
+        """
+        Returns the port on which the server is running on.
+        :return: The port the server is running on.
+        """
 
         return self.socket.getsockname()[1]
 
     def remove_thread(self, thread_id):
-        """ Sets a thread given its thread_id in the threads array to None to mark it as closed."""
+        """
+        Sets a thread given its thread_id in the threads array to None to mark it as closed.
+        :param thread_id: The ID of the thread that needs to be removed.
+        """
+
         while not self.lock.acquire():
             self.lock.acquire()
         try:
@@ -157,7 +189,9 @@ class SATServer(Thread):
             self.lock.release()
 
     def close(self):
-        """ Terminates server operation. """
+        """
+        Terminates server operation.
+        """
 
         self.socket.close()
         for i in range(0, len(self.threads)-1):
