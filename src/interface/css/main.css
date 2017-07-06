@@ -1,11 +1,20 @@
-.slide-out {
+  
+  html {
+    font-family: Helvetica;
+    src: url(../fonts/HelveticaLTStd-Light.otf) format("opentype");
+  }
+  
+  body{
+  	background-color: #f0f3f4;
+  }  
+
+/*.slide-out {
 	align-content: center;
 }
-
+*/
 #side-bar-title {
-	color : white;
-	align-content: center;
-	font-size: 16px;
+	padding: 1.2em 2.2em 0;
+	margin-bottom: 8px;
 }
 
 
@@ -24,4 +33,38 @@
 #page-title {
 	width: 60%; 
 	float: left;
+}
+
+.SAT-roayal-blue{
+	background-color: #0c2e4a;
+}
+
+.white-text{
+	color: white;
+}
+
+.nav-bar-grey{
+	background-color: #abb8c1;
+}
+
+.page-item:nth-child(odd){
+	background-color: #d0d7dc;
+}
+
+.collapsible-header{
+	background-color: #f0f3f4;
+	border: 0;
+}
+
+.collapsible-header-odd{
+	background-color: #d0d7dc;
+}
+
+.body-container{
+	padding: 0 2.1rem;
+}
+
+.collapsible-body{
+	padding-top: 0.7rem;
+	padding-bottom: 1.5rem;
 }
