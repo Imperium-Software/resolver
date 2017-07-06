@@ -33,10 +33,42 @@
       <li class="page-item">
           <div class="collapsible-header collapsible-header-odd active"><div class="container">>SAT_SETUP</div></div>
           <div class="collapsible-body" align='center'>
-            <div class="body-container">
-              <button id='open-file' class='btn white black-text'>Upload File</button>
-              <button class='btn white black-text'>Enter Text</button>
-            </div>
+            <form class="col s12 body-container">
+                <div class="input-field col s12">
+                  <select id='open-file'>
+                    <option value="" disabled selected>>SOURCE</option>
+                    <option value="1">>File</option>
+                    <option value="2">>Playground</option>
+                  </select>
+                </div>
+                <div class="input-field col s12">
+                  <select id='open-file2'>
+                    <option value="" disabled selected>>EVALUATION_FORMULA</option>
+                    <option value="1">>File</option>
+                    <option value="2">>_</option>
+                  </select>
+                </div>
+                <div class="input-field col s12">
+                  <select>
+                    <option value="" disabled selected>>CROSSOVER_SELECTION</option>
+                    <option value="1">>Corrective_Clause_Crossover</option>
+                    <option value="2">>CCTM</option> <!-- these are not final -->
+                    <option value="3">>F_n_F</option> <!-- these are not final -->
+                    <option value="4">>Uniform_Crossover</option> <!-- these are not final -->
+                  </select>
+                </div>
+                <div>
+                  <div class="input-field col s12">
+                    <select multiple>
+                      <option value="" disabled selected>>TABU_SEARCH_SETTING</option>
+                      <option value="1">>RVCF</option>
+                      <option value="2">>Diversification</option> <!-- these are not final -->
+                    </select>
+                  </div>
+                </div>
+              <!-- <button id='open-file' class='btn white black-text'>Upload File</button>
+              <button class='btn white black-text'>Enter Text</button> -->
+            </form>
           </div>
         </li>
         <li class="page-item">
