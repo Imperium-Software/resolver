@@ -1,3 +1,4 @@
+
 """
     Module: GA
     Description: Defines the genetic algorithm and all the core functionality of it, including crossover and tabu search
@@ -5,7 +6,8 @@
 
 from individual import Individual
 import copy
-
+import random
+import copy
 
 class GA:
     def __init__(self, filename, method):
@@ -15,6 +17,10 @@ class GA:
         (self.numberOfVariables, self.numberOfClauses) = int(lines[0].split()[2]), int(lines[0].split()[3])
         self.formula = []
         self.method = method
+        
+        # Initialize tabu to an empty list
+        self.tabu = []
+        
         # Go through the lines and create numberOfClauses clauses
         line = 1
         # for line in range(1, len(lines)):
@@ -146,7 +152,6 @@ class GA:
 
         """
             Some docstring
-
         """
 
         Z = Individual(self.numberOfVariables, self.method, False)
@@ -169,7 +174,6 @@ class GA:
 
         """
             See page 9 of the paper
-
         """
 
         Z = Individual(self.numberOfVariables, self.method, False)
@@ -206,29 +210,56 @@ class GA:
         Z.allocate(X, Y)
         return Z
 
-def fluerent_and_ferland(self, x, y):
-    Z = Individual(self.numberOfVariables, self.method, False)
-    for clause in self.formula:
-        if (self.sat(x, clause) and not self.sat(y, clause)):
-            for i in range(len(clause)):
-                Z.set(i, x(i))
-                Z.set_defined(i, 1)
-        elif (not self.sat(x, clause) and self.sat(y, clause)):
-            for i in range(len(clause)):
-                Z.set(i, y(i))
-                Z.set_defined(i, 1)
-    Z.allocate(x,y)
-    return Z
+    def standard_tabu(self, individual_in, tabu_size, max_flip, choose_function):
+
+        """ Performs the tabu search algorithm. """
+
+        self.tabu = self.tabu[:tabu_size]
+        best = individual_in
+        num_flips = 0
+        while not (self.evaluate(best) == 0 or num_flips > max_flip):
+            # index = self.choose(individual_in)
+            index = choose_function(individual_in)
+            individual_temp = copy.deepcopy(individual_in)
+            individual_temp.flip(index)
+            if self.evaluate(individual_temp) < self.evaluate(best):
+                best = individual_temp
+            num_flips += 1
+            self.tabu.pop()
+            self.tabu = [index] + self.tabu
+        return best
+
+
+    def fluerent_and_ferland(self, x, y):
+
+        """ Performs the Fluerent & Ferland crossover operator. """
+
+        Z = Individual(self.numberOfVariables, self.method, False)
+        for clause in self.formula:
+            if (self.sat(x, clause) and not self.sat(y, clause)):
+                for i in range(len(clause)):
+                    Z.set(i, x(i))
+                    Z.set_defined(i, 1)
+            elif (not self.sat(x, clause) and self.sat(y, clause)):
+                for i in range(len(clause)):
+                    Z.set(i, y(i))
+                    Z.set_defined(i, 1)
+        Z.allocate(x,y)
+        return Z
+    
 
 def select(self, population, number_of_individuals):
+    
+    """ Selects number_of_individuals from a population. """
+    
     population.sort(key=evaluate)
     sub_population = population[0:number_of_individuals]
     child_x = random.choice(sub_population)
     child_y = random.choice(sub_population)
     while child_x == child_y:
         child_x = random.choice(sub_population)
-
     return child_x, child_y   
+
 
 if __name__ == "__main__":
     # TESTS
