@@ -37,29 +37,89 @@ let PORT = 23;
 //   });
 // });
 
+//select drowpdowns
+$(document).ready(function() {
+    $('select').material_select();
+  });
 
+//open file
+// document.getElementById('open-file').addEventListener('click', () => {
+//   dialog.showOpenDialog((filename) => {
+//     if (filename === undefined) {
+//       console.log('The user did not select a location to open.')
+//       return
+//     }
+//     console.log(filename)
+//     fs.readFile(filename[0], 'utf8', (err, data) => {
+//       if (err) {
+//         console.log(err)
+//         return
+//       }
+//       editor.value = data;
+//       toggle_hex = false;
+//     })
+//   })
+// })
 
-document.getElementById('open-file').addEventListener('click', () => {
-  dialog.showOpenDialog((filename) => {
-    if (filename === undefined) {
-      console.log('The user did not select a location to open.')
-      return
-    }
-    console.log(filename)
-    fs.readFile(filename[0], 'utf8', (err, data) => {
-      if (err) {
-        console.log(err)
-        return
-      }
-      editor.value = data;
-      toggle_hex = false;
-    })
-  })
-})
+// document.getElementById('open-file').addEventListener("click", () => {
+
+//   if(true)
+//   {
+//     dialog.showOpenDialog((filename) => {
+//     if (filename === undefined) {
+//       console.log('The user did not select a location to open.')
+//       return
+//     }
+//     console.log(filename)
+//     fs.readFile(filename[0], 'utf8', (err, data) => {
+//       if (err) {
+//         console.log(err)
+//         return
+//       }
+//       editor.value = data;
+//       toggle_hex = false;
+//     })
+//   })
+//   } 
+  
+// })
+
+// document.getElementById('open-file2').addEventListener("change", () => {
+
+//   if(this.options[this.selctedIndex].value == "1")
+//   {
+//     dialog.showOpenDialog((filename) => {
+//     if (filename === undefined) {
+//       console.log('The user did not select a location to open.')
+//       return
+//     }
+//     console.log(filename)
+//     fs.readFile(filename[0], 'utf8', (err, data) => {
+//       if (err) {
+//         console.log(err)
+//         return
+//       }
+//       editor.value = data;
+//       toggle_hex = false;
+//     })
+//   })
+//   } 
+  
+// })
 
 // Side Nav
 
  $(".button-collapse").sideNav();
+
+ $('.button-collapse').sideNav({
+      menuWidth: 300, // Default is 300
+      edge: 'left', // Choose the horizontal origin
+      closeOnClick: true, // Closes side-nav on <a> clicks, useful for Angular/Meteor
+      draggable: true, // Choose whether you can drag to open on touch screens,
+      //onOpen: function(el) { /* Do Stuff* / }, // A function to be called when sideNav is opened
+      //onClose: function(el) { /* Do Stuff* / }, // A function to be called when sideNav is closed
+    }
+  );
 
  // Progress Circle
 
