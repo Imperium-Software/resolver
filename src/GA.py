@@ -165,7 +165,7 @@ class GA:
                         best_improvement = current_improvement
                         best_pos = i
                 z.set(best_pos, x.get(best_pos))
-                z.set_defined(best_pos)
+                z.set_defined(best_pos, x.get(best_pos))
                 z.flip(best_pos)
                 z.allocate(x, y)
         return z
@@ -187,7 +187,7 @@ class GA:
                         maximum_improvement = current_improvement
                         best_pos = i
                 z.set(best_pos, x.get(best_pos))
-                z.set_defined(best_pos)
+                z.set_defined(best_pos, x.get(best_pos))
                 z.flip(best_pos)
 
         # Truth maintenance - See section 4.2 of the paper
