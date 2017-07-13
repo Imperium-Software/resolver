@@ -210,6 +210,29 @@ class GA:
         z.allocate(x, y)
         return z
 
+    def standard_tabu_choose(self, assignment, best_assignment):
+
+        """
+        Choose function for the tabu search. The best move (flips of value of an assignment) is chosen i.e. 
+        it is the best gain in flip and if it is not a tabu configuration.
+        :param assignment: A particular individual (assignment of atoms).
+        :param best_assignment: The current best assignment during execution of the standard_tabu function.
+        :return: A position (index) in the assignment due to which maximum gain is obtained.
+        """
+
+        for position in assignment:
+            temp = copy.deepcopy(assignment)
+            temp.flip(position)
+            positions = []
+            best_sigma = -math.inf
+            if (temp not in self.tabu) or (self.evaluate(temp) < self.evaluate(best_assignment)):
+                if self.improvement(assignment, position) >= best_sigma:
+                    positions.append(position)
+            elif best_sigma != -math.inf:
+                positions.append(position)
+
+        return random.choice(positions)    
+    
     def standard_tabu(self, individual_in, tabu_size, max_flip, choose_function):
 
         """ Performs the tabu search algorithm. """
