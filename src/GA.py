@@ -209,7 +209,6 @@ class GA:
                     z.set_defined(best_pos, 1)
         z.allocate(x, y)
         return z
-
     def standard_tabu_choose(self, assignment, best_assignment):
 
         """
@@ -220,17 +219,37 @@ class GA:
         :return: A position (index) in the assignment due to which maximum gain is obtained.
         """
 
+        # A list to maintain the position(s) where the gain (by flip) is the best. 
+        positions = []
+        # The current overall best gain observed. Initially, it is set to a large negative value.
+        best_sigma = -math.inf
+        # Iterate through each of the positions (atoms) of the individual.
         for position in assignment:
+            # A copy of the original individual is made and the particular position of the copy is flipped.
             temp = copy.deepcopy(assignment)
             temp.flip(position)
-            positions = []
-            best_sigma = -math.inf
+            # If the move is not in the tabu list and the number of unsatisfied clauses in the copy is
+            # better (lower) than that of the best_assignment, then we can consider this move as a possibility.
             if (temp not in self.tabu) or (self.evaluate(temp) < self.evaluate(best_assignment)):
-                if self.improvement(assignment, position) >= best_sigma:
+                # Calculate the gain in the fitness function.
+                gain = self.improvement(assignment, position)
+                # If a new best gain is found (greater than the previous best), then we empty the list
+                # as the list should not include positions of the previous best gain.
+                # The list will currently only include the position of the current move.
+                if gain > best_sigma:
+                    positions = []
+                    best_sigma = gain
                     positions.append(position)
-            elif best_sigma != -math.inf:
+                # If the gain calculated is equal to the best gain calculated so far, we simply append the position.     
+                elif gain == best_sigma:
+                    best_sigma = gain
+                    positions.append(position)
+            # This will only fire in the case that the we have not yet managed to find neither an individual who wasn't
+            # in the tabu list nor one with a better evaluation in each iteration of the for loop above.
+            elif best_sigma == -math.inf:
                 positions.append(position)
-
+        # Return a position that is randomly selected in those which have the maximum sigma 
+        # i.e. out of those elements in the positions list.
         return random.choice(positions)    
     
     def standard_tabu(self, individual_in, tabu_size, max_flip, choose_function):
