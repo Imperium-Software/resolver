@@ -276,7 +276,6 @@ class GA:
         improvements = [(i, improvements.index(i) + 1) for i in max(improvements)]
         weights = [self.weight(individual_in, j) for j in improvements]
         return random.choice(weights)
-    def tabu_with_diversification(self, individual, threshhold, recurse_count, max_false=5):
 
     def weight(self, individual, index):
         c_ones = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 1)]
@@ -289,6 +288,8 @@ class GA:
     def degree(individual, clause):
         l = [literal for literal in clause if individual.get(literal) == 1]
         return len(l)
+
+    def tabu_with_diversification(self, individual, threshhold, recurse_count, max_false=5):
 
         """ Tabu search with augmentations to prevent convergence on local maxima. """
 
