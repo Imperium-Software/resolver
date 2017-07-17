@@ -10,7 +10,8 @@ import copy
 
 
 class GA:
-    def __init__(self, filename, method=None):
+    def __init__(self, filename, max_generations, population_size, sub_population_size, crossover_operatior,
+                 tabu_list_length, max_flip,  method=None):
         f = open(filename, "r")
         # Read all the lines from the file that aren't comments
         lines = [line.replace("\n", "") for line in f.readlines() if line[0] != "c" and line.strip() != ""]
@@ -20,6 +21,9 @@ class GA:
 
         # Initialize tabu to an empty list
         self.tabu = []
+
+        self.tabu_list_length = tabu_list_length
+        self.max_flip = max_flip
 
         # Go through the lines and create numberOfClauses clauses
         line = 1
@@ -232,7 +236,7 @@ class GA:
             temp.flip(position)
             # If the move is not in the tabu list and the number of unsatisfied clauses in the copy is
             # better (lower) than that of the best_assignment, then we can consider this move as a possibility.
-            if (temp not in self.tabu) or (self.evaluate(temp) < self.evaluate(best_assignment)):
+            if (position not in self.tabu) or (self.evaluate(temp) < self.evaluate(best_assignment)):
                 # Calculate the gain in the fitness function.
                 gain = self.improvement(assignment, position)
                 # If a new best gain is found (greater than the previous best), then we empty the list
@@ -244,7 +248,6 @@ class GA:
                     positions.append(position)
                 # If the gain calculated is equal to the best gain calculated so far, we simply append the position.     
                 elif gain == best_sigma:
-                    best_sigma = gain
                     positions.append(position)
             # This will only fire in the case that the we have not yet managed to find neither an individual who wasn't
             # in the tabu list nor one with a better evaluation in each iteration of the for loop above.
@@ -254,16 +257,16 @@ class GA:
         # i.e. out of those elements in the positions list.
         return random.choice(positions)    
     
-    def standard_tabu(self, individual_in, tabu_size, max_flip, choose_function):
+    def standard_tabu(self, individual_in, choose_function):
 
         """ Performs the tabu search algorithm. """
 
-        self.tabu = self.tabu[:tabu_size]
+        self.tabu = self.tabu[:self.tabu_list_length]
         best = individual_in
         num_flips = 0
-        while not (self.evaluate(best) == 0 or num_flips > max_flip):
+        while not (self.evaluate(best) == 0 or num_flips > self.max_flip):
             # index = self.choose(individual_in)
-            index = choose_function(individual_in)
+            index = choose_function(individual_in, best)
             individual_temp = copy.deepcopy(individual_in)
             individual_temp.flip(index)
             if self.evaluate(individual_temp) < self.evaluate(best):
