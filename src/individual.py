@@ -1,7 +1,7 @@
 """
     Module: Individual
     Description: Defines classes related to the creation and manipulation of
-    and Individual for use in the genetic algorithm.
+    an Individual for use in the genetic algorithm.
 """
 
 from BitVector import BitVector
@@ -50,7 +50,7 @@ class Individual:
                 self.defined.setall(False)
 
             if value is not None:
-                self.data = [bool(x) for x in value]
+                self.data = [bool(X) for X in value]
 
     def __str__(self):
 
