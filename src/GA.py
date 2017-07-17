@@ -229,6 +229,23 @@ class GA:
             self.tabu = [index] + self.tabu
         return best
 
+    def choose_rvcf(self, individual_in):
+        improvements = [self.improvement(individual_in, i) for i in range(1, individual_in.length + 1)]
+        improvements = [(i, improvements.index(i) + 1) for i in max(improvements)]
+        weights = [self.weight(individual_in, j) for j in improvements]
+        return random.choice(weights)
+
+    def weight(self, individual, index):
+        c_ones = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 1)]
+        c_twoes = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 0)]
+
+        return sum(self.degree(individual, c) for c in c_ones) / len(c_ones) + sum(self.degree(individual, c)
+                                                                                   for c in c_twoes) / len(c_twoes)
+
+    @staticmethod
+    def degree(individual, clause):
+        l = [literal for literal in clause if individual.get(literal) == 1]
+        return len(l)
 
     def fluerent_and_ferland(self, x, y):
 
