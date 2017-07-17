@@ -10,20 +10,36 @@ import copy
 
 
 class GA:
-    def __init__(self, filename, max_generations, population_size, sub_population_size, crossover_operatior,
-                 tabu_list_length, max_flip,  method=None):
+    def __init__(self, filename, max_generations, population_size, sub_population_size, crossover_operator,
+                 tabu_list_length, max_flip, is_rvcf, is_diversification, max_false, rec, k, method=None):
+
         f = open(filename, "r")
         # Read all the lines from the file that aren't comments
         lines = [line.replace("\n", "") for line in f.readlines() if line[0] != "c" and line.strip() != ""]
         (self.numberOfVariables, self.numberOfClauses) = int(lines[0].split()[2]), int(lines[0].split()[3])
         self.formula = []
-        self.method = method
 
-        # Initialize tabu to an empty list
-        self.tabu = []
-
+        # Creating member variables for each of the parameters
+        self.max_generations = max_generations
+        self.population_size = population_size
+        self.sub_population_size = sub_population_size
+        self.crossover_operator = crossover_operator
         self.tabu_list_length = tabu_list_length
         self.max_flip = max_flip
+        self.is_rvcf = is_rvcf
+        self.is_diversification = is_diversification
+        self.max_false = max_false
+        self.rec = rec
+        self.k = k
+        self.method = method
+
+        # Initialize tabu, population and the sub_population to empty lists
+        self.tabu = []
+        self.population = []
+        self.sub_population = []
+
+        # Used in tabu search to determine best configuration/move
+        self.best = None
 
         # Go through the lines and create numberOfClauses clauses
         line = 1
@@ -45,6 +61,60 @@ class GA:
             # clause is now a list of lists, so we need to flatten it and convert it to a list
             self.formula.append(tuple([item for sublist in clause for item in sublist]))
         self.false_counts = [0 for _ in range(len(self.formula))]
+
+        # The GASAT Algorithm
+        # -------------------------------------------------------------------------------------------------------------
+        # A population of individuals is initialised
+        self.create_population()
+
+        # Counts the current number of iterations completed
+        generation_counter = 0
+
+        # An individual that satisfies the formula or None
+        satisfied_individual = None
+
+        # While no individual in the population satisfies the formula and while we have not reached the maximum
+        # generation threshold
+        while satisfied_individual is None and generation_counter < self.max_generations:
+            # A sub-population of possible parents is selected and two individuals are randomly selected as parents
+            parents = self.select()
+
+            # A child is produced through reproduction - the method of reproduction is determined by the operator
+            # parameter
+            child = None
+            if crossover_operator == 0:
+                child = self.corrective_clause(parents[0], parents[1])
+            elif crossover_operator == 1:
+                child = self.corrective_clause_with_truth_maintenance(parents[0], parents[1])
+            elif crossover_operator == 2:
+                child = self.fluerent_and_ferland(parents[0], parents[1])
+
+            # TODO: Complete Tabu Search
+            if not self.is_rvcf:
+                child = self.standard_tabu(child, self.standard_tabu_choose())
+                if self.is_diversification:
+                    child = self.tabu_with_diversification()
+            else:
+                child = self.standard_tabu(child, self.choose_rvcf())
+
+            # TODO: Insertion Condition of the child
+
+            # Determine whether any individual that satisfies the formula appeared in the current generation
+            satisfied_individual = self.is_satisfied()
+            # Increase the generation
+            generation_counter = generation_counter + 1
+
+        # Return a satisfying assignment if there exists one
+        if satisfied_individual is not None:
+            return satisfied_individual
+        else:
+            # Sort the population by fitness value
+            self.population.sort(key=self.evaluate)
+            # The first individual in the sorted population has the lowest number of unsatisfied clauses - best
+            # assignment found
+            return self.population[0]
+
+        # -------------------------------------------------------------------------------------------------------------
 
     def sat(self, individual, clause):
 
@@ -215,13 +285,12 @@ class GA:
         z.allocate(x, y)
         return z
 
-    def standard_tabu_choose(self, assignment, best_assignment):
+    def standard_tabu_choose(self, assignment):
 
         """
         Choose function for the tabu search. The best move (flips of value of an assignment) is chosen i.e. 
         it is the best gain in flip and if it is not a tabu configuration.
         :param assignment: A particular individual (assignment of atoms).
-        :param best_assignment: The current best assignment during execution of the standard_tabu function.
         :return: A position (index) in the assignment due to which maximum gain is obtained.
         """
 
@@ -236,7 +305,7 @@ class GA:
             temp.flip(position)
             # If the move is not in the tabu list and the number of unsatisfied clauses in the copy is
             # better (lower) than that of the best_assignment, then we can consider this move as a possibility.
-            if (position not in self.tabu) or (self.evaluate(temp) < self.evaluate(best_assignment)):
+            if (position not in self.tabu) or (self.evaluate(temp) < self.evaluate(self.best)):
                 # Calculate the gain in the fitness function.
                 gain = self.improvement(assignment, position)
                 # If a new best gain is found (greater than the previous best), then we empty the list
@@ -262,19 +331,19 @@ class GA:
         """ Performs the tabu search algorithm. """
 
         self.tabu = self.tabu[:self.tabu_list_length]
-        best = individual_in
+        self.best = individual_in
         num_flips = 0
-        while not (self.evaluate(best) == 0 or num_flips > self.max_flip):
+        while not (self.evaluate(self.best) == 0 or num_flips > self.max_flip):
             # index = self.choose(individual_in)
-            index = choose_function(individual_in, best)
+            index = choose_function(individual_in)
             individual_temp = copy.deepcopy(individual_in)
             individual_temp.flip(index)
-            if self.evaluate(individual_temp) < self.evaluate(best):
-                best = individual_temp
+            if self.evaluate(individual_temp) < self.evaluate(self.best):
+                self.best = individual_temp
             num_flips += 1
             self.tabu.pop()
             self.tabu = [index] + self.tabu
-        return best
+        return self.best
 
     def choose_rvcf(self, individual_in):
         improvements = [self.improvement(individual_in, i) for i in range(1, individual_in.length + 1)]
@@ -353,18 +422,40 @@ class GA:
         z.allocate(x, y)
         return z
 
+    def select(self):
+        """ Selects number_of_individuals from a population. """
 
-def select(self, population, number_of_individuals):
-    """ Selects number_of_individuals from a population. """
+        self.population.sort(key=self.evaluate)
+        self.sub_population = self.population[0:self.sub_population_size]
+        child_x = random.choice(self.sub_population)
+        child_y = random.choice(self.sub_population)
+        while child_x == child_y:
+            child_x = random.choice(self.sub_population)
+        return child_x, child_y
 
-    population.sort(key=self.evaluate)
-    sub_population = population[0:number_of_individuals]
-    child_x = random.choice(sub_population)
-    child_y = random.choice(sub_population)
-    while child_x == child_y:
-        child_x = random.choice(sub_population)
-    return child_x, child_y
+    def create_population(self):
+        """
+        Creates a population of individuals (possible assignments of values to variables) of a specific size specified
+        as a parameter to the genetic algorithm.
+        :return: void (no return value)
+        """
 
+        individual_counter = 0
+        while individual_counter < self.population_size:
+            self.population.append(Individual(self.numberOfVariables))
+            individual_counter = individual_counter + 1
+
+        return
+
+    def is_satisfied (self):
+        """
+        Determines whether or not there is a satisfying assignment.
+        :return: An individual (assignment) or None.
+        """
+        for individual in self.population:
+            if self.evaluate(individual) == 0:
+                return individual
+        return None
 
 if __name__ == "__main__":
     # TESTS
