@@ -4,6 +4,7 @@
 """
 
 from individual import Individual
+from decimal import Decimal
 import random
 import copy
 
@@ -209,6 +210,7 @@ class GA:
                     z.set_defined(best_pos, 1)
         z.allocate(x, y)
         return z
+
     def standard_tabu_choose(self, assignment, best_assignment):
 
         """
@@ -222,7 +224,7 @@ class GA:
         # A list to maintain the position(s) where the gain (by flip) is the best. 
         positions = []
         # The current overall best gain observed. Initially, it is set to a large negative value.
-        best_sigma = -math.inf
+        best_sigma = Decimal('-Infinity')
         # Iterate through each of the positions (atoms) of the individual.
         for position in assignment:
             # A copy of the original individual is made and the particular position of the copy is flipped.
@@ -246,7 +248,7 @@ class GA:
                     positions.append(position)
             # This will only fire in the case that the we have not yet managed to find neither an individual who wasn't
             # in the tabu list nor one with a better evaluation in each iteration of the for loop above.
-            elif best_sigma == -math.inf:
+            elif best_sigma == Decimal('-Infinity'):
                 positions.append(position)
         # Return a position that is randomly selected in those which have the maximum sigma 
         # i.e. out of those elements in the positions list.
@@ -309,9 +311,9 @@ class GA:
 
         """ Helper function for tabu_with_diversification. """
 
-        temp_clause = [c for c in clause if c not in iteration_dict.keys()]
+        temp_clause = [C for C in clause if C not in iteration_dict.keys()]
         try:
-            index = max(temp_clause, key=lambda c: self.improvement(individual, c))[0]
+            index = max(temp_clause, key=lambda C: self.improvement(individual, C))[0]
         except ValueError as e:
             raise e
         pos = temp_clause[index]
