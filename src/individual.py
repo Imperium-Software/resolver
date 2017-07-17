@@ -8,8 +8,8 @@ from BitVector import BitVector
 from bitarray import bitarray
 import random
 
-class Individual:
 
+class Individual:
     """ Encapsulates an Individual in the GA. """
 
     BIT_VECTOR = 0
@@ -31,14 +31,14 @@ class Individual:
             self.data = BitVector(size=length)
             self.data = self.data.gen_random_bits(length)
             self.defined = BitVector(size=length)
-            
+
             if defined:
                 self.defined = None
             else:
                 self.defined.reset(0)
 
             if value is not None:
-                self.data = BitVector(bitlist = value)
+                self.data = BitVector(bitlist=value)
 
         elif self.method == Individual.BIT_ARRAY:
             self.defined = bitarray(length)
@@ -144,16 +144,15 @@ class Individual:
 
 
 class Factory:
-
     """ A factory class for creating individuals in bulk. """
 
     @staticmethod
     def create(length, method, amount):
-
         """ Creates an array of individuals. """
 
         array = [Individual(length, method, True) for _ in range(amount)]
         return array,
+
 
 # TESTS
 
