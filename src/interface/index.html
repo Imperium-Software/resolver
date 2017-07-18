@@ -7,62 +7,57 @@
     <link rel="stylesheet" type="text/css" href="css/main.css">
   </head>
   <body>
-    
     <ul id="slide-out" class="side-nav SAT-roayal-blue">
       <li>
-        <div id="side-bar-title" class="white-text">SAT_SOLVER</div>
+        <div id="side-bar-title" class="white-text"><b>SAT</b>Solver</div>
       </li>
-      <li><a class="waves-effect white-text" href="#">>Main</a></li>
-      <li><a class="waves-effect white-text" href="#">>Playground</a></li>
-      <li><a class="waves-effect white-text" href="#">>Settings</a></li>
+      <li><a class="waves-effect white-text" href="#">Home</a></li>
+      <li><a class="waves-effect white-text" href="#">Playground</a></li>
+      <li><a class="waves-effect white-text" href="#">Settings</a></li>
     </ul>
-    
-
-    <nav class="z-depth-0">
-      <div class="nav-wrapper nav-bar-grey">
-        <ul class="left">
-          <li><a  href="index.html">SAT_HOME</a></li>
-          <li class="hide"><a href="#">SAT_GO!</a></li>
-          <li class="hide"><a href="#">SAT_SETTINGS</a></li>
+    <nav>
+      <div class="nav-wrapper nav-bar">
+        <ul class="left" >
+          <li><a href="index.html" data-activates="slide-out" class="button-collapse"><b>SAT</b>Home</a></li>
         </ul>
       </div>
     </nav>
-    <a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a>
+    <!-- <a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a> -->
     
     <ul class="collapsible z-depth-0" data-collapsible="accordion">
       <li class="page-item">
-          <div class="collapsible-header collapsible-header-odd active"><div class="container">>SAT_SETUP</div></div>
+          <div class="collapsible-header collapsible-header-odd active"><div class="container"> Setup</div></div>
           <div class="collapsible-body" align='center'>
             <form class="col s12 body-container">
                 <div class="input-field col s12 SAT-dark-blue">
                   <select id='open-file'>
-                    <option value="" disabled selected>>SOURCE</option>
-                    <option value="1">>File</option>
-                    <option value="2">>Playground</option>
+                    <option value="" disabled selected>Source</option>
+                    <option value="1">> File</option>
+                    <option value="2">> Playground</option>
                   </select>
                 </div>
                 <div class="input-field SAT-dark-blue col s12">
                   <select id='open-file2'>
-                    <option value="" disabled selected>>EVALUATION_FORMULA</option>
-                    <option value="1">>File</option>
-                    <option value="2">>_</option>
+                    <option value="" disabled selected>Evaluation Formula</option>
+                    <option value="1">> File</option>
+                    <option value="2">> _</option>
                   </select>
                 </div>
                 <div class="input-field col s12 SAT-dark-blue">
                   <select >
-                    <option value="" disabled selected>>CROSSOVER_SELECTION</option>
-                    <option value="1">>Corrective_Clause_Crossover</option>
-                    <option value="2">>CCTM</option> <!-- these are not final -->
-                    <option value="3">>F_n_F</option> <!-- these are not final -->
-                    <option value="4">>Uniform_Crossover</option> <!-- these are not final -->
+                    <option value="" disabled selected>Crossover Operator</option>
+                    <option value="1">Corrective Clause</option>
+                    <option value="2">CCTM</option> <!-- these are not final -->
+                    <option value="3">Fleurent and Ferland</option> <!-- these are not final -->
+                    <option value="4">Uniform Crossover</option> <!-- these are not final -->
                   </select>
                 </div>
                 <div>
                   <div class="input-field col s12 SAT-dark-blue">
                     <select multiple>
-                      <option value="" disabled selected>>TABU_SEARCH_SETTING</option>
-                      <option value="1">>RVCF</option>
-                      <option value="2">>Diversification</option> <!-- these are not final -->
+                      <option value="" disabled selected>> TABU_SEARCH_SETTINGS</option>
+                      <option value="1">> RVCF</option>
+                      <option value="2">> Diversification</option> <!-- these are not final -->
                     </select>
                   </div>
                 </div>
@@ -72,11 +67,11 @@
           </div>
         </li>
         <li class="page-item">
-          <div class="collapsible-header"><div class="container">>SAT_Command_Line_Readout</div></div>
+          <div class="collapsible-header"><div class="container">> SAT_Command_Line_Readout</div></div>
           <div class="collapsible-body"><div class="body-container"><textarea class='terminal'>> Solving...</textarea></div></div>
         </li>
         <li class="page-item">
-          <div class="collapsible-header collapsible-header-odd"><div class="container">>Error_Log</div></div>
+          <div class="collapsible-header collapsible-header-odd"><div class="container">> Error_Log</div></div>
           <div class="collapsible-body"><div class="body-container">
             <textarea class='terminal'>> Example</textarea>
             </div>
