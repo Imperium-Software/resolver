@@ -62,61 +62,10 @@ class GA:
             self.formula.append(tuple([item for sublist in clause for item in sublist]))
         self.false_counts = [0 for _ in range(len(self.formula))]
 
-        # The GASAT Algorithm
-        # -------------------------------------------------------------------------------------------------------------
-        # A population of individuals is initialised
-        self.create_population()
+        self.gasat()
 
-        # Counts the current number of iterations completed
-        generation_counter = 0
-
-        # An individual that satisfies the formula or None
-        satisfied_individual = None
-
-        # While no individual in the population satisfies the formula and while we have not reached the maximum
-        # generation threshold
-        while satisfied_individual is None and generation_counter < self.max_generations:
-            # A sub-population of possible parents is selected and two individuals are randomly selected as parents
-            parents = self.select()
-
-            # A child is produced through reproduction - the method of reproduction is determined by the operator
-            # parameter
-            child = None
-            if crossover_operator == 0:
-                child = self.corrective_clause(parents[0], parents[1])
-            elif crossover_operator == 1:
-                child = self.corrective_clause_with_truth_maintenance(parents[0], parents[1])
-            elif crossover_operator == 2:
-                child = self.fluerent_and_ferland(parents[0], parents[1])
-
-            # TODO: Complete Tabu Search
-            if not self.is_rvcf:
-                child = self.standard_tabu(child, self.standard_tabu_choose())
-                if self.is_diversification:
-                    child = self.tabu_with_diversification()
-            else:
-                child = self.standard_tabu(child, self.choose_rvcf())
-
-            # TODO: Insertion Condition of the child
-
-            # Determine whether any individual that satisfies the formula appeared in the current generation
-            satisfied_individual = self.is_satisfied()
-            # Increase the generation
-            generation_counter = generation_counter + 1
-
-        # Return a satisfying assignment if there exists one
-        if satisfied_individual is not None:
-            return satisfied_individual
-        else:
-            # Sort the population by fitness value
-            self.population.sort(key=self.evaluate)
-            # The first individual in the sorted population has the lowest number of unsatisfied clauses - best
-            # assignment found
-            return self.population[0]
-
-        # -------------------------------------------------------------------------------------------------------------
-
-    def sat(self, individual, clause):
+    @staticmethod
+    def sat(individual, clause):
 
         """
         sat (X,c) - by literature
@@ -144,7 +93,8 @@ class GA:
         # Clause is unsatisfiable - no true atoms
         return False
 
-    def sat_crossover(self, individual, clause):
+    @staticmethod
+    def sat_crossover(individual, clause):
 
         """
         sat (X,c) - by literature
@@ -385,9 +335,9 @@ class GA:
 
         """ Helper function for tabu_with_diversification. """
 
-        temp_clause = [C for C in clause if C not in iteration_dict.keys()]
+        temp_clause = [c for c in clause if c not in iteration_dict.keys()]
         try:
-            index = max(temp_clause, key=lambda C: self.improvement(individual, C))[0]
+            index = max(temp_clause, key=lambda c: self.improvement(individual, c))[0]
         except ValueError as e:
             raise e
         pos = temp_clause[index]
@@ -449,7 +399,7 @@ class GA:
 
         return
 
-    def is_satisfied (self):
+    def is_satisfied(self):
         """
         Determines whether or not there is a satisfying assignment.
         :return: An individual (assignment) or None.
@@ -459,105 +409,178 @@ class GA:
                 return individual
         return None
 
-if __name__ == "__main__":
-    # TESTS
-    num_fail = 0
-    print("Testing SAT instance : f1000")
-    test_individual = GA("../examples/f1000.cnf")
-    if len(test_individual.formula) == test_individual.numberOfClauses:
-        print("    len(formula) == numberOfClauses => pass")
-    else:
-        print("    len(formula) == numberOfClauses => fail")
-        num_fail += 1
-    if test_individual.formula[0] == (119, 325, -401):
-        print("    formula[0] == (119, 325, -401) => pass")
-    else:
-        print("    formula[0] == (119, 325, -401) => fail")
-        num_fail += 1
-    if test_individual.formula[-1] == (-839, -494, 718):
-        print("    formula[-1] == (-839, -494, 718) => pass")
-    else:
-        print("    formula[-1] == (-839, -494, 718) => fail")
-        num_fail += 1
+    def replace(self, child):
+        """
+        Replace the weakest individual in the sub-population (most number of unsatisfied clauses) with the newborn
+        child. If the child is worse than the weakest individual, then no replacement is done.
+        :return: void (NONE)
+        """
 
-    print()
-    print("Testing SAT instance : f2000")
-    test_individual = GA("../examples/f2000.cnf")
-    if len(test_individual.formula) == test_individual.numberOfClauses:
-        print("    len(formula) == numberOfClauses => pass")
-    else:
-        print("    len(formula) == numberOfClauses => fail")
-        num_fail += 1
-    if test_individual.formula[0] == (1295, 1303, -1372):
-        print("    formula[0] == (1295, 1303, -1372) => pass")
-    else:
-        print("    formula[0] == (1295, 1303, -1372) => fail")
-        num_fail += 1
-    if test_individual.formula[-1] == (1952, -450, 952):
-        print("    formula[-1] == (1952, -450, 952) => pass")
-    else:
-        print("    formula[-1] == (1952, -450, 952) => fail")
-        num_fail += 1
+        weakest_individual = max(self.sub_population, key=self.evaluate)
+        if not self.evaluate(weakest_individual) < self.evaluate(child):
+            self.population.remove(weakest_individual)
+            self.population.append(child)
 
-    print()
-    print("Testing SAT instance : par16-4-c")
-    test_individual = GA("../examples/par16-4-c.cnf")
-    if len(test_individual.formula) == test_individual.numberOfClauses:
-        print("    len(formula) == numberOfClauses => pass")
-    else:
-        print("    len(formula) == numberOfClauses => fail")
-        num_fail += 1
-    if test_individual.formula[0] == (-2, 1):
-        print("    formula[0] == (-2, 1) => pass")
-    else:
-        print("    formula[0] == (-2, 1) => fail")
-        num_fail += 1
-    if test_individual.formula[-1] == (132, 324, -140):
-        print("    formula[-1] == (132, 324, -140) => pass")
-    else:
-        print("    formula[-1] == (132, 324, -140) => fail")
-        num_fail += 1
+        return
 
-    print()
-    print("Testing SAT instance : par32-5")
-    test_individual = GA("../examples/par32-5.cnf")
-    if len(test_individual.formula) == test_individual.numberOfClauses:
-        print("    len(formula) == numberOfClauses => pass")
-    else:
-        print("    len(formula) == numberOfClauses => fail")
-        num_fail += 1
-    if test_individual.formula[0] == (-1,):
-        print("    formula[0] == (-1,) => pass")
-    else:
-        print("    formula[0] == (-1,) => fail")
-        num_fail += 1
-    if test_individual.formula[-1] == (-3176,):
-        print("    formula[-1] == (-3176,) => pass")
-    else:
-        print("    formula[-1] == (-3176,) => fail")
-        num_fail += 1
+    def gasat(self):
+        # The GASAT Algorithm
+        # -------------------------------------------------------------------------------------------------------------
+        # A population of individuals is initialised
+        self.create_population()
 
-    print()
-    print("Testing SAT instance : par32-5-c")
-    test_individual = GA("../examples/par32-5-c.cnf")
-    if len(test_individual.formula) == test_individual.numberOfClauses:
-        print("    len(formula) == numberOfClauses => pass")
-    else:
-        print("    len(formula) == numberOfClauses => fail")
-        num_fail += 1
-    if test_individual.formula[0] == (-2, 1):
-        print("    formula[0] == (-2, 1) => pass")
-    else:
-        print("    formula[0] == (-2, 1) => fail")
-        num_fail += 1
-    if test_individual.formula[-1] == (450, -408, 1339):
-        print("    formula[-1] == (450, -408, 1339) => pass")
-    else:
-        print("    formula[-1] == (450, -408, 1339) => fail")
-        num_fail += 1
+        # Counts the current number of iterations completed
+        generation_counter = 0
 
-    print("----------------------")
-    if num_fail == 0:
-        print("Passed all tests.")
-    else:
-        print(str(num_fail) + " tests failed.")
+        # An individual that satisfies the formula or None
+        satisfied_individual = None
+
+        # While no individual in the population satisfies the formula and while we have not reached the maximum
+        # generation threshold
+        while satisfied_individual is None and generation_counter < self.max_generations:
+            # A sub-population of possible parents is selected and two individuals are randomly selected as parents
+            parents = self.select()
+
+            # A child is produced through reproduction - the method of reproduction is determined by the operator
+            # parameter
+            child = None
+            if self.crossover_operator == 0:
+                child = self.corrective_clause(parents[0], parents[1])
+            elif self.crossover_operator == 1:
+                child = self.corrective_clause_with_truth_maintenance(parents[0], parents[1])
+            elif self.crossover_operator == 2:
+                child = self.fluerent_and_ferland(parents[0], parents[1])
+
+            # TODO: Complete Tabu Search
+            if not self.is_rvcf:
+                child = self.standard_tabu(child, self.standard_tabu_choose)
+                if self.is_diversification:
+                    child = self.tabu_with_diversification()
+            else:
+                child = self.standard_tabu(child, self.choose_rvcf)
+                if self.is_diversification:
+                    child = self.tabu_with_diversification()
+
+            # TODO: Insertion Condition of the child
+            self.replace(child)
+
+            # Determine whether any individual that satisfies the formula appeared in the current generation
+            satisfied_individual = self.is_satisfied()
+            # Increase the generation
+            generation_counter = generation_counter + 1
+
+        # Return a satisfying assignment if there exists one
+        if satisfied_individual is not None:
+            return satisfied_individual
+        else:
+            # Sort the population by fitness value
+            self.population.sort(key=self.evaluate)
+            # The first individual in the sorted population has the lowest number of unsatisfied clauses - best
+            # assignment found
+            return self.population[0]
+
+        # -------------------------------------------------------------------------------------------------------------
+
+# Old Tests
+# if __name__ == "__main__":
+#     # TESTS
+#     num_fail = 0
+#     print("Testing SAT instance : f1000")
+#     test_individual = GA("../examples/f1000.cnf")
+#     if len(test_individual.formula) == test_individual.numberOfClauses:
+#         print("    len(formula) == numberOfClauses => pass")
+#     else:
+#         print("    len(formula) == numberOfClauses => fail")
+#         num_fail += 1
+#     if test_individual.formula[0] == (119, 325, -401):
+#         print("    formula[0] == (119, 325, -401) => pass")
+#     else:
+#         print("    formula[0] == (119, 325, -401) => fail")
+#         num_fail += 1
+#     if test_individual.formula[-1] == (-839, -494, 718):
+#         print("    formula[-1] == (-839, -494, 718) => pass")
+#     else:
+#         print("    formula[-1] == (-839, -494, 718) => fail")
+#         num_fail += 1
+#
+#     print()
+#     print("Testing SAT instance : f2000")
+#     test_individual = GA("../examples/f2000.cnf")
+#     if len(test_individual.formula) == test_individual.numberOfClauses:
+#         print("    len(formula) == numberOfClauses => pass")
+#     else:
+#         print("    len(formula) == numberOfClauses => fail")
+#         num_fail += 1
+#     if test_individual.formula[0] == (1295, 1303, -1372):
+#         print("    formula[0] == (1295, 1303, -1372) => pass")
+#     else:
+#         print("    formula[0] == (1295, 1303, -1372) => fail")
+#         num_fail += 1
+#     if test_individual.formula[-1] == (1952, -450, 952):
+#         print("    formula[-1] == (1952, -450, 952) => pass")
+#     else:
+#         print("    formula[-1] == (1952, -450, 952) => fail")
+#         num_fail += 1
+#
+#     print()
+#     print("Testing SAT instance : par16-4-c")
+#     test_individual = GA("../examples/par16-4-c.cnf")
+#     if len(test_individual.formula) == test_individual.numberOfClauses:
+#         print("    len(formula) == numberOfClauses => pass")
+#     else:
+#         print("    len(formula) == numberOfClauses => fail")
+#         num_fail += 1
+#     if test_individual.formula[0] == (-2, 1):
+#         print("    formula[0] == (-2, 1) => pass")
+#     else:
+#         print("    formula[0] == (-2, 1) => fail")
+#         num_fail += 1
+#     if test_individual.formula[-1] == (132, 324, -140):
+#         print("    formula[-1] == (132, 324, -140) => pass")
+#     else:
+#         print("    formula[-1] == (132, 324, -140) => fail")
+#         num_fail += 1
+#
+#     print()
+#     print("Testing SAT instance : par32-5")
+#     test_individual = GA("../examples/par32-5.cnf")
+#     if len(test_individual.formula) == test_individual.numberOfClauses:
+#         print("    len(formula) == numberOfClauses => pass")
+#     else:
+#         print("    len(formula) == numberOfClauses => fail")
+#         num_fail += 1
+#     if test_individual.formula[0] == (-1,):
+#         print("    formula[0] == (-1,) => pass")
+#     else:
+#         print("    formula[0] == (-1,) => fail")
+#         num_fail += 1
+#     if test_individual.formula[-1] == (-3176,):
+#         print("    formula[-1] == (-3176,) => pass")
+#     else:
+#         print("    formula[-1] == (-3176,) => fail")
+#         num_fail += 1
+#
+#     print()
+#     print("Testing SAT instance : par32-5-c")
+#     test_individual = GA("../examples/par32-5-c.cnf")
+#     if len(test_individual.formula) == test_individual.numberOfClauses:
+#         print("    len(formula) == numberOfClauses => pass")
+#     else:
+#         print("    len(formula) == numberOfClauses => fail")
+#         num_fail += 1
+#     if test_individual.formula[0] == (-2, 1):
+#         print("    formula[0] == (-2, 1) => pass")
+#     else:
+#         print("    formula[0] == (-2, 1) => fail")
+#         num_fail += 1
+#     if test_individual.formula[-1] == (450, -408, 1339):
+#         print("    formula[-1] == (450, -408, 1339) => pass")
+#     else:
+#         print("    formula[-1] == (450, -408, 1339) => fail")
+#         num_fail += 1
+#
+#     print("----------------------")
+#     if num_fail == 0:
+#         print("Passed all tests.")
+#     else:
+#         print(str(num_fail) + " tests failed.")
