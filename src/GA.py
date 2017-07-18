@@ -418,7 +418,7 @@ class GA:
         """
 
         weakest_individual = max(self.sub_population, key=self.evaluate)
-        if not self.evaluate(weakest_individual) < self.evaluate(child):
+        if not self.evaluate(weakest_individual) > self.evaluate(child):
             self.population.remove(weakest_individual)
             self.population.append(child)
 
