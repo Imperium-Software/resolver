@@ -176,7 +176,7 @@ class GA:
     def corrective_clause(self, x, y):
 
         """
-            Some docstring
+            Performs the corrective clause cross-over operator on parents x and y.
         """
 
         z = Individual(self.numberOfVariables, self.method, False)
