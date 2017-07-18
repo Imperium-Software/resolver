@@ -1,6 +1,6 @@
 """
     Module: GA
-    Description: Defines the genetic algorithm and all the core functionality of it, including crossover and tabu search
+    Description: Defines the genetic algorithm and all the core functionality of it, including crossover and Tabu search
 """
 
 from individual import Individual
@@ -66,7 +66,6 @@ class GA:
 
     @staticmethod
     def sat(individual, clause):
-
         """
         sat (X,c) - by literature
         Indicates whether the clause c is true or false for the individual X i.e. satisfied or not by the assignment
@@ -95,12 +94,11 @@ class GA:
 
     @staticmethod
     def sat_crossover(individual, clause):
-
         """
         sat (X,c) - by literature
         Indicates whether the clause c is true or false for the individual X i.e. satisfied or not by the assignment
         corresponding to X - Particular to crossovers as it takes into account whether there are undefined variables
-    used in the clause - if so, the clause is not satisfied.
+        used in the clause - if so, the clause is not satisfied.
         :param individual: Individual class (Implemented by Regan) representing a particular assignment of truth values
         to variables.
         :param clause: Python tuple of integers - should be the same tuple as in the DIMACS format.
@@ -130,7 +128,6 @@ class GA:
         return False
 
     def evaluate(self, individual):
-
         """
         The fitness of individual with respect to the formula.
         :param individual: Individual class (Implemented by Regan) representing a particular assignment of truth values
@@ -151,7 +148,6 @@ class GA:
         return num_unsatisfied_clauses
 
     def improvement(self, individual, index):
-
         """
         The function computes the improvement (difference in unsatisfiable clauses) obtained by the flip of the ith
         variable of the individual.
@@ -174,9 +170,12 @@ class GA:
         return original_individual_fitness - self.evaluate(new_individual)
 
     def corrective_clause(self, x, y):
-
         """
-            Performs the corrective clause cross-over operator on parents x and y.
+        Performs the corrective clause cross-over.
+
+        :param x: The first parent parameter.
+        :param y: The second parent parameter.
+        :return: The generated individual z
         """
 
         z = Individual(self.numberOfVariables, self.method, False)
@@ -196,9 +195,12 @@ class GA:
         return z
 
     def corrective_clause_with_truth_maintenance(self, x, y):
-
         """
-            See page 9 of the paper
+        Performs the CCTM cross-over operator.
+
+        :param x: The first parent parameter.
+        :param y: The second parent parameter.
+        :return: The generated individual z
         """
 
         z = Individual(self.numberOfVariables, self.method, False)
@@ -236,9 +238,8 @@ class GA:
         return z
 
     def standard_tabu_choose(self, assignment):
-
         """
-        Choose function for the tabu search. The best move (flips of value of an assignment) is chosen i.e. 
+        Choose function for the Tabu search. The best move (flips of value of an assignment) is chosen i.e.
         it is the best gain in flip and if it is not a tabu configuration.
         :param assignment: A particular individual (assignment of atoms).
         :return: A position (index) in the assignment due to which maximum gain is obtained.
@@ -277,8 +278,13 @@ class GA:
         return random.choice(positions)    
     
     def standard_tabu(self, individual_in, choose_function):
+        """
+        Performs the standard Tabu algorithm.
 
-        """ Performs the tabu search algorithm. """
+        :param individual_in: An individual
+        :param choose_function: A function object
+        :return: An individual that conforms to the Tabu restrictions.
+        """
 
         self.tabu = self.tabu[:self.tabu_list_length]
         self.best = individual_in
@@ -296,6 +302,12 @@ class GA:
         return self.best
 
     def choose_rvcf(self, individual_in):
+        """
+
+        :param individual_in:
+        :return:
+        """
+
         improvements = [self.improvement(individual_in, i) for i in range(1, individual_in.length + 1)]
         improvements = [(i, improvements.index(i) + 1) for i in max(improvements)]
         if len(improvements) == 1:
@@ -304,6 +316,14 @@ class GA:
         return random.choice(weights)
 
     def weight(self, individual, index):
+        """
+        Calculates
+
+        :param individual:
+        :param index:
+        :return:
+        """
+
         c_ones = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 1)]
         c_zeros = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 0)]
 
@@ -312,12 +332,27 @@ class GA:
 
     @staticmethod
     def degree(individual, clause):
+        """
+        Calculates the degree of
+
+        :param individual:
+        :param clause:
+        :return:
+        """
+
         l = [literal for literal in clause if individual.get(literal) == 1]
         return len(l)
 
     def tabu_with_diversification(self, individual, threshhold, recurse_count, max_false=5):
+        """
+        Performs Tabu Search with measures to avoid "stumble clauses".
 
-        """ Tabu search with augmentations to prevent convergence on local maxima. """
+        :param individual:
+        :param threshhold:
+        :param recurse_count:
+        :param max_false:
+        :return:
+        """
 
         false_clauses = [self.formula[i] for i in range(len(self.formula)) if self.false_counts[i] >= max_false]
         individual_temp = copy.deepcopy(individual)
@@ -332,8 +367,14 @@ class GA:
         return individual_temp
 
     def check_flip(self, individual, clause, iteration_dict, k):
+        """
 
-        """ Helper function for tabu_with_diversification. """
+        :param individual:
+        :param clause: The clause
+        :param iteration_dict:
+        :param k:
+        :return: Whether
+        """
 
         temp_clause = [c for c in clause if c not in iteration_dict.keys()]
         try:
@@ -358,8 +399,13 @@ class GA:
             individual.flip(pos)
 
     def fluerent_and_ferland(self, x, y):
+        """
+        Performs the Fluerent & Ferland cross-over operator.
 
-        """ Performs the Fluerent & Ferland crossover operator. """
+        :param x: The first parent parameter.
+        :param y: The second parent parameter.
+        :return: The generated individual z.
+        """
 
         z = Individual(self.numberOfVariables, self.method, False)
         for clause in self.formula:
@@ -375,7 +421,10 @@ class GA:
         return z
 
     def select(self):
-        """ Selects number_of_individuals from a population. """
+        """
+        Selects two parents from a sub-population.
+        :return: Two individuals child_x and child_y
+        """
 
         self.population.sort(key=self.evaluate)
         self.sub_population = self.population[0:self.sub_population_size]
@@ -424,6 +473,11 @@ class GA:
         return
 
     def gasat(self):
+        """
+        The GASAT algorithm
+        :return:
+        """
+
         # The GASAT Algorithm
         # -------------------------------------------------------------------------------------------------------------
         # A population of individuals is initialised
