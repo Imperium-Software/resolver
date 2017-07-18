@@ -348,15 +348,17 @@ class GA:
     def choose_rvcf(self, individual_in):
         improvements = [self.improvement(individual_in, i) for i in range(1, individual_in.length + 1)]
         improvements = [(i, improvements.index(i) + 1) for i in max(improvements)]
+        if len(improvements) == 1:
+            return improvements[0][1]
         weights = [self.weight(individual_in, j) for j in improvements]
         return random.choice(weights)
 
     def weight(self, individual, index):
         c_ones = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 1)]
-        c_twoes = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 0)]
+        c_zeros = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 0)]
 
         return sum(self.degree(individual, c) for c in c_ones) / len(c_ones) + sum(self.degree(individual, c)
-                                                                                   for c in c_twoes) / len(c_twoes)
+                                                                                   for c in c_zeros) / len(c_zeros)
 
     @staticmethod
     def degree(individual, clause):
