@@ -10,8 +10,9 @@ import copy
 
 
 class GA:
-    def __init__(self, filename, max_generations, population_size, sub_population_size, crossover_operator,
-                 tabu_list_length, max_flip, is_rvcf, is_diversification, max_false, rec, k, method=None):
+    def __init__(self, filename, tabu_list_length, max_false, rec, k, max_generations=1000, population_size=100,
+                 sub_population_size=15, crossover_operator=0, max_flip=10000, is_rvcf=True,
+                 is_diversification=True, method=None):
 
         f = open(filename, "r")
         # Read all the lines from the file that aren't comments
@@ -315,23 +316,23 @@ class GA:
         l = [literal for literal in clause if individual.get(literal) == 1]
         return len(l)
 
-    def tabu_with_diversification(self, individual, threshhold, recurse_count, max_false=5):
+    def tabu_with_diversification(self, individual):
 
         """ Tabu search with augmentations to prevent convergence on local maxima. """
 
-        false_clauses = [self.formula[i] for i in range(len(self.formula)) if self.false_counts[i] >= max_false]
+        false_clauses = [self.formula[i] for i in range(len(self.formula)) if self.false_counts[i] >= self.max_false]
         individual_temp = copy.deepcopy(individual)
         forbidden_flips = {}
         for clause in false_clauses:
-            self.check_flip(individual_temp, clause, forbidden_flips, threshhold)
-            for _ in range(recurse_count):
+            self.check_flip(individual_temp, clause, forbidden_flips)
+            for _ in range(self.rec):
                 non_false_clauses = [self.formula[i] for i in range(len(self.formula))
                                      if self.sat(individual_temp, clause) and not self.sat(individual, clause)]
                 for nested_clause in non_false_clauses:
-                    self.check_flip(individual_temp, nested_clause, forbidden_flips, threshhold)
+                    self.check_flip(individual_temp, nested_clause, forbidden_flips)
         return individual_temp
 
-    def check_flip(self, individual, clause, iteration_dict, k):
+    def check_flip(self, individual, clause, iteration_dict):
 
         """ Helper function for tabu_with_diversification. """
 
@@ -347,7 +348,7 @@ class GA:
         if pos in iteration_dict.keys():
             # Check if pos has been flipped k times and remove it if it has
             # or increment it if it hasn't
-            if iteration_dict[pos] < k:
+            if iteration_dict[pos] < self.k:
                 iteration_dict[pos] = iteration_dict[pos] + 1
                 individual.flip(pos)
             else:
@@ -455,11 +456,11 @@ class GA:
             if not self.is_rvcf:
                 child = self.standard_tabu(child, self.standard_tabu_choose)
                 if self.is_diversification:
-                    child = self.tabu_with_diversification()
+                    child = self.tabu_with_diversification(child)
             else:
                 child = self.standard_tabu(child, self.choose_rvcf)
                 if self.is_diversification:
-                    child = self.tabu_with_diversification()
+                    child = self.tabu_with_diversification(child)
 
             # TODO: Insertion Condition of the child
             self.replace(child)
