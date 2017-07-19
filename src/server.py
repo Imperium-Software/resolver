@@ -147,7 +147,7 @@ class SATServer(Thread):
             self.lock.acquire()
         try:
             index = 0
-            while (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
+            while (self.threads[index] is not None) and (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
                 index += 1
             if (index < len(self.threads)) and (self.threads[index]):
                 self.threads[index].send_to_client(msg)
@@ -181,7 +181,7 @@ class SATServer(Thread):
             self.lock.acquire()
         try:
             index = 0
-            while (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
+            while (self.threads[index] is not None) and (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
                 index += 1
             if (index < len(self.threads)) and (self.threads[index]):
                 self.threads[index] = None
@@ -193,9 +193,10 @@ class SATServer(Thread):
         Terminates server operation.
         """
 
-        self.socket.close()
         for i in range(0, len(self.threads)-1):
-            self.threads[i].kill()
+            if self.threads[i] is not None:
+                self.threads[i].kill()
+        self.socket.close()
         print("Server closed.")
 
 
