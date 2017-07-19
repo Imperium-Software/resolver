@@ -1,4 +1,7 @@
 from unittest import TestCase
+
+import time
+
 from server import SATServer
 from threading import Thread
 import socket
@@ -8,6 +11,8 @@ import sys
 class TestSATServer(TestCase):
 
     def test_push_to_all(self):
+        # Test Message
+        msg = "Test Message#"
 
         # Server with two clients connected
         server_thread = SATServer("localhost", 55555)
@@ -18,17 +23,29 @@ class TestSATServer(TestCase):
         client2.start()
         while len(server_thread.threads) < 2:
             pass
-        msg = "Test Message#"
         server_thread.push_to_all(msg)
         client1_response = None
         while client1_response is None:
             client1_response = client1.received
-        client2_response = client2.received
+        client2_response = None
+        while client2_response is None:
+            client2_response = client2.received
         self.assertEqual(msg, client1_response, "Client one did not receive the correct message.")
         self.assertEqual(msg, client2_response, "Client two did not receive the correct message.")
 
         # Clients disconnected test send message
         server_thread.push_to_all(msg)
+
+        # New client connects
+        client3 = TesterClient()
+        client3.start()
+        while len(server_thread.threads) < 1:
+            pass
+        server_thread.push_to_all(msg)
+        client3_response = None
+        while client3_response is None:
+            client3_response = client3.received
+        self.assertEqual(msg, client3_response, "Client three did not receive the correct message.")
 
         server_thread.close()
 

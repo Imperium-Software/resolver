@@ -22,6 +22,7 @@ class ClientThread(Thread):
         self.thread_id = thread_id
         self.read_thread = None
         self.server_thread = server_thread
+        self.peer_name = conn.getpeername()
 
     def run(self):
         """
@@ -62,8 +63,8 @@ class ClientThread(Thread):
         Closes the connection with client.
         """
 
-        print(BColors.FAIL + '[-]' + BColors.ENDC + ' Client disconnected: ' + '{0}'.format(self.conn.getpeername()[0])
-              + ':{0}'.format(self.conn.getpeername()[1]))
+        print(BColors.FAIL + '[-]' + BColors.ENDC + ' Client disconnected: ' + '{0}'.format(self.peer_name[0])
+              + ':{0}'.format(self.peer_name[1]))
         self.server_thread.remove_thread(self.thread_id)
         self.conn.close()
 
@@ -147,7 +148,7 @@ class SATServer(Thread):
             self.lock.acquire()
         try:
             index = 0
-            while (self.threads[index] is not None) and (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
+            while (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
                 index += 1
             if (index < len(self.threads)) and (self.threads[index]):
                 self.threads[index].send_to_client(msg)
@@ -181,10 +182,10 @@ class SATServer(Thread):
             self.lock.acquire()
         try:
             index = 0
-            while (self.threads[index] is not None) and (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
+            while (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
                 index += 1
             if (index < len(self.threads)) and (self.threads[index]):
-                self.threads[index] = None
+                self.threads.remove(self.threads[index])
         finally:
             self.lock.release()
 
