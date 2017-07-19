@@ -11,6 +11,8 @@
   "dependencies": {
     "hammerjs": "^2.0.8",
     "jquery": "^3.2.1",
-    "jquery-circle-progress": "^1.2.2"
+    "jquery-circle-progress": "^1.2.2",
+    "mathjax": "^2.7.1",
+    "mathjax-electron": "^2.0.1"
   }
 }

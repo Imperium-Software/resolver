@@ -40,7 +40,7 @@
 
 
 .terminal {
-	background-color: #111;
+	background-color: var(--theme-one);
 	color : white;
 	border-style: none;
   	border-color: Transparent;
@@ -140,4 +140,9 @@ button {
 
 body:not(.loaded) {
   display:none;
+}
+
+#dimacs-example {
+	background-color: var(--theme-one)
+	color: white;
 }
