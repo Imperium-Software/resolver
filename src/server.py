@@ -4,10 +4,9 @@
                  operation are possible.
 """
 import socket
-import sys
-import time  # TODO Remove this when testing is moved to the testing framework.
 from threading import Thread
 from threading import Lock
+from ServerDSLInterpreter import decode
 
 
 class ClientThread(Thread):
@@ -63,10 +62,10 @@ class ClientThread(Thread):
         Closes the connection with client.
         """
 
+        self.conn.close()
         print(BColors.FAIL + '[-]' + BColors.ENDC + ' Client disconnected: ' + '{0}'.format(self.peer_name[0])
               + ':{0}'.format(self.peer_name[1]))
         self.server_thread.remove_thread(self.thread_id)
-        self.conn.close()
 
 
 class BColors:
@@ -88,7 +87,7 @@ class SATServer(Thread):
     single client. Clients can also send requests which will then be passed to a higher module.
     """
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, message_decoder=decode):
         super(SATServer, self).__init__()
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -97,11 +96,12 @@ class SATServer(Thread):
             self.socket.listen(5)
             print("Server listening on port: " + str(port))
         except socket.error:
-            print('Failed to create socket')
-            sys.exit()
+            print('Address already in use.')
+            return
         self.thread_id_iter = 1
         self.lock = Lock()
         self.threads = []
+        self.message_decoder = message_decoder
 
     def run(self):
         """
@@ -112,8 +112,7 @@ class SATServer(Thread):
         try:
             while True:
                 client_connection, address = self.socket.accept()
-                while not self.lock.acquire():
-                    self.lock.acquire()
+                self.lock.acquire()
                 try:
                     new_thread = ClientThread(client_connection, self.thread_id_iter, self)
                     self.thread_id_iter += 1
@@ -144,11 +143,10 @@ class SATServer(Thread):
         :param msg: The data that will be sent to the client.
         """
 
-        while not self.lock.acquire():
-            self.lock.acquire()
+        self.lock.acquire()
         try:
             index = 0
-            while (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
+            while (index < len(self.threads)) and (self.threads[index].thread_id != thread_id):
                 index += 1
             if (index < len(self.threads)) and (self.threads[index]):
                 self.threads[index].send_to_client(msg)
@@ -158,11 +156,11 @@ class SATServer(Thread):
     def process_message_from_client(self, msg):
         """
         Passes a message to the DSL interpreter(or whatever the correct term for it is) to be interpreted.
-        :param msg: A data sent by a client.
+        :param msg: Data sent by a client.
         """
 
-        # TODO When DSL interpreter is done this function should call it.
-        print("From 'process_message_from_client': " + msg)
+        print(BColors.OKBLUE + "> " + BColors.ENDC + "Processing message from client")
+        self.message_decoder(msg)
 
     def get_port(self):
         """
@@ -178,8 +176,8 @@ class SATServer(Thread):
         :param thread_id: The ID of the thread that needs to be removed.
         """
 
-        while not self.lock.acquire():
-            self.lock.acquire()
+        self.lock.acquire()
+
         try:
             index = 0
             while (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
@@ -194,31 +192,7 @@ class SATServer(Thread):
         Terminates server operation.
         """
 
-        for i in range(0, len(self.threads)-1):
-            if self.threads[i] is not None:
-                self.threads[i].kill()
+        while len(self.threads) > 0:
+            self.threads[0].kill()
         self.socket.close()
         print("Server closed.")
-
-
-# Stand-alone server code, for testing purposes:
-def main():
-
-    """ Main function for module SATServer """
-    server_thread = SATServer("localhost", 55555)
-    server_thread.start()
-    sent = False
-    while not sent:
-        if len(server_thread.threads) == 2 and not sent:
-            server_thread.push_to_all("Hello you two!")
-            server_thread.push_to_one(1, "Hello number 1")
-            server_thread.push_to_one(2, "Hello number 2")
-            sent = True
-            time.sleep(2)
-            server_thread.threads[1].kill()
-            time.sleep(2)
-            server_thread.push_to_all("Hello you two!")
-            server_thread.close()
-
-if __name__ == "__main__":
-    main()
