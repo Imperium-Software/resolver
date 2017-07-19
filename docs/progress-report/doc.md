@@ -4,4 +4,4 @@
 
 ### Code
 
-### Team Organisation
+### Team Organization
