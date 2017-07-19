@@ -9,8 +9,6 @@
   }  
 
 
-
-
 /*THEME */
 
 /*:root {
@@ -117,4 +115,29 @@
 
 .select-dropdown li:not(.disabled):hover, .select-dropdown li.active.selected {
 	background-color: #0076fd;
+}
+
+button {
+	background-color: var(--theme-four) !important;
+}
+
+.btn {
+    text-transform: none;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--theme-four);
+}
+
+.nav {
+	position: fixed;
+}
+
+body:not(.loaded) {
+  display:none;
 }
