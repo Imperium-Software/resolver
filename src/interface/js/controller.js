@@ -1,4 +1,5 @@
 let net = require('net');
+let fs = require('fs');
 const {dialog} = require('electron').remote;
 
 let HOST = 'rainmaker.wunderground.com';
@@ -132,3 +133,16 @@ $(document).ready(function() {
   }).on('circle-animation-progress', function(event, progress) {
     $(this).find('strong').html(Math.round(100 * progress) + '<i>%</i>');
   });
+
+function navigate(filename) {
+  fs.readFile(filename, 'utf8', (err, data) => {
+    document.getElementById('base').innerHTML = data;
+    document.body.classList.add('loaded')
+    $(".button-collapse").sideNav();
+    $('select').material_select();
+    $('.collapsible').collapsible({
+      accordion : true
+    });
+    render();
+  })
+}

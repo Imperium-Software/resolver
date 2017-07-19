@@ -10,7 +10,7 @@ function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({width: 800, height: 600, 
                             backgroundColor: '#f0f3f4', 
-                            show:false})
+                            })
 
   // and load the index.html of the app.
   win.loadURL(url.format({

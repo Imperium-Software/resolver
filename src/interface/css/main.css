@@ -137,10 +137,10 @@ button {
 .nav {
 	position: fixed;
 }
-
+/*
 body:not(.loaded) {
   display:none;
-}
+}*/
 
 #dimacs-example {
 	background-color: var(--theme-one)
