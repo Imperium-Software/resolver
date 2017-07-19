@@ -62,10 +62,10 @@ class ClientThread(Thread):
         Closes the connection with client.
         """
 
-        self.conn.close()
         print(BColors.FAIL + '[-]' + BColors.ENDC + ' Client disconnected: ' + '{0}'.format(self.peer_name[0])
               + ':{0}'.format(self.peer_name[1]))
         self.server_thread.remove_thread(self.thread_id)
+        self.conn.close()
 
 
 class BColors:
@@ -180,7 +180,7 @@ class SATServer(Thread):
 
         try:
             index = 0
-            while (self.threads[index].thread_id != thread_id) and (index < len(self.threads)):
+            while (index < len(self.threads)) and (self.threads[index].thread_id != thread_id):
                 index += 1
             if (index < len(self.threads)) and (self.threads[index]):
                 self.threads.remove(self.threads[index])

@@ -81,14 +81,14 @@ class TestSATServer(TestCase):
         client2.start()
         while len(server_thread.threads) < 2:
             pass
-        server_thread.push_to_one(1, msg1)
-        client1_response = None
-        while client1_response is None:
-            client1_response = client1.received
         server_thread.push_to_one(2, msg2)
         client2_response = None
         while client2_response is None:
             client2_response = client2.received
+        server_thread.push_to_one(1, msg1)
+        client1_response = None
+        while client1_response is None:
+            client1_response = client1.received
         self.assertEqual(msg1, client1_response, "Client one did not receive the correct message.")
         self.assertEqual(msg2, client2_response, "Client two did not receive the correct message.")
 
