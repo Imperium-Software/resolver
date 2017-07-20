@@ -128,7 +128,7 @@ class SATServer(Thread):
     def push_to_all(self, msg):
         """
         Broadcasts a message to all connected clients.
-        :param msg: The data that will be broadcasted.
+        :param msg: The data that will be broadcast.
         """
 
         for thread in self.threads:

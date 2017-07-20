@@ -125,6 +125,7 @@ class TestSATServer(TestCase):
     def test_address_in_use_exception(self):
         server_thread = SATServer("localhost", 55555)
         server_thread.start()
+        # noinspection PyUnusedLocal
         another_server_thread = SATServer("localhost", 55555)
         server_thread.close()
 
