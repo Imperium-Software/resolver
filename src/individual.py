@@ -104,7 +104,7 @@ class Individual:
         elif self.method == Individual.BIT_ARRAY:
             self.data[b] = not self.data[b]
 
-    def set_defined(self, b, v):
+    def set_defined(self, b):
 
         """ Sets a certain bit b as defined. """
 
@@ -113,9 +113,9 @@ class Individual:
             return
 
         if self.method == Individual.BIT_VECTOR:
-            self.defined[b] = v
+            self.defined[b] = 1
         elif self.method == Individual.BIT_ARRAY:
-            self.defined[b] = bool(v)
+            self.defined[b] = not self.data[b]
 
     def get_defined(self, b):
 
@@ -134,6 +134,8 @@ class Individual:
 
         """ Allocates uniformly from either first or second parent. """
 
+        for i in range(1, self.length+1):
+            self.set_defined(i)
         for i in range(self.length):
             if not self.get_defined(i):
                 if bool(random.getrandbits(1)):
@@ -151,92 +153,4 @@ class Factory:
         """ Creates an array of individuals. """
 
         array = [Individual(length, method, True) for _ in range(amount)]
-        return array,
-
-
-# TESTS
-
-if __name__ == "__main__":
-    ind = Individual(9, Individual.BIT_VECTOR)
-    num_fail = 0
-    print()
-    for x in range(2):
-        if x == 0:
-            print("Testing implementation : BitVector")
-            ind.data = BitVector(bitlist=[0, 1, 1, 0, 1, 0, 1, 0, 0])
-            ind.method = Individual.BIT_VECTOR
-        else:
-            print("Testing implementation : bitarray")
-            ind.data = bitarray("011010100")
-            ind.method = Individual.BIT_ARRAY
-        print("With data: " + str(ind))
-        print("  Testing get")
-
-        if ind.get(5) == 1:
-            print("    get(5) == 1 => pass")
-        else:
-            print("    get(5) == 1 => fail")
-            num_fail += 1
-
-        if ind.get(8) == 0:
-            print("    get(8) == 0 => pass")
-        else:
-            print("    get(8) == 0 => fail")
-            num_fail += 1
-
-        if ind.get(10) is None:
-            print("    get(10) == None => pass")
-        else:
-            print("    get(10) == None => fail")
-            num_fail += 1
-        print()
-        print("  Testing set")
-        ind.set(2, 1)
-        if ind.get(2) == 1:
-            print("    set(2,1) => pass")
-        else:
-            print("    set(2,1) => fail")
-            num_fail += 1
-
-        ind.set(7, 0)
-        if ind.get(7) == 0:
-            print("    set(7,0) => pass")
-        else:
-            print("    set(7,0) => fail")
-            num_fail += 1
-
-        ind.set(6, 1)
-        if ind.get(6) == 1:
-            print("    set(6,1) => pass")
-        else:
-            print("    set(6,1) => fail")
-            num_fail += 1
-
-        print()
-        print("  Testing flip")
-        ind.flip(1)
-        if ind.get(1) == 1:
-            print("    flip(1) => pass")
-        else:
-            print("    flip(1) => fail")
-            num_fail += 1
-
-        ind.flip(8)
-        if ind.get(8) == 1:
-            print("    flip(8) => pass")
-        else:
-            print("    flip(8) => fail")
-            num_fail += 1
-
-        ind.flip(4)
-        if ind.get(4) == 1:
-            print("    flip(4) => pass")
-        else:
-            print("    flip(4) => fail")
-            num_fail += 1
-        print()
-    print("----------------------")
-    if num_fail == 0:
-        print("Passed all tests.")
-    else:
-        print(str(num_fail) + " tests failed.")
+        return array
