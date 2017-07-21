@@ -7,6 +7,7 @@ import socket
 from threading import Thread
 from threading import Lock
 from ServerDSLInterpreter import decode
+from ServerDSLInterpreter import encode
 
 
 class ClientThread(Thread):
@@ -45,7 +46,7 @@ class ClientThread(Thread):
                     if msg_chunk == "":
                         self.kill()
                     total_msg += msg_chunk
-                self.server_thread.process_message_from_client(msg_chunk)
+                self.server_thread.process_message_from_client(msg_chunk, self.thread_id)
         except socket.error:
             return
 
@@ -87,7 +88,7 @@ class SATServer(Thread):
     single client. Clients can also send requests which will then be passed to a higher module.
     """
 
-    def __init__(self, host, port, message_decoder=decode):
+    def __init__(self, host, port, message_decoder=decode, message_encoder=encode):
         super(SATServer, self).__init__()
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -102,6 +103,7 @@ class SATServer(Thread):
         self.lock = Lock()
         self.threads = []
         self.message_decoder = message_decoder
+        self.message_encoder = message_encoder
 
     def run(self):
         """
@@ -153,14 +155,16 @@ class SATServer(Thread):
         finally:
             self.lock.release()
 
-    def process_message_from_client(self, msg):
+    def process_message_from_client(self, msg, client_thread_id):
         """
         Passes a message to the DSL interpreter(or whatever the correct term for it is) to be interpreted.
         :param msg: Data sent by a client.
+        :param client_thread_id: The ID of the thread to which the client is connected.
         """
 
-        print(BColors.OKBLUE + "> " + BColors.ENDC + "Processing message from client")
-        self.message_decoder(msg)
+        print(BColors.OKBLUE + "> " + BColors.ENDC + "Processing message from client with thread-ID: "
+              + str(client_thread_id))
+        self.message_decoder(msg, self, client_thread_id)
 
     def get_port(self):
         """

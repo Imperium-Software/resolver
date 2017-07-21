@@ -138,6 +138,7 @@ class TestSATServer(TestCase):
         def get_message_from_client(msg_to_process):
             nonlocal msg_from_client
             msg_from_client = msg_to_process
+            return None
 
         server_thread = SATServer("localhost", 55555, get_message_from_client)
         server_thread.start()
@@ -148,6 +149,29 @@ class TestSATServer(TestCase):
         self.assertEqual(msg, msg_from_client, "The message sent by the client does not match the message received by "
                                                "the server.")
         get_message_from_client(None)
+        server_thread.close()
+        print("Here1")
+        # Dummy test to test error response
+        msg = """{
+"SOLVE" : {
+    "filename": "test",
+    "tabu_list_length": "test",
+    "max_false": "test",
+    "rec": "test",
+    "k": "test",
+    "max_flip": "test"
+    }
+}#"""
+
+        server_thread = SATServer("localhost", 55555)
+        server_thread.start()
+        print("Here2")
+        client1 = TesterClient(msg, True)
+        client1.start()
+        client1_response = None
+        while client1_response is None:
+            client1_response = client1.received
+        print(client1_response)
         server_thread.close()
 
     def test_get_port(self):
@@ -173,10 +197,11 @@ class TestSATServer(TestCase):
 
 class TesterClient(Thread):
 
-    def __init__(self, msg=None):
+    def __init__(self, msg=None, wait=False):
         Thread.__init__(self)
         self.msg = msg
         self.received = None
+        self.wait = wait
 
     def run(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -194,5 +219,14 @@ class TesterClient(Thread):
                 self.received = total_msg
             else:
                 sock.sendall(self.msg.encode())
+                if self.wait:
+                    total_msg = ""
+                    msg_chunk = ""
+                    while msg_chunk == "" or msg_chunk[-1] != '#':
+                        msg_chunk = sock.recv(1024).strip().decode("utf-8").strip()
+                        if msg_chunk == "":
+                            break
+                        total_msg += msg_chunk
+                    self.received = total_msg
         finally:
             sock.close()
