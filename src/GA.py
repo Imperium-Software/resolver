@@ -513,7 +513,7 @@ class GA:
             else:
                 child = self.standard_tabu(child, self.choose_rvcf)
                 if self.is_diversification:
-                    child = self.tabu_with_diversification(child)
+                    child = self.tabu_with_diversification(child, self.k, self.rec)
 
             # TODO: Insertion Condition of the child
             self.replace(child)

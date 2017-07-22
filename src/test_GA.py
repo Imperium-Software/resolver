@@ -1,8 +1,8 @@
-import individual
-import BitVector
+
+import GA
+from BitVector import BitVector
 from unittest import TestCase
 from individual import Individual
-from GA import GA
 
 
 class TestGA(TestCase):
@@ -16,11 +16,10 @@ class TestGA(TestCase):
         self.fail()
 
     def test_improvement(self):
-        ga = GA("../examples/trivial.cnf", 10, 5, 5, 5)
-        ind = Individual(9, method=individual.BIT_VECTOR)
+        ga = GA.GA("../examples/trivial.cnf", 10, 5, 5, 5)
+        ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
-
-        self.assertEqual(ga.improvement(ind, 1), 2)
+        self.assertEqual(ga.improvement(ind, 1), 1)
 
         # TODO: More sub-tests
 
