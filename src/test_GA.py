@@ -7,7 +7,24 @@ from individual import Individual
 
 class TestGA(TestCase):
     def test_sat(self):
-        self.fail()
+        ga = GA.GA("../examples/trivial.cnf", 10, 5, 5, 5)
+        ind = Individual(9)
+        ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
+        self.assertEqual(ga.sat(ind, ga.formula[0]), 1)
+
+        ind.data = BitVector(bitlist=[0, 0, 0, 0, 1, 0, 0, 0, 0])
+        self.assertEqual(ga.sat(ind, ga.formula[0]), 0)
+
+        ind.data = BitVector(bitlist=[1, 0, 1, 0, 1, 1, 0, 0, 0])
+        self.assertEqual(ga.sat(ind, ga.formula[1]), 1)
+
+        ind.data = BitVector(bitlist=[1, 0, 1, 0, 1, 1, 0, 0, 0])
+        self.assertEqual(ga.sat(ind, ga.formula[2]), 1)
+
+        ind.data = BitVector(bitlist=[1, 0, 1, 1, 1, 0, 0, 0, 0])
+        self.assertEqual(ga.sat(ind, ga.formula[2]), 0)
+
+        # TODO: More sub-tests
 
     def test_sat_crossover(self):
         self.fail()
