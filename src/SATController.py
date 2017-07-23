@@ -1,5 +1,5 @@
 import sys
-import getopt
+from optparse import OptionParser
 from server import SATServer
     
 default_port = 55555
@@ -14,33 +14,25 @@ def main(argv):
          - Starts the interface or parses command-line arguments
         And finally returns the exit code
     """
-    server_thread = SATServer(default_host, default_port)
+
     if len(argv) == 0:
         # Start the interface
-        print("Starting Interface")
+        server_thread = SATServer(default_host, default_port)
+        server_thread.start()
     else:
-        try:
-            opts, args = getopt.getopt(argv, '', [])
-        except getopt.GetoptError:
-            show_help()
-            sys.exit(2)
-        if any('port' in opt for opt in opts):
-            # Run GA without server
-            print("Without Server")
+        parser = OptionParser()
+        parser.add_option("-p", "--port", dest="port", help="Port number on which the server should run.",
+                          metavar="<port>")
+        parser.add_option("-f", "--file", dest="file", help="File that will be opened", metavar="<filename>")
+        (options, args) = parser.parse_args()
+        options = vars(options)
+        if options["port"] is not None:
+            # Port has been specified start server
+            server_thread = SATServer(default_host, default_port)
+            server_thread.start()
         else:
-            # Run with server
-            print("With Server")
-            pass
+            print("Server not wanted")
 
-        pass
-
-        # Parse command-line args and start the server instance or start solving
-        pass
-    
-def show_help():
-    print("The command-line arguments are:")
-    print("-o \t The file to output the (partially) satisfying assignment to")
-    pass
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))

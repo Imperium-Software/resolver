@@ -7,6 +7,7 @@ import socket
 class TestSATServer(TestCase):
 
     def test_push_to_all(self):
+        print("Testing 'push_to_all'")
         # Test Message
         msg = "Test Message#"
 
@@ -66,6 +67,7 @@ class TestSATServer(TestCase):
         server_thread.close()
 
     def test_push_to_one(self):
+        print("Testing 'push_to_one'")
         # Test Messages
         msg = "Test Message#"
         msg1 = "Test Message1#"
@@ -123,6 +125,7 @@ class TestSATServer(TestCase):
         server_thread.close()
 
     def test_address_in_use_exception(self):
+        print("Testing 'address_in_use_exception'")
         server_thread = SATServer("localhost", 55555)
         server_thread.start()
         # noinspection PyUnusedLocal
@@ -130,6 +133,7 @@ class TestSATServer(TestCase):
         server_thread.close()
 
     def test_process_message_from_client(self):
+        print("Testing 'process_message_from_client'")
         # Test message
         msg = "Test Message#"
         msg_from_client = None
@@ -150,31 +154,9 @@ class TestSATServer(TestCase):
                                                "the server.")
         get_message_from_client(None)
         server_thread.close()
-        print("Here1")
-        # Dummy test to test error response
-        msg = """{
-"SOLVE" : {
-    "filename": "test",
-    "tabu_list_length": "test",
-    "max_false": "test",
-    "rec": "test",
-    "k": "test",
-    "max_flip": "test"
-    }
-}#"""
-
-        server_thread = SATServer("localhost", 55555)
-        server_thread.start()
-        print("Here2")
-        client1 = TesterClient(msg, True)
-        client1.start()
-        client1_response = None
-        while client1_response is None:
-            client1_response = client1.received
-        print(client1_response)
-        server_thread.close()
 
     def test_get_port(self):
+        print("Testing 'get_port'")
         server_thread = SATServer("localhost", 55555)
         server_thread.start()
         self.assertEqual(55555, server_thread.get_port(), "The get_port() function did not return the correct port "
@@ -182,6 +164,7 @@ class TestSATServer(TestCase):
         server_thread.close()
 
     def test_close(self):
+        print("Testing 'close'")
         server_thread = SATServer("localhost", 55555)
         server_thread.start()
         client1 = TesterClient()
