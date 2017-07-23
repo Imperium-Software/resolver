@@ -1,7 +1,11 @@
 import sys
+import getopt
+from server import SATServer
     
 default_port = 55555
 default_host = "localhost"
+
+
 def main(argv):
     """
         The main method of the program. It is responsible for:
@@ -11,10 +15,25 @@ def main(argv):
         And finally returns the exit code
     """
     server_thread = SATServer(default_host, default_port)
-    if (len(argv) == 0):
+    if len(argv) == 0:
         # Start the interface
-        pass
+        print("Starting Interface")
     else:
+        try:
+            opts, args = getopt.getopt(argv, '', [])
+        except getopt.GetoptError:
+            show_help()
+            sys.exit(2)
+        if any('port' in opt for opt in opts):
+            # Run GA without server
+            print("Without Server")
+        else:
+            # Run with server
+            print("With Server")
+            pass
+
+        pass
+
         # Parse command-line args and start the server instance or start solving
         pass
     

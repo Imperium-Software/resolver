@@ -8,12 +8,13 @@ import json
 class RequestHandlerError(Exception):
     """This error should be raised when there was a error interpreting a message."""
 
+
 class RequestHandler:
     
-    def __init__:
+    def __init__(self):
         pass
-    
-    
+
+    @staticmethod
     def decode(data):
         """
         This function decodes a JSON string then determines which command should be exected and calls the corresponding
@@ -72,9 +73,8 @@ class RequestHandler:
             options[list(command.keys())[0]](command)
         else:
             raise RequestHandlerError("Unsupported command: " + str(list(command.keys())[0]))
-    
-    
-    def encode(message_type, message):
+
+    def encode(self, message_type, message):
     
         def error(msg):
             return '{"RESPONSE":{"ERROR":"' + msg + '"}}#'
