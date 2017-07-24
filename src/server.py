@@ -199,3 +199,4 @@ class SATServer(Thread):
             self.threads[0].kill()
         self.socket.close()
         print("Server closed.")
+        

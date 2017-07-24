@@ -1,15 +1,15 @@
 """
     Module: Individual
     Description: Defines classes related to the creation and manipulation of
-    and Individual for use in the genetic algorithm.
+    an Individual for use in the genetic algorithm.
 """
 
 from BitVector import BitVector
 from bitarray import bitarray
+import random
 
 
 class Individual:
-
     """ Encapsulates an Individual in the GA. """
 
     BIT_VECTOR = 0
@@ -38,7 +38,7 @@ class Individual:
                 self.defined.reset(0)
 
             if value is not None:
-                self.data = BitVector(bitlist = value)
+                self.data = BitVector(bitlist=value)
 
         elif self.method == Individual.BIT_ARRAY:
             self.defined = bitarray(length)
@@ -50,7 +50,7 @@ class Individual:
                 self.defined.setall(False)
 
             if value is not None:
-                self.data = [bool(x) for x in value]
+                self.data = [bool(X) for X in value]
 
     def __str__(self):
 
@@ -134,105 +134,23 @@ class Individual:
 
         """ Allocates uniformly from either first or second parent. """
 
-        for i in range(self.length):
+        for i in range(1, self.length+1):
             self.set_defined(i)
+        for i in range(self.length):
+            if not self.get_defined(i):
+                if bool(random.getrandbits(1)):
+                    self.set(i, first.get(i))
+                else:
+                    self.set(i, second.get(i))
+                self.set_defined(i)
 
 
 class Factory:
-
     """ A factory class for creating individuals in bulk. """
 
     @staticmethod
     def create(length, method, amount):
-
         """ Creates an array of individuals. """
 
         array = [Individual(length, method, True) for _ in range(amount)]
-        return array,
-
-# TESTS
-
-if __name__ == "__main__":
-    ind = Individual(9, Individual.BIT_VECTOR)
-    num_fail = 0
-    print()
-    for x in range(2):
-        if x == 0:
-            print("Testing implementation : BitVector")
-            ind.data = BitVector(bitlist=[0, 1, 1, 0, 1, 0, 1, 0, 0])
-            ind.method = Individual.BIT_VECTOR
-        else:
-            print("Testing implementation : bitarray")
-            ind.data = bitarray("011010100")
-            ind.method = Individual.BIT_ARRAY
-        print("With data: " + str(ind))
-        print("  Testing get")
-
-        if ind.get(5) == 1:
-            print("    get(5) == 1 => pass")
-        else:
-            print("    get(5) == 1 => fail")
-            num_fail += 1
-
-        if ind.get(8) == 0:
-            print("    get(8) == 0 => pass")
-        else:
-            print("    get(8) == 0 => fail")
-            num_fail += 1
-
-        if ind.get(10) is None:
-            print("    get(10) == None => pass")
-        else:
-            print("    get(10) == None => fail")
-            num_fail += 1
-        print()
-        print("  Testing set")
-        ind.set(2, 1)
-        if ind.get(2) == 1:
-            print("    set(2,1) => pass")
-        else:
-            print("    set(2,1) => fail")
-            num_fail += 1
-
-        ind.set(7, 0) == 0
-        if ind.get(7) == 0:
-            print("    set(7,0) => pass")
-        else:
-            print("    set(7,0) => fail")
-            num_fail += 1
-
-        ind.set(6, 1)
-        if ind.get(6) == 1:
-            print("    set(6,1) => pass")
-        else:
-            print("    set(6,1) => fail")
-            num_fail += 1
-
-        print()
-        print("  Testing flip")
-        ind.flip(1)
-        if ind.get(1) == 1:
-            print("    flip(1) => pass")
-        else:
-            print("    flip(1) => fail")
-            num_fail += 1
-
-        ind.flip(8)
-        if ind.get(8) == 1:
-            print("    flip(8) => pass")
-        else:
-            print("    flip(8) => fail")
-            num_fail += 1
-
-        ind.flip(4)
-        if ind.get(4) == 1:
-            print("    flip(4) => pass")
-        else:
-            print("    flip(4) => fail")
-            num_fail += 1
-        print()
-    print("----------------------")
-    if num_fail == 0:
-        print("Passed all tests.")
-    else:
-        print(str(num_fail) + " tests failed.")
+        return array
