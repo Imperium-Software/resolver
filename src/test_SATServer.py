@@ -139,7 +139,7 @@ class TestSATServer(TestCase):
         msg_from_client = None
         # Function to get the message sent by the client
 
-        def get_message_from_client(msg_to_process):
+        def get_message_from_client(msg_to_process, server, client_id):
             nonlocal msg_from_client
             msg_from_client = msg_to_process
             return None
@@ -152,7 +152,7 @@ class TestSATServer(TestCase):
             pass
         self.assertEqual(msg, msg_from_client, "The message sent by the client does not match the message received by "
                                                "the server.")
-        get_message_from_client(None)
+        get_message_from_client(None, None, None)
         server_thread.close()
 
     def test_get_port(self):
@@ -188,7 +188,7 @@ class TesterClient(Thread):
 
     def run(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_address = ("localhost", 55555, None)
+        server_address = ("localhost", 55555)
         sock.connect(server_address)
         try:
             if self.msg is None:

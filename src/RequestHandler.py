@@ -35,7 +35,7 @@ class RequestHandler:
             Helper method that will try execute the `SOLVE` command.
             :param json_data: The JSON object 'SOLVE'
             """
-            required_parameters = ["filename", "tabu_list_length", "max_false", "rec", "k"]
+            required_parameters = ["raw_input", "tabu_list_length", "max_false", "rec", "k"]
             optional_parameters = ["max_generations", "population_size", "sub_population_size", "crossover_operator",
                                    "max_flip", "is_rvcf", "is_diversification", "method"]
             if set(required_parameters).issubset(list(json_data["SOLVE"].keys())):
@@ -45,6 +45,9 @@ class RequestHandler:
                         raise RequestHandlerError("This server is already solving. No `SOLVE` requests can be handled "
                                                   "until it has completed.")
                     else:
+                        raw_formula = json_data["SOLVE"]["raw_input"].split()
+                        json_data["SOLVE"]["formula"], json_data["SOLVE"]["number_of_variables"], json_data["SOLVE"]["number_of_clauses"] = controller.parse_formula(json_data["SOLVE"]["raw_input"])
+                        del json_data["SOLVE"]["raw_input"]
                         controller.create_ga(json_data["SOLVE"])
                 else:
                     raise RequestHandlerError("Unexpected arguments found for SOLVE command: " + ', '.join(set(list(
