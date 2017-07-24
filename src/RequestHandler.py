@@ -3,6 +3,9 @@
     Description: Defines a c
 """
 import json
+from SATController import SATController
+from SATController import singleton
+from GA import GA
 
 
 class RequestHandlerError(Exception):
@@ -15,7 +18,7 @@ class RequestHandler:
         pass
 
     @staticmethod
-    def decode(data):
+    def decode(data, server, client_id):
         """
         This function decodes a JSON string then determines which command should be exected and calls the corresponding
         function. The SATServer module will call this function to execute request sent by a client.
@@ -31,16 +34,18 @@ class RequestHandler:
             """
             Helper method that will try execute the `SOLVE` command.
             :param json_data: The JSON object 'SOLVE'
-            :return:
             """
             required_parameters = ["filename", "tabu_list_length", "max_false", "rec", "k"]
             optional_parameters = ["max_generations", "population_size", "sub_population_size", "crossover_operator",
                                    "max_flip", "is_rvcf", "is_diversification", "method"]
             if set(required_parameters).issubset(list(json_data["SOLVE"].keys())):
                 if set(list(json_data["SOLVE"].keys())).issubset(set(required_parameters+optional_parameters)):
-                    # TODO Call solving module.
-                    return None
-    
+                    controller = singleton(SATController)()
+                    if controller.has_ga_instance:
+                        raise RequestHandlerError("This server is already solving. No `SOLVE` requests can be handled "
+                                                  "until it has completed.")
+                    else:
+                        controller.create_ga(json_data["SOLVE"])
                 else:
                     raise RequestHandlerError("Unexpected arguments found for SOLVE command: " + ', '.join(set(list(
                         json_data["SOLVE"].keys())) - set(required_parameters+optional_parameters)))
@@ -60,21 +65,29 @@ class RequestHandler:
     
         # Try and decode the JSON string. Return error message if the decoding failed.
         try:
-            command = json.loads(data[:-1])
-        except json.JSONDecodeError as e:
-            raise RequestHandlerError("JSON could not be decoded: " + str(e))
-    
-        # Execute the command if it is a supported command. If it is not supported return a error message.
-        if list(command.keys())[0] in ["SOLVE", "POLL"]:
-            options = {
-                "SOLVE": solve,
-                "POLL": poll
-                }
-            options[list(command.keys())[0]](command)
-        else:
-            raise RequestHandlerError("Unsupported command: " + str(list(command.keys())[0]))
+            try:
+                command = json.loads(data[:-1])
+            except json.JSONDecodeError as e:
+                raise RequestHandlerError("JSON could not be decoded: " + str(e))
 
-    def encode(self, message_type, message):
+            # Execute the command if it is a supported command. If it is not supported return a error message.
+            if list(command.keys())[0] in ["SOLVE", "POLL"]:
+                options = {
+                    "SOLVE": solve,
+                    "POLL": poll
+                    }
+                options[list(command.keys())[0]](command)
+            else:
+                raise RequestHandlerError("Unsupported command: " + str(list(command.keys())[0]))
+        except RequestHandlerError as e:
+            error_response = RequestHandler.encode("ERROR", e)
+            server.push_to_one(client_id, error_response)
+        except Exception as e:
+            error_response = RequestHandler.encode("ERROR", "A fatal error occurred: " + str(e))
+            server.push_to_one(client_id, error_response)
+
+    @staticmethod
+    def encode(message_type, message):
     
         def error(msg):
             return '{"RESPONSE":{"ERROR":"' + msg + '"}}#'

@@ -1,4 +1,5 @@
 import sys
+from GA import GA
 from optparse import OptionParser
 from server import SATServer
     
@@ -21,7 +22,12 @@ class SATController:
 
     def __init__(self):
         self.GA = None
-        pass
+
+    def has_ga_instance(self):
+        return self.GA is not None
+
+    def create_ga(self, ga_parameters):
+        self.GA = GA(**ga_parameters)
 
 
 def main(argv):
