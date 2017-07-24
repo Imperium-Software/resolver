@@ -12,7 +12,7 @@
 ## Team Resources
 - [Slack](https://imperium-se.slack.com)
 - [Project Briefing Documentation](http://cs.up.ac.za/files/COS301/Download/1905/)
-- [Requirements Documentation](https://www.overleaf.com/read/phtmqmxjpsdx)
+- [Requirements Documentation](https://www.overleaf.com/9687894kqqdwgmqymsx)
 - [CS Group Page](http://cs.up.ac.za/teams/pages/manage/147/5)
 - [Waffle.io](https://waffle.io/ErnstEksteen/COS301_GA-SATSolver)
 
