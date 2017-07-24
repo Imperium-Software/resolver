@@ -6,7 +6,6 @@
 import socket
 from threading import Thread
 from threading import Lock
-from RequestHandler import RequestHandler
 
 
 class ClientThread(Thread):
@@ -87,7 +86,7 @@ class SATServer(Thread):
     single client. Clients can also send requests which will then be passed to a higher module.
     """
 
-    def __init__(self, host, port, message_decoder=RequestHandler.decode, message_encoder=RequestHandler.encode):
+    def __init__(self, host, port, message_decoder):
         super(SATServer, self).__init__()
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -102,7 +101,6 @@ class SATServer(Thread):
         self.lock = Lock()
         self.threads = []
         self.message_decoder = message_decoder
-        self.message_encoder = message_encoder
 
     def run(self):
         """

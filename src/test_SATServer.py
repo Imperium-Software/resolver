@@ -12,7 +12,7 @@ class TestSATServer(TestCase):
         msg = "Test Message#"
 
         # Server with two clients connected
-        server_thread = SATServer("localhost", 55555)
+        server_thread = SATServer("localhost", 55555, None)
         server_thread.start()
         client1 = TesterClient()
         client1.start()
@@ -47,7 +47,7 @@ class TestSATServer(TestCase):
         server_thread.close()
 
         # Server with one client connected
-        server_thread = SATServer("localhost", 55555)
+        server_thread = SATServer("localhost", 55555, None)
         server_thread.start()
         client1 = TesterClient()
         client1.start()
@@ -61,7 +61,7 @@ class TestSATServer(TestCase):
         server_thread.close()
 
         # Server with no clients
-        server_thread = SATServer("localhost", 55555)
+        server_thread = SATServer("localhost", 55555, None)
         server_thread.start()
         server_thread.push_to_all(msg)
         server_thread.close()
@@ -75,7 +75,7 @@ class TestSATServer(TestCase):
         msg3 = "Test Message3#"
 
         # Server with two clients connected
-        server_thread = SATServer("localhost", 55555)
+        server_thread = SATServer("localhost", 55555, None)
         server_thread.start()
         client1 = TesterClient()
         client1.start()
@@ -111,7 +111,7 @@ class TestSATServer(TestCase):
         server_thread.close()
 
         # Server with one client connected
-        server_thread = SATServer("localhost", 55555)
+        server_thread = SATServer("localhost", 55555, None)
         server_thread.start()
         client1 = TesterClient()
         client1.start()
@@ -126,10 +126,10 @@ class TestSATServer(TestCase):
 
     def test_address_in_use_exception(self):
         print("Testing 'address_in_use_exception'")
-        server_thread = SATServer("localhost", 55555)
+        server_thread = SATServer("localhost", 55555, None)
         server_thread.start()
         # noinspection PyUnusedLocal
-        another_server_thread = SATServer("localhost", 55555)
+        another_server_thread = SATServer("localhost", 55555, None)
         server_thread.close()
 
     def test_process_message_from_client(self):
@@ -157,7 +157,7 @@ class TestSATServer(TestCase):
 
     def test_get_port(self):
         print("Testing 'get_port'")
-        server_thread = SATServer("localhost", 55555)
+        server_thread = SATServer("localhost", 55555, None)
         server_thread.start()
         self.assertEqual(55555, server_thread.get_port(), "The get_port() function did not return the correct port "
                                                           "number")
@@ -165,7 +165,7 @@ class TestSATServer(TestCase):
 
     def test_close(self):
         print("Testing 'close'")
-        server_thread = SATServer("localhost", 55555)
+        server_thread = SATServer("localhost", 55555, None)
         server_thread.start()
         client1 = TesterClient()
         client1.start()
@@ -188,7 +188,7 @@ class TesterClient(Thread):
 
     def run(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_address = ("localhost", 55555)
+        server_address = ("localhost", 55555, None)
         sock.connect(server_address)
         try:
             if self.msg is None:
