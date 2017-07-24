@@ -1,1 +1,4 @@
 language: python
+
+notifications:
+    slack: imperium-se:mBOzfUzNqfrDwonqXmBzg4Nl
