@@ -6,6 +6,23 @@ default_port = 55555
 default_host = "localhost"
 
 
+def singleton(class_):
+    instances = {}
+
+    def get_instance(*args, **kwargs):
+        if class_ not in instances:
+            instances[class_] = class_(*args, **kwargs)
+        return instances[class_]
+    return get_instance
+
+
+@singleton
+class SATController():
+
+    def __init__(self):
+        pass
+
+
 def main(argv):
     """
         The main method of the program. It is responsible for:
@@ -14,6 +31,8 @@ def main(argv):
          - Starts the interface or parses command-line arguments
         And finally returns the exit code
     """
+
+    controller = singleton(SATController)()
 
     if len(argv) == 0:
         # Start the interface
