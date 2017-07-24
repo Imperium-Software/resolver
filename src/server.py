@@ -163,7 +163,8 @@ class SATServer(Thread):
 
         print(BColors.OKBLUE + "> " + BColors.ENDC + "Processing message from client with thread-ID: "
               + str(client_thread_id))
-        self.message_decoder(msg)
+        handle_thread = Thread(target=self.message_decoder, args=msg)
+        handle_thread.start()
 
     def get_port(self):
         """
