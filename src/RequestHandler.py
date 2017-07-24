@@ -5,7 +5,6 @@
 import json
 from SATController import SATController
 from SATController import singleton
-from GA import GA
 
 
 class RequestHandlerError(Exception):
@@ -13,7 +12,6 @@ class RequestHandlerError(Exception):
 
 
 class RequestHandler:
-    
     def __init__(self):
         pass
 
@@ -29,7 +27,7 @@ class RequestHandler:
         :return: Will return either `None` if no errors occurred and the command was successfully executed or a string
         explaining the error that occurred.
         """
-    
+
         def solve(json_data):
             """
             Helper method that will try execute the `SOLVE` command.
@@ -39,23 +37,24 @@ class RequestHandler:
             optional_parameters = ["max_generations", "population_size", "sub_population_size", "crossover_operator",
                                    "max_flip", "is_rvcf", "is_diversification", "method"]
             if set(required_parameters).issubset(list(json_data["SOLVE"].keys())):
-                if set(list(json_data["SOLVE"].keys())).issubset(set(required_parameters+optional_parameters)):
+                if set(list(json_data["SOLVE"].keys())).issubset(set(required_parameters + optional_parameters)):
                     controller = singleton(SATController)()
                     if controller.has_ga_instance:
                         raise RequestHandlerError("This server is already solving. No `SOLVE` requests can be handled "
                                                   "until it has completed.")
                     else:
                         raw_formula = json_data["SOLVE"]["raw_input"].split()
-                        json_data["SOLVE"]["formula"], json_data["SOLVE"]["number_of_variables"], json_data["SOLVE"]["number_of_clauses"] = controller.parse_formula(json_data["SOLVE"]["raw_input"])
+                        json_data["SOLVE"]["formula"], json_data["SOLVE"]["number_of_variables"], json_data["SOLVE"][
+                            "number_of_clauses"] = controller.parse_formula(raw_formula)
                         del json_data["SOLVE"]["raw_input"]
                         controller.create_ga(json_data["SOLVE"])
                 else:
                     raise RequestHandlerError("Unexpected arguments found for SOLVE command: " + ', '.join(set(list(
-                        json_data["SOLVE"].keys())) - set(required_parameters+optional_parameters)))
+                        json_data["SOLVE"].keys())) - set(required_parameters + optional_parameters)))
             else:
                 raise RequestHandlerError("Missing required arguments for SOLVE command: " + ', '.join(
                     set(required_parameters) - set(list(json_data["SOLVE"].keys()))))
-    
+
         def poll(json_data):
             """
             Helper method that will execute the `POLL` command.
@@ -65,7 +64,7 @@ class RequestHandler:
             """
             print("Poll called")
             pass
-    
+
         # Try and decode the JSON string. Return error message if the decoding failed.
         try:
             try:
@@ -78,7 +77,7 @@ class RequestHandler:
                 options = {
                     "SOLVE": solve,
                     "POLL": poll
-                    }
+                }
                 options[list(command.keys())[0]](command)
             else:
                 raise RequestHandlerError("Unsupported command: " + str(list(command.keys())[0]))
@@ -91,10 +90,10 @@ class RequestHandler:
 
     @staticmethod
     def encode(message_type, message):
-    
+
         def error(msg):
             return '{"RESPONSE":{"ERROR":"' + msg + '"}}#'
-    
+
         options = {
             "ERROR": error
         }

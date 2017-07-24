@@ -15,8 +15,8 @@ class GA:
                  is_diversification=True, method=None):
 
         self.formula = formula
-        self.numberOfClauses = numberOfClauses
-        self.numberOfVariables = numberOfVariables
+        self.numberOfClauses = number_of_clauses
+        self.numberOfVariables = number_of_variables
         # Creating member variables for each of the parameters
         self.max_generations = max_generations
         self.population_size = population_size
@@ -168,7 +168,7 @@ class GA:
                         best_improvement = current_improvement
                         best_pos = i
                 z.set(best_pos, x.get(best_pos))
-                z.set_defined(best_pos, x.get(best_pos))
+                z.set_defined(best_pos)
                 z.flip(best_pos)
                 z.allocate(x, y)
         return z
@@ -193,7 +193,7 @@ class GA:
                         maximum_improvement = current_improvement
                         best_pos = i
                 z.set(best_pos, x.get(best_pos))
-                z.set_defined(best_pos, x.get(best_pos))
+                z.set_defined(best_pos)
                 z.flip(best_pos)
 
         # Truth maintenance - See section 4.2 of the paper
@@ -206,13 +206,13 @@ class GA:
                         current_improvement = self.improvement(x, i) + self.improvement(y, i)
                         z_new = copy.deepcopy(z)
                         z_new.set(best_pos, 1)
-                        z_new.set_defined(best_pos, 1)
+                        z_new.set_defined(best_pos)
                         if current_improvement < minimum_improvement and self.sat_crossover(z_new, clause):
                             minimum_improvement = current_improvement
                             best_pos = i
                 if not best_pos == -1:
                     z.set(best_pos, 1)
-                    z.set_defined(best_pos, 1)
+                    z.set_defined(best_pos)
         z.allocate(x, y)
         return z
 
@@ -387,11 +387,11 @@ class GA:
             if self.sat(x, clause) and not self.sat(y, clause):
                 for i in range(len(clause)):
                     z.set(i, x(i))
-                    z.set_defined(i, 1)
+                    z.set_defined(i)
             elif not self.sat(x, clause) and self.sat(y, clause):
                 for i in range(len(clause)):
                     z.set(i, y(i))
-                    z.set_defined(i, 1)
+                    z.set_defined(i)
         z.allocate(x, y)
         return z
 
