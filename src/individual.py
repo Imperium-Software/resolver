@@ -31,7 +31,7 @@ class Individual:
             self.data = BitVector(size=length)
             self.data = self.data.gen_random_bits(length)
             self.defined = BitVector(size=length)
-
+            
             if defined:
                 self.defined = None
             else:

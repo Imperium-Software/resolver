@@ -3,7 +3,7 @@
     Description: Defines the genetic algorithm and all the core functionality of it, including crossover and Tabu search
 """
 
-from individual import Individual
+from src.individual import Individual
 from decimal import Decimal
 import random
 import copy
@@ -344,14 +344,11 @@ class GA:
         l = [literal for literal in clause if individual.get(literal) == 1]
         return len(l)
 
-    def tabu_with_diversification(self, individual, threshhold, recurse_count, max_false=5):
+    def tabu_with_diversification(self, individual):
         """
         Performs Tabu Search with measures to avoid "stumble clauses".
 
         :param individual:
-        :param threshhold:
-        :param recurse_count:
-        :param max_false:
         :return:
         """
 
@@ -513,7 +510,7 @@ class GA:
             else:
                 child = self.standard_tabu(child, self.choose_rvcf)
                 if self.is_diversification:
-                    child = self.tabu_with_diversification(child, self.k, self.rec)
+                    child = self.tabu_with_diversification(child)
 
             # TODO: Insertion Condition of the child
             self.replace(child)

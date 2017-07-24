@@ -1,13 +1,13 @@
 
-import GA
+from src.GA import GA
 from BitVector import BitVector
 from unittest import TestCase
-from individual import Individual
+from src.individual import Individual
 
 
 class TestGA(TestCase):
     def test_sat(self):
-        ga = GA.GA("../examples/trivial.cnf", 10, 5, 5, 5)
+        ga = GA("../examples/trivial.cnf", 10, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
         self.assertEqual(ga.sat(ind, ga.formula[0]), 1)
@@ -33,7 +33,7 @@ class TestGA(TestCase):
         self.fail()
 
     def test_improvement(self):
-        ga = GA.GA("../examples/trivial.cnf", 10, 5, 5, 5)
+        ga = GA("../examples/trivial.cnf", 10, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
         self.assertEqual(ga.improvement(ind, 1), 1)
