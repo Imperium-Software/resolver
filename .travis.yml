@@ -1,4 +1,10 @@
 language: python
 
+install:
+  - pip install bitarray
+  - pip install BitVector
+
 notifications:
     slack: imperium-se:mBOzfUzNqfrDwonqXmBzg4Nl
+
+script: py.test
