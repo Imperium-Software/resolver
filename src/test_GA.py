@@ -59,7 +59,13 @@ class TestGA(TestCase):
         self.assertEqual(1, 1)
 
     def test_degree(self):
-        self.assertEqual(1, 1)
+        ind = Individual(9)
+        ind.data = BitVector(bitlist=[1, 0, 0, 1, 0, 0, 0, 0, 0])
+        self.assertEqual(GA.degree(ind, [9, -5]), 0)
+        self.assertEqual(GA.degree(ind, [1, 3, 6]), 1)
+        ind.data = BitVector(bitlist=[0, 0, 1, 0, 0, 0, 1, 1, 0])
+        self.assertEqual(GA.degree(ind, [7, 8, -3]), 3)
+
 
     def test_tabu_with_diversification(self):
         self.assertEqual(1, 1)

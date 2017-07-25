@@ -318,11 +318,11 @@ class GA:
 
     def weight(self, individual, index):
         """
-        Calculates
+        Calculates the weight of an individual in respects to some index.
 
         :param individual:
         :param index:
-        :return:
+        :return: The weight value.
         """
 
         c_ones = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 1)]
@@ -334,14 +334,14 @@ class GA:
     @staticmethod
     def degree(individual, clause):
         """
-        Calculates the degree of
+        Calculates the number of true atoms that appear in some clause, for some individual.
 
-        :param individual:
-        :param clause:
-        :return:
+        :param individual: The individual for whom the True/False values will be obtained.
+        :param clause: The clause to be tested.
+        :return: A numerical value representing the degree.
         """
 
-        l = [literal for literal in clause if individual.get(literal) == 1]
+        l = [literal for literal in clause if individual.get(abs(literal)) == 1]
         return len(l)
 
     def tabu_with_diversification(self, individual):
