@@ -1,3 +1,6 @@
+[pytest]
+testpaths = src/
+
 language: python
 
 install:
