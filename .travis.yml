@@ -1,13 +1,14 @@
-[pytest]
-testpaths = src/
-
 language: python
 
+python:
+  - "2.7"
+
+cache: pip
+
 install:
-  - pip install bitarray
-  - pip install BitVector
+  - pip install -r dependencies.txt
 
 notifications:
     slack: imperium-se:mBOzfUzNqfrDwonqXmBzg4Nl
 
-script: py.test
+script: cd src; py.test
