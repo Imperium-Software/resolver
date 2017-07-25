@@ -143,7 +143,7 @@ class GA:
         for clause in self.formula:
 
             # If a clause is unsatisfied increase the unsatisfied counter
-            if self.sat(individual, clause) == 0:
+            if not self.sat(individual, clause):
                 num_unsatisfied_clauses = num_unsatisfied_clauses + 1
 
         return num_unsatisfied_clauses
@@ -310,7 +310,7 @@ class GA:
         """
 
         improvements = [self.improvement(individual_in, i) for i in range(1, individual_in.length + 1)]
-        improvements = [(i, improvements.index(i) + 1) for i in max(improvements)]
+        improvements = [(max(improvements), improvements.index(max(improvements)) + 1)]
         if len(improvements) == 1:
             return improvements[0][1]
         weights = [self.weight(individual_in, j) for j in improvements]
