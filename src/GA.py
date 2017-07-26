@@ -63,6 +63,7 @@ class GA:
             self.formula.append(tuple([item for sublist in clause for item in sublist]))
         self.false_counts = [0 for _ in range(len(self.formula))]
 
+        f.close()
         self.gasat()
 
     @staticmethod
@@ -298,7 +299,9 @@ class GA:
             if self.evaluate(individual_temp) < self.evaluate(self.best):
                 self.best = individual_temp
             num_flips += 1
-            self.tabu.pop()
+
+            if self.tabu:
+                self.tabu.pop()
             self.tabu = [index] + self.tabu
         return self.best
 
