@@ -506,7 +506,6 @@ class GA:
             elif self.crossover_operator == 2:
                 child = self.fluerent_and_ferland(parents[0], parents[1])
 
-            # TODO: Complete Tabu Search
             if not self.is_rvcf:
                 child = self.standard_tabu(child, self.standard_tabu_choose)
                 if self.is_diversification:
@@ -516,7 +515,6 @@ class GA:
                 if self.is_diversification:
                     child = self.tabu_with_diversification(child)
 
-            # TODO: Insertion Condition of the child
             self.replace(child)
 
             # Determine whether any individual that satisfies the formula appeared in the current generation
