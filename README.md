@@ -1,3 +1,4 @@
+![Build Status](https://travis-ci.org/ErnstEksteen/COS301_GA-SATSolver.svg?branch=master)
 [![Stories in Ready](https://badge.waffle.io/ErnstEksteen/COS301_GA-SATSolver.png?label=ready&title=Ready)](https://waffle.io/ErnstEksteen/COS301_GA-SATSolver?utm_source=badge)
 # COS301 GA-SATSolver
 > GA-SATSolver is a SAT Solving that is based on a Genetic Algorithm. The program is intended to be integrated  into and replace the SAT solver currently being used by the Software Specifications and Formal Methods (SSFM) research group (SAT4J). 
@@ -12,7 +13,7 @@
 ## Team Resources
 - [Slack](https://imperium-se.slack.com)
 - [Project Briefing Documentation](http://cs.up.ac.za/files/COS301/Download/1905/)
-- [Requirements Documentation](https://www.overleaf.com/read/phtmqmxjpsdx)
+- [Requirements Documentation](https://www.overleaf.com/9687894kqqdwgmqymsx)
 - [CS Group Page](http://cs.up.ac.za/teams/pages/manage/147/5)
 - [Waffle.io](https://waffle.io/ErnstEksteen/COS301_GA-SATSolver)
 

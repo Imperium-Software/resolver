@@ -1,11 +1,9 @@
-
 """
     Module: GA
     Description: Defines the genetic algorithm and all the core functionality of it, including crossover and tabu search
 """
 
 from individual import Individual
-import copy
 import random
 import copy
 
@@ -20,7 +18,7 @@ class GA:
         
         # Initialize tabu to an empty list
         self.tabu = []
-        
+
         # Go through the lines and create numberOfClauses clauses
         line = 1
         # for line in range(1, len(lines)):
@@ -149,7 +147,6 @@ class GA:
         return original_individual_fitness - self.evaluate(new_individual)
 
     def corrective_clause(self, X, Y):
-
         """
             Some docstring
         """
@@ -171,7 +168,6 @@ class GA:
         return Z
 
     def corrective_clause_with_truth_maintenance(self, X, Y):
-
         """
             See page 9 of the paper
         """
@@ -251,15 +247,14 @@ class GA:
 def select(self, population, number_of_individuals):
     
     """ Selects number_of_individuals from a population. """
-    
+
     population.sort(key=evaluate)
     sub_population = population[0:number_of_individuals]
     child_x = random.choice(sub_population)
     child_y = random.choice(sub_population)
     while child_x == child_y:
         child_x = random.choice(sub_population)
-    return child_x, child_y   
-
+    return child_x, child_y
 
 if __name__ == "__main__":
     # TESTS
