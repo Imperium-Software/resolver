@@ -306,6 +306,8 @@ class GA:
             if self.tabu:
                 self.tabu.pop()
             self.tabu = [index[0]] + self.tabu
+            if self.is_diversification:
+                self.tabu_with_diversification(individual_in)
         return self.best
 
     def choose_rvcf(self, individual_in):
@@ -320,7 +322,7 @@ class GA:
         if len(improvements) == 1:
             return improvements[0][1]
         weights = [self.weight(individual_in, j) for j in improvements]
-        return random.choice(weights)
+        return random.choice(weights), weights
 
     def weight(self, individual, index):
         """
@@ -510,12 +512,8 @@ class GA:
 
             if not self.is_rvcf:
                 child = self.standard_tabu(child, self.standard_tabu_choose)
-                if self.is_diversification:
-                    child = self.tabu_with_diversification(child)
             else:
                 child = self.standard_tabu(child, self.choose_rvcf)
-                if self.is_diversification:
-                    child = self.tabu_with_diversification(child)
 
             self.replace(child)
 
