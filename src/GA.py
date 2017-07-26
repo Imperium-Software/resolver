@@ -186,16 +186,18 @@ class GA:
             best_improvement = 0
             if not self.sat(x, clause) and not self.sat(y, clause) and not self.sat_crossover(z, clause):
                 for i in range(len(clause)):
+                    #isnt this the same as brute forcing it?
                     current_improvement = self.improvement(x, clause[i]) + self.improvement(y, clause[i])
                     if current_improvement >= best_improvement:
                         best_improvement = current_improvement
                         best_pos = clause[i]
-                if best_improvement != 0:
+                if best_improvement != 0:               #not sure about this but its to prevent zero sum allocations
                     z.set(best_pos, x.get(best_pos))
                     # z.set_defined(best_pos, x.get(best_pos))          removing this due to too many arguments
                     z.set_defined(best_pos)
                     z.flip(best_pos)
-                    z.allocate(x, y)
+        #was nested in the wrong place
+        z.allocate(x, y)
         return z
 
     def corrective_clause_with_truth_maintenance(self, x, y):
