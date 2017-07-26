@@ -64,7 +64,7 @@ class GA:
         self.false_counts = [0 for _ in range(len(self.formula))]
 
         f.close()
-        self.gasat()
+        # This function should be called outside this class after instantiating an object of this class: self.gasat()
 
     @staticmethod
     def sat(individual, clause):
@@ -253,7 +253,7 @@ class GA:
         # The current overall best gain observed. Initially, it is set to a large negative value.
         best_sigma = Decimal('-Infinity')
         # Iterate through each of the positions (atoms) of the individual.
-        for position in assignment:
+        for position in range(1, len(assignment.data) + 1):
             # A copy of the original individual is made and the particular position of the copy is flipped.
             temp = copy.deepcopy(assignment)
             temp.flip(position)
@@ -278,7 +278,7 @@ class GA:
                 positions.append(position)
         # Return a position that is randomly selected in those which have the maximum sigma 
         # i.e. out of those elements in the positions list.
-        return random.choice(positions)    
+        return random.choice(positions), positions
     
     def standard_tabu(self, individual_in, choose_function):
         """
@@ -296,14 +296,14 @@ class GA:
             # index = self.choose(individual_in)
             index = choose_function(individual_in)
             individual_temp = copy.deepcopy(individual_in)
-            individual_temp.flip(index)
+            individual_temp.flip(index[0])
             if self.evaluate(individual_temp) < self.evaluate(self.best):
                 self.best = individual_temp
             num_flips += 1
 
             if self.tabu:
                 self.tabu.pop()
-            self.tabu = [index] + self.tabu
+            self.tabu = [index[0]] + self.tabu
         return self.best
 
     def choose_rvcf(self, individual_in):

@@ -55,7 +55,25 @@ class TestGA(TestCase):
         self.assertEqual(1, 1)
 
     def test_standard_tabu_choose(self):
-        self.assertEqual(1, 1)
+        # An instance of the GA class which will be used to test the standard_tabu_choose function
+        ga_implementation = GA("../examples/trivial.cnf", 10, 5, 5, 5)
+        # The tabu list is set to the size which was received as parameter i.e. [5]
+        ga_implementation.tabu = ga_implementation.tabu[:ga_implementation.tabu_list_length]
+        for index in range(1, 10, 1):
+            ga_implementation.tabu.append(index)
+
+        print(ga_implementation.tabu)
+        # Creating an individual that will represent the best individual during a tabu search procedure
+        ind = Individual(9)
+        # Individual is assigned values for variables to overwrite the random initialisation
+        ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
+        ga_implementation.best = ind
+
+        # Creating an individual that will represent another individual for which we want to find best flip for
+        ind = Individual(9)
+        # Individual is assigned values for variables to overwrite the random initialisation
+        ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
+        self.assertEqual(ga_implementation.standard_tabu_choose(ind)[1], [1, 2, 4, 6])
 
     def test_standard_tabu(self):
         self.assertEqual(1, 1)
@@ -73,7 +91,6 @@ class TestGA(TestCase):
         self.assertEqual(GA.degree(ind, [1, 3, 6]), 1)
         ind.data = BitVector(bitlist=[0, 0, 1, 0, 0, 0, 1, 1, 0])
         self.assertEqual(GA.degree(ind, [7, 8, -3]), 3)
-
 
     def test_tabu_with_diversification(self):
         self.assertEqual(1, 1)
@@ -98,4 +115,3 @@ class TestGA(TestCase):
 
     def test_gasat(self):
         self.assertEqual(1, 1)
-
