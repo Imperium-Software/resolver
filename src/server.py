@@ -50,11 +50,12 @@ class ClientThread(Thread):
             return
 
     def send_to_client(self, msg):
+
         """
         Sends a msg to the client.
         :param msg: The data to be sent
         """
-
+        
         self.conn.sendall(msg.encode())
 
     def kill(self):
