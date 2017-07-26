@@ -10,5 +10,6 @@ install:
 
 notifications:
     slack: imperium-se:mBOzfUzNqfrDwonqXmBzg4Nl
+    email: false
 
 script: cd src; py.test
