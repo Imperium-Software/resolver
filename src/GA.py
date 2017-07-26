@@ -191,7 +191,8 @@ class GA:
                         best_improvement = current_improvement
                         best_pos = i
                 z.set(best_pos, x.get(best_pos))
-                z.set_defined(best_pos, x.get(best_pos))
+                # z.set_defined(best_pos, x.get(best_pos))          removing this due to too many arguments
+                z.set_defined(best_pos)
                 z.flip(best_pos)
                 z.allocate(x, y)
         return z
