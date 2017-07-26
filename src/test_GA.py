@@ -55,14 +55,15 @@ class TestGA(TestCase):
         self.assertEqual(1, 1)
 
     def test_standard_tabu_choose(self):
+        # .............................................................................................................
         # An instance of the GA class which will be used to test the standard_tabu_choose function
         ga_implementation = GA("../examples/trivial.cnf", 10, 5, 5, 5)
         # The tabu list is set to the size which was received as parameter i.e. [5]
         ga_implementation.tabu = ga_implementation.tabu[:ga_implementation.tabu_list_length]
+        # Every single position is tabu
         for index in range(1, 10, 1):
             ga_implementation.tabu.append(index)
 
-        print(ga_implementation.tabu)
         # Creating an individual that will represent the best individual during a tabu search procedure
         ind = Individual(9)
         # Individual is assigned values for variables to overwrite the random initialisation
@@ -73,10 +74,22 @@ class TestGA(TestCase):
         ind = Individual(9)
         # Individual is assigned values for variables to overwrite the random initialisation
         ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
+        # A test
         self.assertEqual(ga_implementation.standard_tabu_choose(ind)[1], [1, 2, 4, 6])
+        # .............................................................................................................
 
     def test_standard_tabu(self):
-        self.assertEqual(1, 1)
+        # .............................................................................................................
+        # An instance of the GA class which will be used to test the standard_tabu_choose function
+        ga_implementation = GA("../examples/trivial.cnf", 10, 5, 5, 5)
+        # Creating an individual that will represent another individual for which we want to find best flip for
+        ind = Individual(9)
+        # Individual is assigned values for variables to overwrite the random initialisation
+        ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 1, 1, 1, 1])
+        # Test whether if a satisfying assignment is passed, then that assignment should be returned as best
+        ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
+        self.assertEqual(list(ind.data), list(BitVector(bitlist=[0, 0, 0, 0, 0, 1, 1, 1, 1])))
+        # .............................................................................................................
 
     def test_choose_rvcf(self):
         self.assertEqual(1, 1)

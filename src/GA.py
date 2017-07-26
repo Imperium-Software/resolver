@@ -245,7 +245,8 @@ class GA:
         Choose function for the Tabu search. The best move (flips of value of an assignment) is chosen i.e.
         it is the best gain in flip and if it is not a tabu configuration.
         :param assignment: A particular individual (assignment of atoms).
-        :return: A position (index) in the assignment due to which maximum gain is obtained.
+        :return: A position (index) in the assignment due to which maximum gain is obtained and the array of positions
+        from which it was randomly chosen.
         """
 
         # A list to maintain the position(s) where the gain (by flip) is the best. 
@@ -278,6 +279,7 @@ class GA:
                 positions.append(position)
         # Return a position that is randomly selected in those which have the maximum sigma 
         # i.e. out of those elements in the positions list.
+        # Also return the positions list for the purposes of testing
         return random.choice(positions), positions
     
     def standard_tabu(self, individual_in, choose_function):
@@ -300,7 +302,7 @@ class GA:
             if self.evaluate(individual_temp) < self.evaluate(self.best):
                 self.best = individual_temp
             num_flips += 1
-
+            individual_in = individual_temp
             if self.tabu:
                 self.tabu.pop()
             self.tabu = [index[0]] + self.tabu
