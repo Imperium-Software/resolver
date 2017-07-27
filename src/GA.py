@@ -10,16 +10,13 @@ import copy
 
 
 class GA:
-    def __init__(self, filename, tabu_list_length, max_false, rec, k, max_generations=1000, population_size=100,
+    def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length, max_false, rec, k, max_generations=1000, population_size=100,
                  sub_population_size=15, crossover_operator=0, max_flip=10000, is_rvcf=True,
                  is_diversification=True, method=None):
 
-        f = open(filename, "r")
-        # Read all the lines from the file that aren't comments
-        lines = [line.replace("\n", "") for line in f.readlines() if line[0] != "c" and line.strip() != ""]
-        (self.numberOfVariables, self.numberOfClauses) = int(lines[0].split()[2]), int(lines[0].split()[3])
-        self.formula = []
-
+        self.formula = formula
+        self.numberOfClauses = number_of_clauses
+        self.numberOfVariables = number_of_variables
         # Creating member variables for each of the parameters
         self.max_generations = max_generations
         self.population_size = population_size
@@ -42,25 +39,6 @@ class GA:
         # Used in tabu search to determine best configuration/move
         self.best = None
 
-        # Go through the lines and create numberOfClauses clauses
-        line = 1
-        # for line in range(1, len(lines)):
-        while line < len(lines):
-            clause = []
-            # We need a while loop as a clause may be split over many lines, but eventually ends with a 0
-            end_of_clause = False
-            while line < len(lines) and not end_of_clause:
-                # Split the line and append a list of all integers, excluding 0, to clause
-                clause.append([int(variable.strip()) for variable in lines[line].split() if int(variable.strip()) != 0])
-                # If this line ended with a 0, we reached the end of the clause
-                if int(lines[line].split()[-1].strip()) == 0:
-                    end_of_clause = True
-                    line += 1
-                # Otherwise continue reading this clause from the next line
-                else:
-                    line += 1
-            # clause is now a list of lists, so we need to flatten it and convert it to a list
-            self.formula.append(tuple([item for sublist in clause for item in sublist]))
         self.false_counts = [0 for _ in range(len(self.formula))]
 
         f.close()
@@ -217,7 +195,7 @@ class GA:
                         maximum_improvement = current_improvement
                         best_pos = i
                 z.set(best_pos, x.get(best_pos))
-                z.set_defined(best_pos, x.get(best_pos))
+                z.set_defined(best_pos)
                 z.flip(best_pos)
 
         # Truth maintenance - See section 4.2 of the paper
@@ -230,13 +208,13 @@ class GA:
                         current_improvement = self.improvement(x, i) + self.improvement(y, i)
                         z_new = copy.deepcopy(z)
                         z_new.set(best_pos, 1)
-                        z_new.set_defined(best_pos, 1)
+                        z_new.set_defined(best_pos)
                         if current_improvement < minimum_improvement and self.sat_crossover(z_new, clause):
                             minimum_improvement = current_improvement
                             best_pos = i
                 if not best_pos == -1:
                     z.set(best_pos, 1)
-                    z.set_defined(best_pos, 1)
+                    z.set_defined(best_pos)
         z.allocate(x, y)
         return z
 
@@ -417,11 +395,11 @@ class GA:
             if self.sat(x, clause) and not self.sat(y, clause):
                 for i in range(len(clause)):
                     z.set(i, x(i))
-                    z.set_defined(i, 1)
+                    z.set_defined(i)
             elif not self.sat(x, clause) and self.sat(y, clause):
                 for i in range(len(clause)):
                     z.set(i, y(i))
-                    z.set_defined(i, 1)
+                    z.set_defined(i)
         z.allocate(x, y)
         return z
 
