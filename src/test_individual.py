@@ -84,7 +84,6 @@ class TestIndividual(TestCase):
             ind.set_defined(x)
             self.assertEqual(ind.get_defined(x), True)
 
-
     def test_get_defined(self):
         ind = Individual(9, Individual.BIT_VECTOR)
         for x in range(1, 10):
@@ -92,7 +91,6 @@ class TestIndividual(TestCase):
         for x in range(1, 10):
             ind.set_defined(x)
             self.assertEqual(ind.get_defined(x), True)
-
 
     def test_allocate(self):
         ind = Individual(9, Individual.BIT_VECTOR)

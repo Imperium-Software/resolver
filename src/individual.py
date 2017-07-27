@@ -1,15 +1,15 @@
 """
     Module: Individual
     Description: Defines classes related to the creation and manipulation of
-    and Individual for use in the genetic algorithm.
+    an Individual for use in the genetic algorithm.
 """
 
 from BitVector import BitVector
 from bitarray import bitarray
+import random
 
 
 class Individual:
-
     """ Encapsulates an Individual in the GA. """
 
     BIT_VECTOR = 0
@@ -38,7 +38,7 @@ class Individual:
                 self.defined.reset(0)
 
             if value is not None:
-                self.data = BitVector(bitlist = value)
+                self.data = BitVector(bitlist=value)
 
         elif self.method == Individual.BIT_ARRAY:
             self.defined = bitarray(length)
@@ -50,7 +50,7 @@ class Individual:
                 self.defined.setall(False)
 
             if value is not None:
-                self.data = [bool(x) for x in value]
+                self.data = [bool(X) for X in value]
 
     def __str__(self):
 
@@ -136,15 +136,20 @@ class Individual:
 
         for i in range(1, self.length+1):
             self.set_defined(i)
+        for i in range(self.length):
+            if not self.get_defined(i):
+                if bool(random.getrandbits(1)):
+                    self.set(i, first.get(i))
+                else:
+                    self.set(i, second.get(i))
+                self.set_defined(i)
 
 
 class Factory:
-
     """ A factory class for creating individuals in bulk. """
 
     @staticmethod
     def create(length, method, amount):
-
         """ Creates an array of individuals. """
 
         array = [Individual(length, method, True) for _ in range(amount)]

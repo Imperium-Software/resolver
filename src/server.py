@@ -50,12 +50,11 @@ class ClientThread(Thread):
             return
 
     def send_to_client(self, msg):
-
         """
         Sends a msg to the client.
         :param msg: The data to be sent
         """
-        
+
         self.conn.sendall(msg.encode())
 
     def kill(self):
@@ -164,7 +163,7 @@ class SATServer(Thread):
 
         print(BColors.OKBLUE + "> " + BColors.ENDC + "Processing message from client with thread-ID: "
               + str(client_thread_id))
-        self.message_decoder(msg, self, client_thread_id)
+        self.message_decoder(msg)
 
     def get_port(self):
         """
@@ -200,3 +199,4 @@ class SATServer(Thread):
             self.threads[0].kill()
         self.socket.close()
         print("Server closed.")
+        
