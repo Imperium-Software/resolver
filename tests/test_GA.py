@@ -1,7 +1,9 @@
-from src.GA import GA
-from BitVector import BitVector
 from unittest import TestCase
-from src.individual import Individual
+
+from BitVector import BitVector
+
+from SATSolver.GA import GA
+from SATSolver.individual import Individual
 
 
 class TestGA(TestCase):

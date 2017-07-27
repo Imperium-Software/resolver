@@ -3,10 +3,10 @@
     Description: Defines the genetic algorithm and all the core functionality of it, including crossover and Tabu search
 """
 
-from src.individual import Individual
-from decimal import Decimal
-import random
 import copy
+import random
+from decimal import Decimal
+from individual import Individual
 
 
 class GA:
@@ -612,6 +612,6 @@ class GA:
 #
 #     print("----------------------")
 #     if num_fail == 0:
-#         print("Passed all tests.")
+#         print("Passed all benchmarks.")
 #     else:
-#         print(str(num_fail) + " tests failed.")
+#         print(str(num_fail) + " benchmarks failed.")
