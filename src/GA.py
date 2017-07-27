@@ -360,7 +360,13 @@ class GA:
         :return:
         """
 
-        false_clauses = [self.formula[i] for i in range(len(self.formula)) if self.false_counts[i] >= self.max_false]
+        false_clauses = []
+
+        for i in range(len(self.formula)):
+            if self.sat(individual, self.formula[i]) and self.false_counts[i] >= self.max_false:
+                false_clauses.append(self.formula[i])
+                self.false_counts[i] += 1
+
         individual_temp = copy.deepcopy(individual)
         forbidden_flips = {}
         for clause in false_clauses:
