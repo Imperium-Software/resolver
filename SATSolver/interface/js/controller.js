@@ -1,11 +1,16 @@
 let net = require('net');
 let fs = require('fs');
-const {
-    dialog
-} = require('electron').remote;
+const { dialog } = require('electron').remote;
 
-let HOST = 'rainmaker.wunderground.com';
+let HOST = 'localhost';
 let PORT = 23;
+
+function construct_request() {
+    var request_string = "";
+
+    // Add terminating character.
+    return request_string.concat('#')
+}
 
 //select drowpdowns
 $(document).ready(function() {
@@ -82,12 +87,10 @@ $(document).ready(function() {
 $(".button-collapse").sideNav();
 
 $('.button-collapse').sideNav({
-    menuWidth: 300, // Default is 300
-    edge: 'left', // Choose the horizontal origin
-    closeOnClick: true, // Closes side-nav on <a> clicks, useful for Angular/Meteor
-    draggable: true, // Choose whether you can drag to open on touch screens,
-    //onOpen: function(el) { /* Do Stuff* / }, // A function to be called when sideNav is opened
-    //onClose: function(el) { /* Do Stuff* / }, // A function to be called when sideNav is closed
+    menuWidth: 300,
+    edge: 'left',
+    closeOnClick: true,
+    draggable: true,
 });
 
 // Progress Circle
@@ -113,18 +116,19 @@ function navigate(filename) {
 
         // Re-render percentage
 
-        app = new Vue({
+        perc = new Vue({
             el: '#perc',
             data: {
-                percentage: app.percentage
+                percentage: perc.percentage
             }
-        })
+        });
+
+
     })
 }
 
 
 function theme_change() {
-
     let theme_select = document.getElementById('theme-select');
     switch (theme_select.value) {
         case "tea":
@@ -133,7 +137,53 @@ function theme_change() {
             document.body.style.setProperty("--theme-three", "#3B6064");
             document.body.style.setProperty("--theme-four", "#ADC698");
             document.body.style.setProperty("--theme-five", "#C9E4CA");
+            document.body.style.setProperty("--theme-background","#f0f3f4");
             break;
+        case "halloween":
+            document.body.style.setProperty("--theme-one", "#121415");
+            document.body.style.setProperty("--theme-two", "#FD971F");
+            document.body.style.setProperty("--theme-three", "#283137");
+            document.body.style.setProperty("--theme-four", "#F37259");
+            document.body.style.setProperty("--theme-five", "#66D9EF");
+            document.body.style.setProperty("--theme-background","#f0f3f4");
+            break;
+        case "iphone":
+            document.body.style.setProperty("--theme-one", "black");
+            document.body.style.setProperty("--theme-two", "black");
+            document.body.style.setProperty("--theme-three", "black");
+            document.body.style.setProperty("--theme-four", "#222");
+            document.body.style.setProperty("--theme-five", "black");
+            document.body.style.setProperty("--theme-background","#586e75");
+            break;
+    }
 
+    fs.writeFile("css/current-theme-init.css", 
+        ":root {" +
+        "--theme-one:"   + document.body.style.getPropertyValue('--theme-one') + ";\n" + 
+        "--theme-two:"   + document.body.style.getPropertyValue('--theme-two') + ";\n" +
+        "--theme-three:" + document.body.style.getPropertyValue('--theme-three') + ";\n" +
+        "--theme-four:"  + document.body.style.getPropertyValue('--theme-four') + ";\n" +
+        "--theme-five:"  + document.body.style.getPropertyValue('--theme-five') + ";\n" +
+        "--theme-background:"  + document.body.style.getPropertyValue('--theme-background') + ";\n" +
+        "}"
+        , 
+        function(err) {
+    if(err) {
+        return console.log(err);
+    }}); 
+}
+
+function make_request() {
+    alert('hi!')
+}
+
+function input_method_change() {
+    let select_box = document.getElementById('cnf-input-method');
+    if (select_box.value == "file") {
+        $('#input-cnf-file').attr('hidden', false);
+        $('#input-cnf-text').attr('hidden', true);
+    } else {
+        $('#input-cnf-file').attr('hidden', true);
+        $('#input-cnf-text').attr('hidden', false);
     }
 }
