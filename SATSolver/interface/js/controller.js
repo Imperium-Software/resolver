@@ -123,6 +123,12 @@ function navigate(filename) {
             }
         });
 
+        terminal = new Vue({
+            el: '#term',
+            data: {
+                text : terminal.text
+            }
+        });
 
     })
 }
