@@ -5,82 +5,24 @@ const { dialog } = require('electron').remote;
 let HOST = 'localhost';
 let PORT = 23;
 
-function construct_request() {
+function construct_request(type, filename) {
     var request_string = "";
-
+    if (type == 'SOLVE') {
+        request_string += "SOLVE\n";
+        request_string += fs.readFileSync(filename).toString();
+    }
     // Add terminating character.
-    return request_string.concat('#')
+    return request_string.concat('#');
+}
+
+function make_request(type, filename) {
+    console.log(construct_request('SOLVE', $('#selected-file').prop('files')[0].path));
 }
 
 //select drowpdowns
 $(document).ready(function() {
     $('select').material_select();
 });
-
-//open file
-// document.getElementById('open-file').addEventListener('click', () => {
-//   dialog.showOpenDialog((filename) => {
-//     if (filename === undefined) {
-//       console.log('The user did not select a location to open.')
-//       return
-//     }
-//     console.log(filename)
-//     fs.readFile(filename[0], 'utf8', (err, data) => {
-//       if (err) {
-//         console.log(err)
-//         return
-//       }
-//       editor.value = data;
-//       toggle_hex = false;
-//     })
-//   })
-// })
-
-// document.getElementById('open-file').addEventListener("click", () => {
-
-//   if(true)
-//   {
-//     dialog.showOpenDialog((filename) => {
-//     if (filename === undefined) {
-//       console.log('The user did not select a location to open.')
-//       return
-//     }
-//     console.log(filename)
-//     fs.readFile(filename[0], 'utf8', (err, data) => {
-//       if (err) {
-//         console.log(err)
-//         return
-//       }
-//       editor.value = data;
-//       toggle_hex = false;
-//     })
-//   })
-//   } 
-
-// })
-
-// document.getElementById('open-file2').addEventListener("change", () => {
-
-//   if(this.options[this.selctedIndex].value == "1")
-//   {
-//     dialog.showOpenDialog((filename) => {
-//     if (filename === undefined) {
-//       console.log('The user did not select a location to open.')
-//       return
-//     }
-//     console.log(filename)
-//     fs.readFile(filename[0], 'utf8', (err, data) => {
-//       if (err) {
-//         console.log(err)
-//         return
-//       }
-//       editor.value = data;
-//       toggle_hex = false;
-//     })
-//   })
-//   } 
-
-// })
 
 // Side Nav
 
@@ -133,7 +75,6 @@ function navigate(filename) {
     })
 }
 
-
 function theme_change() {
     let theme_select = document.getElementById('theme-select');
     switch (theme_select.value) {
@@ -177,10 +118,6 @@ function theme_change() {
     if(err) {
         return console.log(err);
     }}); 
-}
-
-function make_request() {
-    alert('hi!')
 }
 
 function input_method_change() {
