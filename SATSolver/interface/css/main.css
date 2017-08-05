@@ -1,14 +1,16 @@
   
+@font-face {
+  font-family: "Kimberley";
+  src: url(fonts/Inconsolata-Regular.ttf) format("truetype");
+}
+
   html {
     font-family: Helvetica;
-    src: url(../fonts/HelveticaLTStd-Light.otf) format("opentype");
   }
   
   body{
   	background-color: var(--theme-background);
   }  
-
-
 
 #slide-out {
 	align-content: center;
@@ -26,7 +28,7 @@
 	color : white;
 	border-style: none;
   	border-color: Transparent;
-  	font-family: monospace;
+  	font-family: Arial, Helvetica, sans-serif;
   }
 
 #circle {
@@ -125,6 +127,6 @@ body:not(.loaded) {
 }*/
 
 #dimacs-example {
-	background-color: var(--theme-one)
+	background-color: var(--theme-one);
 	color: white;
 }

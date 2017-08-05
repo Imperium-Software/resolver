@@ -1,4 +1,3 @@
-let net = require('net');
 let fs = require('fs');
 const { dialog } = require('electron').remote;
 
@@ -16,7 +15,7 @@ function construct_request(type, filename) {
 }
 
 function make_request(type, filename) {
-    console.log(construct_request('SOLVE', $('#selected-file').prop('files')[0].path));
+    conn.write(construct_request('SOLVE', $('#selected-file').prop('files')[0].path));
 }
 
 //select drowpdowns
@@ -69,6 +68,13 @@ function navigate(filename) {
             el: '#term',
             data: {
                 text : terminal.text
+            }
+        });
+
+        error_log = new Vue({
+            el: '#err',
+            data: {
+                text : error_log.text
             }
         });
 
