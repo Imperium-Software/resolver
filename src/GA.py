@@ -294,7 +294,7 @@ class GA:
         self.tabu = self.tabu[:self.tabu_list_length]
         self.best = individual_in
         num_flips = 0
-        while not (self.evaluate(self.best) == 0 or num_flips > self.max_flip):
+        while not (self.evaluate(self.best) == 0) and (self.max_flip > num_flips):
             # index = self.choose(individual_in)
             index = choose_function(individual_in)
             individual_temp = copy.deepcopy(individual_in)
@@ -317,12 +317,29 @@ class GA:
         :return:
         """
 
-        improvements = [self.improvement(individual_in, i) for i in range(1, individual_in.length + 1)]
-        improvements = [(max(improvements), improvements.index(max(improvements)) + 1)]
-        if len(improvements) == 1:
-            return improvements[0][1]
-        weights = [self.weight(individual_in, j) for j in improvements]
-        return random.choice(weights), weights
+        positions = []
+        best_sigma = Decimal('-Infinity')
+        for position in range(1, len(individual_in.data) + 1):
+            gain = self.improvement(individual_in, position)
+            if gain > best_sigma:
+                positions = []
+                best_sigma = gain
+                positions.append(position)
+            elif gain == best_sigma:
+                positions.append(position)
+
+        best_sigma = Decimal('-Infinity')
+        max_weights = []
+        for j in positions:
+            weight = self.weight(individual_in, j)
+            if weight > best_sigma:
+                max_weights = []
+                best_sigma = weight
+                max_weights.append(j)
+            elif weight == best_sigma:
+                max_weights.append(j)
+
+        return random.choice(max_weights), max_weights
 
     def weight(self, individual, index):
         """
@@ -349,8 +366,16 @@ class GA:
         :return: A numerical value representing the degree.
         """
 
-        l = [literal for literal in clause if individual.get(abs(literal)) == 1]
-        return len(l)
+        list_of_literals = []
+        for literal in clause:
+            if literal > 0:
+                if individual.get(literal) == 1:
+                    list_of_literals.append(literal)
+            else:
+                if individual.get(abs(literal)) == 0:
+                    list_of_literals.append(literal)
+
+        return len(list_of_literals)
 
     def tabu_with_diversification(self, individual):
         """
@@ -363,7 +388,7 @@ class GA:
         false_clauses = []
 
         for i in range(len(self.formula)):
-            if self.sat(individual, self.formula[i]) and self.false_counts[i] >= self.max_false:
+            if not self.sat(individual, self.formula[i]) and self.false_counts[i] >= self.max_false:
                 false_clauses.append(self.formula[i])
                 self.false_counts[i] += 1
 
