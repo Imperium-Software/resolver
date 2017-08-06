@@ -3,7 +3,7 @@
 # COS301 GA-SATSolver
 
 <div style="text-align:center;" align="center">
-  <img style="width:100px; align-self: center;" src="http://i.imgur.com/pIRLUG2.png" alt="logo">
+  <img style="width:20%; align-self: center;" src="http://i.imgur.com/pIRLUG2.png" alt="logo">
 </div>
 
 > GA-SATSolver is a SAT Solving that is based on a Genetic Algorithm. The program is intended to be integrated  into and replace the SAT solver currently being used by the Software Specifications and Formal Methods (SSFM) research group (SAT4J). 
