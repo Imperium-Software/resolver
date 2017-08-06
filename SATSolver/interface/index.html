@@ -1,116 +1,161 @@
 <!DOCTYPE html>
 <html id='base'>
-  <head>
-    <meta charset="utf-8">
-    <title>SATSolver</title>
-    <link rel="stylesheet" type="text/css" href="css/materialize.min.css">
-    <link rel="stylesheet" type="text/css" href="css/current-theme-init.css">
-    <link rel="stylesheet" type="text/css" href="css/main.css">
-    <script type="text/x-mathjax-config;executed=true">
-    MathJax.Hub.Config({
-    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']],
-    processEscapes: true}
-    });
-    </script>
-  </head>
-  <body onload="document.body.classList.add('loaded')">
-    <div id='app'>
-      <ul id="slide-out" class="side-nav SAT-roayal-blue">
-        <li>
-          <div id="side-bar-title" class="white-text"><b>SAT</b>Solver</div>
-        </li>
-        <div class="container">
-          <li class="divider"></li>
-        </div>
-        <li><a class="waves-effect white-text" href="#">Home</a></li>
-        <li><a class="waves-effect white-text" onclick='navigate("playground.html")' href="#">Playground</a></li>
-        <li><a class="waves-effect white-text" onclick='navigate("settings.html")' href="#">Settings</a></li>
-      </ul>
-      <nav class="navbar-fixed">
-        <div class="nav-wrapper nav-bar">
-          <div class='row'>
-            <button data-activates="slide-out" class="btn button-collapse"><b>SAT</b>Home</button>
-            <div class="container">
-              <p class="right" id="perc"><b>{{percentage}}</b>%</p>
-            </div>
+
+<head>
+  <meta charset="utf-8">
+  <title>SATSolver</title>
+  <link rel="stylesheet" type="text/css" href="css/materialize.min.css">
+  <link rel="stylesheet" type="text/css" href="css/current-theme-init.css">
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <script type="text/x-mathjax-config;executed=true">
+    MathJax.Hub.Config({ tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']], processEscapes: true} });
+  </script>
+</head>
+
+<body onload="document.body.classList.add('loaded')">
+  <div id='app'>
+    <ul id="slide-out" class="side-nav SAT-roayal-blue">
+      <li>
+        <div id="side-bar-title" class="white-text"><b>SAT</b>Solver</div>
+      </li>
+      <div class="container">
+        <li class="divider"></li>
+      </div>
+      <li><a class="waves-effect white-text" href="#">Home</a></li>
+      <li><a class="waves-effect white-text" onclick='navigate("playground.html")' href="#">Playground</a></li>
+      <li><a class="waves-effect white-text" onclick='navigate("settings.html")' href="#">Settings</a></li>
+    </ul>
+    <nav class="navbar-fixed">
+      <div class="nav-wrapper nav-bar">
+        <div class='row'>
+          <button data-activates="slide-out" class="btn button-collapse"><b>SAT</b>Home</button>
+          <div class="container">
+            <p class="right" id="perc"><b>{{percentage}}</b>%</p>
           </div>
         </div>
-      </nav>
-      <br>
-      <div class="container">
-        <div class="card">
-          <br>
-          <div class="container">
-            <ul class="collapsible z-depth-0" data-collapsible="accordion">
-              <li class="page-item">
-                <div class="collapsible-header collapsible-header-odd"><div class="container">Setup</div></div>
-                <div class="collapsible-body" align='center'>
-                  <form class="col s12 body-container">
-                    <div class="input-field col s12 SAT-dark-blue">
-                      <select id='cnf-input-method' onchange="input_method_change()">
+      </div>
+    </nav>
+    <br>
+    <div class="container">
+      <div class="card">
+        <br>
+        <div class="container">
+          <ul class="collapsible z-depth-0" data-collapsible="accordion">
+            <li class="page-item">
+              <div class="collapsible-header collapsible-header-odd">
+                <div class="container">Setup</div>
+              </div>
+              <div class="collapsible-body" align='center'>
+                <form class="col s12 body-container">
+                  <div class="input-field col s12 SAT-dark-blue">
+                    <select id='cnf-input-method' onchange="input_method_change()">
                         <option value="" disabled selected>Source</option>
                         <option value="file">File</option>
                         <option value="text">Text</option>
                       </select>
+                  </div>
+
+                  <!-- File CNF Input -->
+                  <div id='input-cnf-file' class="file-field input-field" hidden>
+                    <div class="btn">
+                      <span>File</span>
+                      <input id='selected-file' type="file">
                     </div>
-                    
-                    <!-- File CNF Input -->
-                    <div id='input-cnf-file' class="file-field input-field" hidden>
-                      <div class="btn">
-                        <span>File</span>
-                        <input id='selected-file' type="file">
-                      </div>
-                      <div class="file-path-wrapper">
-                        <input class="file-path validate" type="text">
+                    <div class="file-path-wrapper">
+                      <input class="file-path validate" type="text">
+                    </div>
+                  </div>
+
+                  <!-- Text CNF Input -->
+                  <div id='input-cnf-text' class="row" hidden>
+                    <div class="row">
+                      <div class="input-field col s12">
+                        <textarea style='font-family:monospace' id="manual-cnf" class="materialize-textarea"></textarea>
+                        <label for="textarea1">Manual DIMACS Entry:</label>
                       </div>
                     </div>
-                    
-                    <!-- Text CNF Input -->
-                    <div id='input-cnf-text' class="row" hidden>
-                      <div class="row">
-                        <div class="input-field col s12">
-                          <textarea style='font-family:monospace' id="textarea1" class="materialize-textarea"></textarea>
-                          <label for="textarea1">Manual DIMACS Entry:</label>
+                  </div>
+
+                  <ul class="collapsible" data-collapsible="accordion">
+                    <li>
+                      <div class="collapsible-header">Hyper-parameters</div>
+                      <div class="collapsible-body">
+
+
+                        <div class="row">
+                          <div class="input-field col s12 tooltip">
+                            <input id="tabu_list_length" type="number" value=10>
+                            <label for="tabu_list_length">Tabu List Length</label>
+                            <span class="tooltiptext">The length of the algorithm's "memory".</span>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    
-                    <div class="input-field SAT-dark-blue col s12">
-                      <select id='open-file2'>
-                        <option value="" disabled selected>Evaluation Formula</option>
-                        <option value="1">> File</option>
-                        <option value="2">> _</option>
-                      </select>
-                    </div>
-                    <div class="input-field col s12 SAT-dark-blue">
-                      <select >
+
+                        <div class="row">
+                          <div class="input-field col s12 tooltip">
+                            <input id="max_false" type="number" value=5>
+                            <label for="max_false">Max False</label>
+                            <span class="tooltiptext">How many times a clause must be false to be considered a "stumble-clause".</span>
+                          </div>
+                        </div>
+
+                        <div class="row">
+                          <div class="input-field col s12 tooltip">
+                            <input id="rec" type="number" value=5>
+                            <label for="rec">Recursion Count (<i>Rec</i>)</label>
+                            <span class="tooltiptext">The amount the algorithm is allowed to recurse.</span>
+                          </div>
+                        </div>
+
+                        <div class="row">
+                          <div class="input-field col s12 tooltip">
+                            <input id="k" type="number" value=5>
+                            <label for="k">Flip Constraint (<i>K</i>)</label>
+                            <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
+                          </div>
+                        </div>
+
+                        <!-- "tabu_list_length", "max_false", "rec", "k"] -->
+
+                        <div class="input-field col s12 SAT-dark-blue">
+                          <select>
                         <option value="" disabled selected>Crossover Operator</option>
                         <option value="1">Corrective Clause</option>
                         <option value="2">CCTM</option> <!-- these are not final -->
                         <option value="3">Fleurent and Ferland</option> <!-- these are not final -->
                         <option value="4">Uniform Crossover</option> <!-- these are not final -->
                       </select>
-                    </div>
-                    <div>
-                      <div class="input-field col s12 SAT-dark-blue">
-                        <select multiple>
+                        </div>
+                        <div>
+                          <div class="input-field col s12 SAT-dark-blue">
+                            <select multiple>
                           <option value="" disabled selected>Tabu Search Settings</option>
                           <option value="1">> RVCF</option>
                           <option value="2">> Diversification</option> <!-- these are not final -->
                         </select>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <button onclick='make_request(); return false' class='btn'>Start</button>
-                  </form>
-                </div>
-              </li>
-              <li class="page-item">
-                <div class="collapsible-header"><div class="container">Command Line Readout</div></div>
-                <div class="collapsible-body"><div class="body-container"><textarea id="term" class='terminal' readonly="true">{{text}}</textarea></div></div>
-              </li>
-              <li class="page-item">
-                <div class="collapsible-header collapsible-header-odd"><div class="container">Error Log</div></div>
-                <div class="collapsible-body"><div class="body-container">
+                    </li>
+                  </ul>
+
+                  <button onclick='make_request(); return false' class='btn'>Start</button>
+                </form>
+              </div>
+            </li>
+            <li class="page-item">
+              <div class="collapsible-header">
+                <div class="container">Command Line Readout</div>
+              </div>
+              <div class="collapsible-body">
+                <div class="body-container"><textarea id="term" class='terminal' readonly="true">{{text}}</textarea></div>
+              </div>
+            </li>
+            <li class="page-item">
+              <div class="collapsible-header collapsible-header-odd">
+                <div class="container">Error Log</div>
+              </div>
+              <div class="collapsible-body">
+                <div class="body-container">
                   <textarea id='err' class='terminal' readonly="true">{{text}}</textarea>
                 </div>
               </div>
@@ -120,13 +165,14 @@
         <br>
       </div>
     </div>
-  </body>
-  <script src="node_modules/hammerjs/hammer.js"></script>
-  <script src='js/materialize.min.js' type="text/javascript"></script>
-  <script src="node_modules/jquery-circle-progress/dist/circle-progress.js"></script>
-  <script type="text/javascript" src="./node_modules/vue/dist/vue.js"></script>
-  <script src='js/init.js' type="text/javascript"></script>
-  <script src='js/controller.js' type="text/javascript"></script>
-  <script type="text/javascript" src="js/render_maths.js"></script>
-  <script type="text/javascript" src="./node_modules/mathjax-electron/resources/MathJax/MathJax.js?config=electron"></script>
+</body>
+<script src="node_modules/hammerjs/hammer.js"></script>
+<script src='js/materialize.min.js' type="text/javascript"></script>
+<script src="node_modules/jquery-circle-progress/dist/circle-progress.js"></script>
+<script type="text/javascript" src="./node_modules/vue/dist/vue.js"></script>
+<script src='js/init.js' type="text/javascript"></script>
+<script src='js/controller.js' type="text/javascript"></script>
+<script type="text/javascript" src="js/render_maths.js"></script>
+<script type="text/javascript" src="./node_modules/mathjax-electron/resources/MathJax/MathJax.js?config=electron"></script>
+
 </html>

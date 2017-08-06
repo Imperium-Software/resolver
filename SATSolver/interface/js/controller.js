@@ -4,18 +4,29 @@ const { dialog } = require('electron').remote;
 let HOST = 'localhost';
 let PORT = 23;
 
-function construct_request(type, filename) {
-    var request_string = "";
+function construct_request(type) {
+    var request_string = "{\n\t'command' :";
     if (type == 'SOLVE') {
-        request_string += "SOLVE\n";
-        request_string += fs.readFileSync(filename).toString();
+
+        if ($('#cnf-input-method')[0].value == 'file') {
+            let filename = $('#selected-file').prop('files')[0].path;
+            dimacs = fs.readFileSync(filename).toString().trim()
+        } else {
+            dimacs = $('#manual-cnf')[0].value;
+        }
+        request_string += "'SOLVE'";
+        request_string += ",\n\t'tabu_list_length' : " + $("#tabu_list_length")[0].value;
+        request_string += ",\n\t'max_false' : " + $("#max_false")[0].value;
+        request_string += ",\n\t'rec' : " + $("#rec")[0].value;
+        request_string += ",\n\t'k' : " + $("#k")[0].value;
+        request_string += ",\n\t'raw_input' :\n'" + dimacs + "'";
     }
     // Add terminating character.
-    return request_string.concat('#');
+    return request_string.concat('\n\n}\n#');
 }
 
 function make_request(type, filename) {
-    conn.write(construct_request('SOLVE', $('#selected-file').prop('files')[0].path));
+    console.log(construct_request('SOLVE'));
 }
 
 //select drowpdowns
