@@ -6,7 +6,7 @@
 import copy
 import random
 from decimal import Decimal
-from individual import Individual
+from SATSolver.individual import Individual
 
 
 class GA:
@@ -41,7 +41,6 @@ class GA:
 
         self.false_counts = [0 for _ in range(len(self.formula))]
 
-        f.close()
         # This function should be called outside this class after instantiating an object of this class: self.gasat()
 
     @staticmethod
