@@ -19,8 +19,12 @@
 - [Slack](https://imperium-se.slack.com)
 - [Project Briefing Documentation](http://cs.up.ac.za/files/COS301/Download/1905/)
 - [Requirements Documentation](https://www.overleaf.com/9687894kqqdwgmqymsx)
+- [Requirements Documentation PDF](https://dearvolt.com/imperium/software-requirements-specification.pdf)
+- [Architectural Design Specifications](https://github.com/ErnstEksteen/COS301_GA-SATSolver/wiki/Architectural-Design-Specifications)
+- [User Guide](https://github.com/ErnstEksteen/COS301_GA-SATSolver/wiki/User-Guide)
 - [CS Group Page](http://cs.up.ac.za/teams/pages/manage/147/5)
 - [Waffle.io](https://waffle.io/ErnstEksteen/COS301_GA-SATSolver)
+- [Meeting Log](https://github.com/ErnstEksteen/COS301_GA-SATSolver/wiki/Log)
 
 
 ## Other Resources
