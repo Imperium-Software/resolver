@@ -35,6 +35,7 @@ function construct_request(type) {
         let max_flip_input = $('#max_flip')[0].method;
         let crossover_operator_input = $('#crossover_operator')[0].value;
         let method_input = $('#method')[0].value;
+        let tabu_settings_input = $('#tabu-settings').val();
 
         if (population_size_input != undefined && population_size_input != '') {
             request_string += ",\n\t'population_size' : " + population_size_input;
@@ -60,8 +61,13 @@ function construct_request(type) {
             request_string += ",\n\t'method' : '" + method_input + "'";
         }
 
-        // ["max_generations", "population_size", "sub_population_size", "crossover_operator",
-        //    "max_flip", "is_rvcf", "is_diversification", "method"]
+        if (tabu_settings_input.indexOf('rvcf') != -1) {
+            request_string += ",\n\t'is_rvcf' : true";
+        }
+        
+        if (tabu_settings_input.indexOf('diversification') != -1) {
+            request_string += ",\n\t'is_diversification' : true";
+        }
 
         request_string += ",\n\t'raw_input' :\n'" + dimacs + "'";
     } else if (type == 'POLL') {
