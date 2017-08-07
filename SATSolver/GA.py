@@ -192,13 +192,14 @@ class GA:
             maximum_improvement = self.improvement(x, 0) + self.improvement(y, 0)
             if not self.sat(x, clause) and not self.sat(y, clause) and not self.sat_crossover(z, clause):
                 for i in range(len(clause)):
-                    current_improvement = self.improvement(x, i) + self.improvement(y, i)
+                    current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
                     if current_improvement >= maximum_improvement:
                         maximum_improvement = current_improvement
-                        best_pos = i
-                z.set(best_pos, x.get(best_pos))
-                z.set_defined(best_pos)
-                z.flip(best_pos)
+                        best_pos = abs(clause[i])
+                if maximum_improvement != 0:
+                    z.set(best_pos, x.get(best_pos))
+                    z.set_defined(best_pos)
+                    z.flip(best_pos)
 
         # Truth maintenance - See section 4.2 of the paper
         for clause in self.formula:

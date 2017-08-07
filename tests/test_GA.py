@@ -80,19 +80,6 @@ class TestGA(TestCase):
             # self.assertLessEqual(child_eval, par1_eval, "child sucks")
             # self.assertLessEqual(child_eval, par2_eval, "child sucks")
 
-
-        # # self.assertEqual(child.get(1), 1)
-        # # self.assertEqual(child.get(2), 1)
-        # # self.assertEqual(child.get(9), 1)
-        #
-        # parent2.flip(2)
-        # parent2.flip(5)
-        # parent2.flip(9)
-        # child = ga.corrective_clause(parent2, parent1)
-        # # for clause in ga.formula:
-        # #     self.assertEqual(ga.sat(child, clause), True)
-
-
     def test_corrective_clause_with_truth_maintenance(self):
         self.assertEqual(1, 1)
 
