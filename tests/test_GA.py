@@ -165,16 +165,18 @@ class TestGA(TestCase):
     def test_choose_rvcf(self):
         # .............................................................................................................
         # An instance of the GA class which will be used to test the standard_tabu_choose function
-        ga_implementation = GA("../examples/trivial.cnf", 10, 5, 5, 5)
+        file_reader = FormulaReader("../examples/trivial.cnf")
+        ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # Creating an individual that will represent the best individual during a tabu search procedure
         ind = Individual(9)
         # Individual is assigned values for variables to overwrite the random initialisation
         ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
         # A test
-        self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [0])
+        self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [6])
 
     def test_weight(self):
-        ga_implementation = GA("../examples/trivial.cnf", 10, 5, 5, 5)
+        file_reader = FormulaReader("../examples/trivial.cnf")
+        ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
         self.assertEqual(ga_implementation.weight(ind, 4), 4)

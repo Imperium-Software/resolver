@@ -333,8 +333,22 @@ class GA:
         c_ones = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 1)]
         c_zeros = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 0)]
 
-        return sum(self.degree(individual, c) for c in c_ones) / len(c_ones) + sum(self.degree(individual, c)
-                                                                                   for c in c_zeros) / len(c_zeros)
+        length_c_ones = len(c_ones)
+        length_c_zeros = len(c_zeros)
+
+        sum_ones = sum(self.degree(individual, c) for c in c_ones)
+        sum_zeros = sum(self.degree(individual, c) for c in c_zeros)
+
+        # To cater for the case where the length is 0
+        ratio_ones = 0
+        ratio_zeros = 0
+        if length_c_ones > 0:
+            ratio_ones = sum_ones / length_c_ones
+
+        if length_c_zeros > 0:
+            ratio_zeros = sum_zeros / length_c_zeros
+
+        return ratio_ones + ratio_zeros
 
     @staticmethod
     def degree(individual, clause):
