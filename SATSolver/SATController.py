@@ -1,7 +1,7 @@
 import sys
-from GA import GA
+from SATSolver.GA import GA
 from optparse import OptionParser
-from server import SATServer
+from SATSolver.server import SATServer
 
 default_port = 55555
 default_host = "localhost"

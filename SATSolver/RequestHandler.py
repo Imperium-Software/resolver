@@ -3,8 +3,8 @@
     Description: Defines a c
 """
 import json
-from SATController import SATController
-from SATController import singleton
+from SATSolver.SATController import SATController
+from SATSolver.SATController import singleton
 
 
 class RequestHandlerError(Exception):

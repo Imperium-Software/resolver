@@ -134,9 +134,6 @@ class Individual:
 
         """ Allocates uniformly from either first or second parent. """
 
-        # causes all unset bits not to be set
-        # for i in range(1, self.length+1):
-        #     self.set_defined(i)
         for i in range(self.length):
             #i is inconsistently indexed in comparison to other places get_defined and set are called thus 1 must be added
             index = i + 1
