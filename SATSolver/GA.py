@@ -40,7 +40,7 @@ class GA:
         self.best = None
 
         self.false_counts = [0 for _ in range(len(self.formula))]
-
+        
         # This function should be called outside this class after instantiating an object of this class: self.gasat()
 
     @staticmethod
@@ -163,17 +163,16 @@ class GA:
             best_improvement = 0
             if not self.sat(x, clause) and not self.sat(y, clause) and not self.sat_crossover(z, clause):
                 for i in range(len(clause)):
-                    #isnt this the same as brute forcing it?
-                    current_improvement = self.improvement(x, clause[i]) + self.improvement(y, clause[i])
+                    # Find best index to flip in current clause. Absolute value of index must be used
+                    current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
                     if current_improvement >= best_improvement:
                         best_improvement = current_improvement
-                        best_pos = clause[i]
-                if best_improvement != 0:               #not sure about this but its to prevent zero sum allocations
+                        best_pos = abs(clause[i])
+                if best_improvement != 0:
                     z.set(best_pos, x.get(best_pos))
                     # z.set_defined(best_pos, x.get(best_pos))          removing this due to too many arguments
                     z.set_defined(best_pos)
                     z.flip(best_pos)
-        #was nested in the wrong place
         z.allocate(x, y)
         return z
 
@@ -192,13 +191,14 @@ class GA:
             maximum_improvement = self.improvement(x, 0) + self.improvement(y, 0)
             if not self.sat(x, clause) and not self.sat(y, clause) and not self.sat_crossover(z, clause):
                 for i in range(len(clause)):
-                    current_improvement = self.improvement(x, i) + self.improvement(y, i)
+                    current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
                     if current_improvement >= maximum_improvement:
                         maximum_improvement = current_improvement
-                        best_pos = i
-                z.set(best_pos, x.get(best_pos))
-                z.set_defined(best_pos)
-                z.flip(best_pos)
+                        best_pos = abs(clause[i])
+                if maximum_improvement != 0:
+                    z.set(best_pos, x.get(best_pos))
+                    z.set_defined(best_pos)
+                    z.flip(best_pos)
 
         # Truth maintenance - See section 4.2 of the paper
         for clause in self.formula:

@@ -5,6 +5,7 @@
   <link rel="stylesheet" type="text/css" href="css/current-theme-init.css">
   <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
+
 <body onload="document.body.classList.add('loaded')">
   <ul id="slide-out" class="side-nav SAT-roayal-blue">
     <li>
@@ -19,7 +20,7 @@
   </ul>
   <nav class="navbar-fixed">
     <div class="nav-wrapper nav-bar">
-      <button  data-activates="slide-out" class="btn button-collapse"><b>SAT</b>Settings</button>
+      <button data-activates="slide-out" class="btn button-collapse"><b>SAT</b>Settings</button>
       <div class="container">
         <p class="right" id="perc"><b>{{percentage}}</b>%</p>
       </div>
@@ -37,15 +38,17 @@
               <option value="tea">Tea</option>
               <option value="halloween">Halloween</option>
               <option value="iphone">iPhone</option>
-            </select>
-            <p></p>
+            </select> 
+            Tooltips
+            
+            <input type="checkbox">
           </div>
         </div>
       </div>
     </div>
-  </body>
-  <script src="node_modules/hammerjs/hammer.js"></script>
-  <script src='js/materialize.min.js' type="text/javascript"></script>
-  <script src="node_modules/jquery-circle-progress/dist/circle-progress.js"></script>
-  <script type="text/javascript" src="./node_modules/vue/dist/vue.js"></script>
-  <script src='js/controller.js' type="text/javascript"></script>
+</body>
+<script src="node_modules/hammerjs/hammer.js"></script>
+<script src='js/materialize.min.js' type="text/javascript"></script>
+<script src="node_modules/jquery-circle-progress/dist/circle-progress.js"></script>
+<script type="text/javascript" src="./node_modules/vue/dist/vue.js"></script>
+<script src='js/controller.js' type="text/javascript"></script>
