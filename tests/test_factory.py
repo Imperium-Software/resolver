@@ -1,5 +1,5 @@
 from unittest import TestCase
-from SATSolver.individual import Factory
+from individual import Factory
 
 
 class TestFactory(TestCase):

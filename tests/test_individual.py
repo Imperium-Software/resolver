@@ -1,5 +1,5 @@
 from unittest import TestCase
-from SATSolver.individual import Individual
+from individual import Individual
 from BitVector import BitVector
 from bitarray import bitarray
 

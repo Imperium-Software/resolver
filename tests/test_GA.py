@@ -1,11 +1,9 @@
+from GA import GA
 from unittest import TestCase
-
 from BitVector import BitVector
+from individual import Individual
+from formula_reader_test import FormulaReader
 
-from SATSolver.GA import GA
-from SATSolver.individual import Individual
-from tests.formula_reader_test import FormulaReader
-import random
 
 class TestGA(TestCase):
     def test_sat(self):
@@ -25,7 +23,8 @@ class TestGA(TestCase):
         self.assertEqual(GA.sat_crossover(ind, [9, -5]), True)
 
     def test_evaluate(self):
-        ga = GA("../examples/trivial.cnf", 10, 5, 5, 5)
+        reader = FormulaReader("../examples/trivial.cnf")
+        ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
         self.assertEqual(ga.evaluate(ind), 1)
@@ -35,7 +34,8 @@ class TestGA(TestCase):
         self.assertEqual(ga.evaluate(ind), 2)
 
     def test_improvement(self):
-        ga = GA("../examples/trivial.cnf", 10, 5, 5, 5)
+        reader = FormulaReader("../examples/trivial.cnf")
+        ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
         self.assertEqual(ga.improvement(ind, 1), 1)
@@ -169,10 +169,11 @@ class TestGA(TestCase):
         self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [0])
 
     def test_weight(self):
-        ga_implementation = GA("../examples/trivial.cnf", 10, 5, 5, 5)
+        reader = FormulaReader("../examples/trivial.cnf")
+        ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
-        self.assertEqual(ga_implementation.weight(ind, 4), 4)
+        self.assertEqual(ga.weight(ind, 4), 4)
         self.assertEqual(1, 1)
 
     def test_degree(self):
