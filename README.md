@@ -1,5 +1,5 @@
-![Build Status](https://travis-ci.org/ErnstEksteen/COS301_GA-SATSolver.svg?branch=master)
-[![Stories in Ready](https://badge.waffle.io/ErnstEksteen/COS301_GA-SATSolver.png?label=ready&title=Ready)](https://waffle.io/ErnstEksteen/COS301_GA-SATSolver?utm_source=badge)
+![Build Status](https://travis-ci.org/Imperium-Software/resolver.svg?branch=master)
+[![Stories in Ready](https://badge.waffle.io/Imperium-Software/resolver.png?label=ready&title=Ready)](https://waffle.io/ErnstEksteen/COS301_GA-SATSolver?utm_source=badge)
 # COS301 GA-SATSolver
 
 <div style="text-align:center;" align="center">
@@ -16,17 +16,18 @@
 - [Ernst Eksteen](https://github.com/ErnstEksteen)
 
 ## Team Resources
+- [Team Website](https://imperium-software.github.io/)
 - [Slack](https://imperium-se.slack.com)
 - [Project Briefing Documentation](http://cs.up.ac.za/files/COS301/Download/1905/)
 - [Requirements Documentation](https://www.overleaf.com/9687894kqqdwgmqymsx)
 - [Requirements Documentation PDF](https://dearvolt.com/imperium/software-requirements-specification.pdf)
-- [Architectural Design Specifications](https://github.com/ErnstEksteen/COS301_GA-SATSolver/wiki/Architectural-Design-Specifications)
-- [User Guide](https://github.com/ErnstEksteen/COS301_GA-SATSolver/wiki/User-Guide)
+- [Architectural Design Specifications](https://github.com/Imperium-Software/resolver/wiki/Architectural-Design-Specifications)
+- [User Guide](https://github.com/Imperium-Software/resolver/wiki/User-Guide)
 - [CS Group Page](http://cs.up.ac.za/teams/pages/manage/147/5)
-- [Waffle.io](https://waffle.io/ErnstEksteen/COS301_GA-SATSolver)
-- [Meeting Log](https://github.com/ErnstEksteen/COS301_GA-SATSolver/wiki/Log)
+- [Waffle.io](https://waffle.io/Imperium-Software/resolver)
+- [Meeting Log](https://github.com/Imperium-Software/resolver/wiki/Log)
 
 
 ## Other Resources
 - [How to use WaffleBot](https://help.waffle.io/wafflebot-basics/getting-started-with-the-wafflebot/how-to-use-the-wafflebot)
-- [Join Waffle.io](https://waffle.io/ErnstEksteen/COS301_GA-SATSolver/join)
+- [Join Waffle.io](https://waffle.io/Imperium-Software/resolver/join)
