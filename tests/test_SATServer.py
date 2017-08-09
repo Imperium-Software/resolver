@@ -140,8 +140,8 @@ class TestSATServer(TestCase):
         # Function to get the message sent by the client
 
         def get_message_from_client(msg_to_process, server, client_id):
+            nonlocal msg_from_client
             msg_from_client = msg_to_process
-            nonlocal(msg_from_client)
             return None
 
         server_thread = SATServer("localhost", 55555, get_message_from_client)
