@@ -1,5 +1,4 @@
 {
-  "test_GA.py": true,
   "test_GA.py::TestGA::test_choose_rvcf": true,
   "test_GA.py::TestGA::test_degree": true,
   "test_GA.py::TestGA::test_standard_tabu": true,
