@@ -330,8 +330,10 @@ class GA:
         :return: The weight value.
         """
 
-        c_ones = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 1)]
-        c_zeros = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 0)]
+        c_ones = [clause for clause in self.formula if (index in clause or -index in clause) and
+                  (individual.get(index) == 1)]
+        c_zeros = [clause for clause in self.formula if (index in clause or -index in clause) and
+                   (individual.get(index) == 0)]
 
         length_c_ones = len(c_ones)
         length_c_zeros = len(c_zeros)

@@ -174,20 +174,26 @@ class TestGA(TestCase):
         # A test
         self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [6])
 
+        file_reader = FormulaReader("../examples/trivial2.cnf")
+        ga_implementation = GA(file_reader.formula, 1, 3, 5, 5, 5, 5)
+        ind.data = BitVector(bitlist=[0, 0, 0])
+        self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [1, 2, 3])
+
     def test_weight(self):
         file_reader = FormulaReader("../examples/trivial.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
-        self.assertEqual(ga_implementation.weight(ind, 4), 4)
-        self.assertEqual(1, 1)
+        self.assertEqual(ga_implementation.weight(ind, 4), 1.5)
+        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+        self.assertEqual(ga_implementation.weight(ind, 4), 1)
 
     def test_degree(self):
         ind = Individual(9)
         ind.data = BitVector(bitlist=[1, 0, 0, 1, 0, 0, 0, 0, 0])
-        self.assertEqual(GA.degree(ind, [9, -5]), 0)
+        self.assertEqual(GA.degree(ind, [9, -5]), 1)
         self.assertEqual(GA.degree(ind, [1, 3, 6]), 1)
-        ind.data = BitVector(bitlist=[0, 0, 1, 0, 0, 0, 1, 1, 0])
+        ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 1, 1, 0])
         self.assertEqual(GA.degree(ind, [7, 8, -3]), 3)
 
     def test_tabu_with_diversification(self):
