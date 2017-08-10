@@ -384,9 +384,11 @@ class GA:
         false_clauses = []
 
         for i in range(len(self.formula)):
-            if not self.sat(individual, self.formula[i]) and self.false_counts[i] >= self.max_false:
-                false_clauses.append(self.formula[i])
+            if not self.sat(individual, self.formula[i]):
                 self.false_counts[i] += 1
+                if self.false_counts[i] == self.max_false:
+                    false_clauses.append(self.formula[i])
+                    self.false_counts[i] = 0
 
         individual_temp = copy.deepcopy(individual)
         forbidden_flips = {}
