@@ -22,6 +22,7 @@
 - [Requirements Documentation](https://www.overleaf.com/9687894kqqdwgmqymsx)
 - [Requirements Documentation PDF](https://dearvolt.com/imperium/software-requirements-specification.pdf)
 - [Architectural Design Specifications](https://github.com/Imperium-Software/resolver/wiki/Architectural-Design-Specifications)
+- [Latest Testing Report](https://drive.google.com/file/d/0B9BjYGq76aeBNnk1NUx4ek5zMWM/view?usp=sharing)
 - [User Guide](https://github.com/Imperium-Software/resolver/wiki/User-Guide)
 - [CS Group Page](http://cs.up.ac.za/teams/pages/manage/147/5)
 - [Waffle.io](https://waffle.io/Imperium-Software/resolver)
