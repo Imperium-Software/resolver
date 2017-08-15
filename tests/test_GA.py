@@ -202,7 +202,8 @@ class TestGA(TestCase):
         self.assertEqual(1, 1)
 
     def test_is_satisfied(self):
-        self.assertEqual(1, 1)
+        reader = FormulaReader("../examples/trivial.cnf")
+        ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
 
     def test_replace(self):
         self.assertEqual(1, 1)

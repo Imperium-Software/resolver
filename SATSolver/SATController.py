@@ -1,5 +1,6 @@
 import sys
 from SATSolver.GA import GA
+from RequestHandler import *
 from optparse import OptionParser
 from SATSolver.server import SATServer
 
@@ -34,6 +35,7 @@ class SATController:
         Takes a list of lines read from the input file and 
         """
         # Read all the lines from the file that aren't comments
+        print(raw_formula)
         lines = [line.replace("\n", "") for line in raw_formula if line[0] != "c" and line.strip() != ""]
         numberOfVariables, numberOfClauses = int(lines[0].split()[2]), int(lines[0].split()[3])
         formula = []
@@ -70,10 +72,11 @@ def main(argv):
     """
 
     controller = singleton(SATController)()
+    message_decoder = RequestHandler()
 
     if len(argv) == 0:
         # Start the interface
-        server_thread = SATServer(default_host, default_port)
+        server_thread = SATServer(default_host, default_port, message_decoder.decode)
         server_thread.start()
     else:
         parser = OptionParser()
@@ -103,7 +106,7 @@ def main(argv):
             server_thread = SATServer(default_host, options["port"])
             server_thread.start()
         else:
-            f = open("example.cnf", "r")  # TODO: Get filename passed in
+            f = open("../examples/trivial.cnf", "r")  # TODO: Get filename passed in
             formula, number_of_variables, number_of_clauses = controller.parse_formula(f.readlines())
             # TODO: Create the headless, local GA instance here
             print("Server not wanted")
