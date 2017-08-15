@@ -25,7 +25,7 @@ class SATController:
         self.GA = None
 
     def has_ga_instance(self):
-        return self.GA is not None
+        return self.GA is None
 
     def create_ga(self, ga_parameters):
         self.GA = GA(**ga_parameters)
@@ -94,8 +94,8 @@ def main(argv):
                           metavar="<sub population size>")
         parser.add_option("--crossover-operator", dest="crossover_operator", type="string", help="",
                           metavar="<crossover operator>")
-        parser.add_option("--max-flip", dest="max-flip", type="int", help="", metavar="<max flip>")
-        parser.add_option("--rvcf", dest="is_rcvf", type="string", help="")
+        parser.add_option("--max-flip", dest="max_flip", type="int", help="", metavar="<max flip>")
+        parser.add_option("--rvcf", dest="is_rvcf", type="string", help="")
         parser.add_option("--diversification", dest="is_diversification", type="string", help="")
         parser.add_option("--method", dest="method", type="string", help="", metavar="<method>")
 
@@ -108,6 +108,13 @@ def main(argv):
         else:
             f = open("../examples/trivial.cnf", "r")  # TODO: Get filename passed in
             formula, number_of_variables, number_of_clauses = controller.parse_formula(f.readlines())
+            del options['port']
+            del options['file']
+            options['formula'] = formula
+            options['number_of_variables'] = number_of_variables
+            options['number_of_clauses'] = number_of_clauses
+            controller.create_ga(options)
+            controller.GA.gasat()
             # TODO: Create the headless, local GA instance here
             print("Server not wanted")
 
