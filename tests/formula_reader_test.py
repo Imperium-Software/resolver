@@ -28,3 +28,4 @@ class FormulaReader:
                     line += 1
             # clause is now a list of lists, so we need to flatten it and convert it to a list
             self.formula.append(tuple([item for sublist in clause for item in sublist]))
+        f.close()

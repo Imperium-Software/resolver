@@ -2,7 +2,7 @@ from GA import GA
 from unittest import TestCase
 from BitVector import BitVector
 from individual import Individual
-from tests.formula_reader_test import FormulaReader
+from formula_reader_test import FormulaReader
 
 
 class TestGA(TestCase):
@@ -204,6 +204,17 @@ class TestGA(TestCase):
     def test_is_satisfied(self):
         reader = FormulaReader("../examples/trivial.cnf")
         ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
+        ind = Individual(9)
+        ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
+        ga.population = [ind for x in range(100)]
+
+        # There should not be a satisfiable assignment.
+        self.assertIsNone(ga.is_satisfied())
+
+        ga.population[0].data = BitVector(bitlist=[1, 1, 1, 0, 1, 1, 1, 1, 1])
+
+        # Population now has one satisfying assignment.
+        self.assertIsNotNone(ga.is_satisfied())
 
     def test_replace(self):
         self.assertEqual(1, 1)
