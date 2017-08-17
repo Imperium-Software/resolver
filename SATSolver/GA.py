@@ -330,11 +330,27 @@ class GA:
         :return: The weight value.
         """
 
-        c_ones = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 1)]
-        c_zeros = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 0)]
+        c_ones = [clause for clause in self.formula if (index in clause or -index in clause) and
+                  (individual.get(index) == 1)]
+        c_zeros = [clause for clause in self.formula if (index in clause or -index in clause) and
+                   (individual.get(index) == 0)]
 
-        return sum(self.degree(individual, c) for c in c_ones) / len(c_ones) + sum(self.degree(individual, c)
-                                                                                   for c in c_zeros) / len(c_zeros)
+        length_c_ones = len(c_ones)
+        length_c_zeros = len(c_zeros)
+
+        sum_ones = sum(self.degree(individual, c) for c in c_ones)
+        sum_zeros = sum(self.degree(individual, c) for c in c_zeros)
+
+        # To cater for the case where the length is 0
+        ratio_ones = 0
+        ratio_zeros = 0
+        if length_c_ones > 0:
+            ratio_ones = sum_ones / length_c_ones
+
+        if length_c_zeros > 0:
+            ratio_zeros = sum_zeros / length_c_zeros
+
+        return ratio_ones + ratio_zeros
 
     @staticmethod
     def degree(individual, clause):
@@ -368,9 +384,11 @@ class GA:
         false_clauses = []
 
         for i in range(len(self.formula)):
-            if not self.sat(individual, self.formula[i]) and self.false_counts[i] >= self.max_false:
-                false_clauses.append(self.formula[i])
+            if not self.sat(individual, self.formula[i]):
                 self.false_counts[i] += 1
+                if self.false_counts[i] == self.max_false:
+                    false_clauses.append(self.formula[i])
+                    self.false_counts[i] = 0
 
         individual_temp = copy.deepcopy(individual)
         forbidden_flips = {}
