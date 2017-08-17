@@ -1,5 +1,5 @@
 from unittest import TestCase
-from SATSolver.server import SATServer
+from server import SATServer
 from threading import Thread
 import socket
 

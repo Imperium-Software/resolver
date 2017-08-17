@@ -1,5 +1,6 @@
 import sys
 from SATSolver.GA import GA
+from RequestHandler import *
 from optparse import OptionParser
 from SATSolver.server import SATServer
 
@@ -24,7 +25,7 @@ class SATController:
         self.GA = None
 
     def has_ga_instance(self):
-        return self.GA is not None
+        return self.GA is None
 
     def create_ga(self, ga_parameters):
         self.GA = GA(**ga_parameters)
@@ -34,6 +35,7 @@ class SATController:
         Takes a list of lines read from the input file and 
         """
         # Read all the lines from the file that aren't comments
+        print(raw_formula)
         lines = [line.replace("\n", "") for line in raw_formula if line[0] != "c" and line.strip() != ""]
         numberOfVariables, numberOfClauses = int(lines[0].split()[2]), int(lines[0].split()[3])
         formula = []
@@ -70,10 +72,11 @@ def main(argv):
     """
 
     controller = singleton(SATController)()
+    message_decoder = RequestHandler()
 
     if len(argv) == 0:
         # Start the interface
-        server_thread = SATServer(default_host, default_port)
+        server_thread = SATServer(default_host, default_port, message_decoder.decode)
         server_thread.start()
     else:
         parser = OptionParser()
@@ -91,8 +94,8 @@ def main(argv):
                           metavar="<sub population size>")
         parser.add_option("--crossover-operator", dest="crossover_operator", type="string", help="",
                           metavar="<crossover operator>")
-        parser.add_option("--max-flip", dest="max-flip", type="int", help="", metavar="<max flip>")
-        parser.add_option("--rvcf", dest="is_rcvf", type="string", help="")
+        parser.add_option("--max-flip", dest="max_flip", type="int", help="", metavar="<max flip>")
+        parser.add_option("--rvcf", dest="is_rvcf", type="string", help="")
         parser.add_option("--diversification", dest="is_diversification", type="string", help="")
         parser.add_option("--method", dest="method", type="string", help="", metavar="<method>")
 
@@ -103,8 +106,15 @@ def main(argv):
             server_thread = SATServer(default_host, options["port"])
             server_thread.start()
         else:
-            f = open("example.cnf", "r")  # TODO: Get filename passed in
+            f = open("../examples/trivial.cnf", "r")  # TODO: Get filename passed in
             formula, number_of_variables, number_of_clauses = controller.parse_formula(f.readlines())
+            del options['port']
+            del options['file']
+            options['formula'] = formula
+            options['number_of_variables'] = number_of_variables
+            options['number_of_clauses'] = number_of_clauses
+            controller.create_ga(options)
+            controller.GA.gasat()
             # TODO: Create the headless, local GA instance here
             print("Server not wanted")
 

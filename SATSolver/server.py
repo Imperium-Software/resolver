@@ -40,13 +40,15 @@ class ClientThread(Thread):
                 msg_chunk = ""
                 total_msg = ""
                 while msg_chunk == "" or msg_chunk[-1] != '#':
+                    print(msg_chunk)
                     msg_chunk = self.conn.recv(1024).strip().decode("utf-8").strip()
                     if msg_chunk == "":
                         self.kill()
-                    total_msg += msg_chunk
-                self.server_thread.process_message_from_client(msg_chunk, self.thread_id)
+                    total_msg += msg_chunk + "\n"
+                self.server_thread.process_message_from_client(total_msg, self.thread_id)
         except socket.error:
             return
+
 
     def send_to_client(self, msg):
         """

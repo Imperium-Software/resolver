@@ -33,13 +33,14 @@ class RequestHandler:
             Helper method that will try execute the `SOLVE` command.
             :param json_data: The JSON object 'SOLVE'
             """
+
             required_parameters = ["raw_input", "tabu_list_length", "max_false", "rec", "k"]
             optional_parameters = ["max_generations", "population_size", "sub_population_size", "crossover_operator",
                                    "max_flip", "is_rvcf", "is_diversification", "method"]
             if set(required_parameters).issubset(list(json_data["SOLVE"].keys())):
                 if set(list(json_data["SOLVE"].keys())).issubset(set(required_parameters + optional_parameters)):
                     controller = singleton(SATController)()
-                    if controller.has_ga_instance:
+                    if controller.has_ga_instance():
                         raise RequestHandlerError("This server is already solving. No `SOLVE` requests can be handled "
                                                   "until it has completed.")
                     else:
@@ -66,9 +67,11 @@ class RequestHandler:
             pass
 
         # Try and decode the JSON string. Return error message if the decoding failed.
+
         try:
             try:
-                command = json.loads(data[:-1])
+                print("Request handler got this juicy data " + str(data[:data.index('#')]))
+                command = json.loads(data[:data.index('#')])
             except json.JSONDecodeError as e:
                 raise RequestHandlerError("JSON could not be decoded: " + str(e))
 
@@ -92,7 +95,7 @@ class RequestHandler:
     def encode(message_type, message):
 
         def error(msg):
-            return '{"RESPONSE":{"ERROR":"' + msg + '"}}#'
+            return '{"RESPONSE":{"ERROR":"' + str(msg) + '"}}#'
 
         options = {
             "ERROR": error
