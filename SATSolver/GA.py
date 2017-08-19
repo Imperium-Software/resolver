@@ -11,7 +11,7 @@ from individual import Individual
 
 class GA:
     def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length, max_false, rec, k, max_generations=1000, population_size=100,
-                 sub_population_size=15, crossover_operator=0, max_flip=10000, is_rvcf=True,
+                 sub_population_size=15, crossover_operator=0, max_flip=10000, is_rvcf=False,
                  is_diversification=True, method=None):
 
         self.formula = formula
@@ -332,7 +332,9 @@ class GA:
 
         c_ones = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 1)]
         c_zeros = [clause for clause in self.formula if (index in clause) and (individual.get(index) == 0)]
-
+        print(c_ones)
+        print(c_zeros)
+        print(individual)
         return sum(self.degree(individual, c) for c in c_ones) / len(c_ones) + sum(self.degree(individual, c)
                                                                                    for c in c_zeros) / len(c_zeros)
 
@@ -532,6 +534,7 @@ class GA:
             satisfied_individual = self.is_satisfied()
             # Increase the generation
             generation_counter = generation_counter + 1
+            print(generation_counter)
 
         # Return a satisfying assignment if there exists one
         if satisfied_individual is not None:

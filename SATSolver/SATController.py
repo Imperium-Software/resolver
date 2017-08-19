@@ -28,14 +28,15 @@ class SATController:
         return self.GA is None
 
     def create_ga(self, ga_parameters):
-        self.GA = GA(**ga_parameters)
+
+        new_params = {key: ga_parameters[key] for key in ga_parameters.keys() if ga_parameters[key] is not None}
+        self.GA = GA(**new_params)
 
     def parse_formula(self, raw_formula):
         """
         Takes a list of lines read from the input file and 
         """
         # Read all the lines from the file that aren't comments
-        print(raw_formula)
         lines = [line.replace("\n", "") for line in raw_formula if line[0] != "c" and line.strip() != ""]
         numberOfVariables, numberOfClauses = int(lines[0].split()[2]), int(lines[0].split()[3])
         formula = []
@@ -114,9 +115,8 @@ def main(argv):
             options['number_of_variables'] = number_of_variables
             options['number_of_clauses'] = number_of_clauses
             controller.create_ga(options)
-            controller.GA.gasat()
+            print(controller.GA.gasat())
             # TODO: Create the headless, local GA instance here
-            print("Server not wanted")
 
 
 if __name__ == '__main__':
