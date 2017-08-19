@@ -7,8 +7,10 @@ let HOST = 'localhost';
 let PORT = 23;
 
 function construct_request(type) {
-    var request_string = "{\n\t'command' :";
+    
     if (type == 'SOLVE') {
+
+        var request_string = "{\n\t'SOLVE' : {";
 
         if ($('#cnf-input-method')[0].value == 'file') {
             let filename = $('#selected-file').prop('files')[0].path;
@@ -16,14 +18,13 @@ function construct_request(type) {
         } else {
             dimacs = $('#manual-cnf')[0].value;
         }
-        request_string += "'SOLVE'";
 
         // Mandatory parameters
 
-        request_string += ",\n\t'tabu_list_length' : " + $("#tabu_list_length")[0].value;
-        request_string += ",\n\t'max_false' : " + $("#max_false")[0].value;
-        request_string += ",\n\t'rec' : " + $("#rec")[0].value;
-        request_string += ",\n\t'k' : " + $("#k")[0].value;
+        request_string += "\n\t\t'tabu_list_length' : " + $("#tabu_list_length")[0].value + ",";
+        request_string += "\n\t\t'max_false' : " + $("#max_false")[0].value + ",";
+        request_string += "\n\t\t'rec' : " + $("#rec")[0].value + ",";
+        request_string += "\n\t\t'k' : " + $("#k")[0].value;
 
         // Optional parameters
 
@@ -38,43 +39,43 @@ function construct_request(type) {
         let tabu_settings_input = $('#tabu-settings').val();
 
         if (population_size_input != undefined && population_size_input != '') {
-            request_string += ",\n\t'population_size' : " + population_size_input;
+            request_string += ",\n\t\t'population_size' : " + population_size_input;
         }
 
         if (sub_population_size_input != undefined && sub_population_size_input != '') {
-            request_string += ",\n\t'sub_population_size' : " + sub_population_size_input;
+            request_string += ",\n\t\t'sub_population_size' : " + sub_population_size_input;
         }
 
         if (crossover_operator_input != undefined && crossover_operator_input != '') {
-            request_string += ",\n\t'crossover_operator' : " + crossover_operator_input;
+            request_string += ",\n\t\t'crossover_operator' : " + crossover_operator_input;
         }
 
         if (max_flip_input != undefined && max_flip_input != '') {
-            request_string += ",\n\t'max_flip' : " + max_flip_input;
+            request_string += ",\n\t\t'max_flip' : " + max_flip_input;
         }
 
         if (max_generations_input != undefined && max_generations_input != '') {
-            request_string += ",\n\t'max_generations' : " + max_generations_input;
+            request_string += ",\n\t\t'max_generations' : " + max_generations_input;
         }
 
         if (method_input != undefined && method_input != '') {
-            request_string += ",\n\t'method' : '" + method_input + "'";
+            request_string += ",\n\t\t'method' : '" + method_input + "'";
         }
 
         if (tabu_settings_input.indexOf('rvcf') != -1) {
-            request_string += ",\n\t'is_rvcf' : true";
+            request_string += ",\n\t\t'is_rvcf' : true";
         }
         
         if (tabu_settings_input.indexOf('diversification') != -1) {
-            request_string += ",\n\t'is_diversification' : true";
+            request_string += ",\n\t\t'is_diversification' : true";
         }
 
-        request_string += ",\n\t'raw_input' :\n'" + dimacs + "'";
+        request_string += ",\n\t\t'raw_input' :\n'" + dimacs + "'";
     } else if (type == 'POLL') {
         request_string += "'POLL'";
     }
     // Add terminating character.
-    return request_string.concat('\n\n}\n#');
+    return request_string.concat('\n\n\t}\n}\n#');
 }
 
 function make_request(type, filename) {

@@ -2,7 +2,7 @@ from GA import GA
 from unittest import TestCase
 from BitVector import BitVector
 from individual import Individual
-from tests.formula_reader_test import FormulaReader
+from formula_reader_test import FormulaReader
 
 
 class TestGA(TestCase):
@@ -86,7 +86,8 @@ class TestGA(TestCase):
     def test_standard_tabu_choose(self):
         # TEST 1 - All positions are tabu and best is the same as the individual........................................
         # An instance of the GA class which will be used to test the standard_tabu_choose function
-        ga_implementation = GA("../examples/trivial.cnf", 10, 5, 5, 5)
+        file_reader = FormulaReader("../examples/trivial.cnf")
+        ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # The tabu list is set to the size which was received as parameter i.e. [5]
         ga_implementation.tabu = ga_implementation.tabu[:ga_implementation.tabu_list_length]
         # Every single position is tabu
@@ -109,8 +110,8 @@ class TestGA(TestCase):
 
         # TEST 2 - All positions are tabu and best individual is guaranteed to be better................................
 
-        reader = FormulaReader("../examples/trivial.cnf")
-        ga_implementation = GA(reader.formula, 9, 5, 10, 5, 5, 5)
+        file_reader = FormulaReader("../examples/trivial2.cnf")
+        ga_implementation = GA(file_reader.formula, 1, 3, 5, 5, 5, 5)
         ga_implementation.tabu = ga_implementation.tabu[:ga_implementation.tabu_list_length]
 
         for index in range(1, 4, 1):
@@ -128,8 +129,9 @@ class TestGA(TestCase):
     def test_standard_tabu(self):
         # Test 1 - Satisfying assignment Passed - Nothing to intensify..................................................
         # An instance of the GA class which will be used to test the standard_tabu function
-        reader = FormulaReader("../examples/trivial.cnf")
-        ga_implementation = GA(reader.formula, 9, 5, 10, 5, 5, 5)
+
+        file_reader = FormulaReader("../examples/trivial.cnf")
+        ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # Creating an individual that will represent the individual we want to intensify using tabu search
         ind = Individual(9)
         # Individual is assigned values for variables to overwrite the random initialisation
@@ -139,14 +141,16 @@ class TestGA(TestCase):
         self.assertEqual(list(ind.data), list(BitVector(bitlist=[0, 0, 0, 0, 0, 1, 1, 1, 1])))
         # .............................................................................................................
         # Test 2 - Max Number of Flips is Zero..........................................................................
-        ga_implementation = GA(reader.formula, 9, 5,  10, 5, 5, 5, max_flip=0)
+        file_reader = FormulaReader("../examples/trivial.cnf")
+        ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, max_flip=0)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
         ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
         self.assertEqual(list(ind.data), list(BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])))
         # .............................................................................................................
         # Test 3 - No diversification..................................................................................
-        ga_implementation = GA(reader.formula, 9, 5, 10, 5, 5, 5, is_diversification=False)
+        file_reader = FormulaReader("../examples/trivial.cnf")
+        ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, is_diversification=False)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
         ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
@@ -161,29 +165,36 @@ class TestGA(TestCase):
         # .............................................................................................................
     def test_choose_rvcf(self):
         # An instance of the GA class which will be used to test the standard_tabu_choose function
-        reader = FormulaReader("../examples/trivial.cnf")
-        ga_implementation = GA(reader.formula, 9, 5, 10, 5, 5, 5)
+        file_reader = FormulaReader("../examples/trivial.cnf")
+        ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # Creating an individual that will represent the best individual during a tabu search procedure
         ind = Individual(9)
         # Individual is assigned values for variables to overwrite the random initialisation
         ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
         # A test
-        self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [0])
+        self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [6])
+
+        file_reader = FormulaReader("../examples/trivial2.cnf")
+        ga_implementation = GA(file_reader.formula, 1, 3, 5, 5, 5, 5)
+        ind.data = BitVector(bitlist=[0, 0, 0])
+        self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [1, 2, 3])
 
     def test_weight(self):
-        reader = FormulaReader("../examples/trivial.cnf")
-        ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
+
+        file_reader = FormulaReader("../examples/trivial.cnf")
+        ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
-        self.assertEqual(ga.weight(ind, 4), 4)
-        self.assertEqual(1, 1)
+        self.assertEqual(ga_implementation.weight(ind, 4), 1.5)
+        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+        self.assertEqual(ga_implementation.weight(ind, 4), 1)
 
     def test_degree(self):
         ind = Individual(9)
         ind.data = BitVector(bitlist=[1, 0, 0, 1, 0, 0, 0, 0, 0])
-        self.assertEqual(GA.degree(ind, [9, -5]), 0)
+        self.assertEqual(GA.degree(ind, [9, -5]), 1)
         self.assertEqual(GA.degree(ind, [1, 3, 6]), 1)
-        ind.data = BitVector(bitlist=[0, 0, 1, 0, 0, 0, 1, 1, 0])
+        ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 1, 1, 0])
         self.assertEqual(GA.degree(ind, [7, 8, -3]), 3)
 
     def test_tabu_with_diversification(self):
@@ -204,6 +215,17 @@ class TestGA(TestCase):
     def test_is_satisfied(self):
         reader = FormulaReader("../examples/trivial.cnf")
         ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
+        ind = Individual(9)
+        ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
+        ga.population = [ind for x in range(100)]
+
+        # There should not be a satisfiable assignment.
+        self.assertIsNone(ga.is_satisfied())
+
+        ga.population[0].data = BitVector(bitlist=[1, 1, 1, 0, 1, 1, 1, 1, 1])
+
+        # Population now has one satisfying assignment.
+        self.assertIsNotNone(ga.is_satisfied())
 
     def test_replace(self):
         self.assertEqual(1, 1)
