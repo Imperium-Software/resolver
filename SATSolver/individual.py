@@ -40,6 +40,7 @@ class Individual:
             if value is not None:
                 self.data = BitVector(bitlist=value)
 
+
         elif self.method == Individual.BIT_ARRAY:
             self.defined = bitarray(length)
             self.data = bitarray(length)
@@ -51,6 +52,11 @@ class Individual:
 
             if value is not None:
                 self.data = [bool(X) for X in value]
+
+        for i in range(1, length+1):
+            if bool(random.getrandbits(1)):
+                self.flip(i)
+        print(self)
 
     def __str__(self):
 
