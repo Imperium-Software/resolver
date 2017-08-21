@@ -412,10 +412,10 @@ class GA:
 
         temp_clause = [c for c in clause if c not in iteration_dict.keys()]
         try:
-            index = max(temp_clause, key=lambda c: self.improvement(individual, c))[0]
+            value = max(temp_clause, key=lambda c: self.improvement(individual, c))
         except ValueError as e:
             raise e
-        pos = temp_clause[index]
+        pos = temp_clause.index(value)
 
         # Check if pos has been flipped before
         # flips this one stubborn bit and refuse to flip it back before k flips.
