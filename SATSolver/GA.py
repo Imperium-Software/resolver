@@ -12,7 +12,7 @@ from individual import Individual
 class GA:
     def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length, max_false, rec, k, max_generations=1000, population_size=100,
                  sub_population_size=15, crossover_operator=0, max_flip=10000, is_rvcf=False,
-                 is_diversification=True, method=None):
+                 is_diversification=False, method=None):
 
         self.formula = formula
         self.numberOfClauses = number_of_clauses
@@ -30,6 +30,8 @@ class GA:
         self.rec = rec
         self.k = k
         self.method = method
+        self._observers = set()
+        self._generation_counter = None
 
         # Initialize tabu, population and the sub_population to empty lists
         self.tabu = []
@@ -506,6 +508,8 @@ class GA:
 
         return
 
+
+
     def gasat(self):
         """
         The GASAT algorithm
@@ -518,14 +522,14 @@ class GA:
         self.create_population()
 
         # Counts the current number of iterations completed
-        generation_counter = 0
+        self._generation_counter = 0
 
         # An individual that satisfies the formula or None
         satisfied_individual = None
 
         # While no individual in the population satisfies the formula and while we have not reached the maximum
         # generation threshold
-        while satisfied_individual is None and generation_counter < self.max_generations:
+        while satisfied_individual is None and self._generation_counter < self.max_generations:
             # A sub-population of possible parents is selected and two individuals are randomly selected as parents
             parents = self.select()
 
@@ -549,8 +553,8 @@ class GA:
             # Determine whether any individual that satisfies the formula appeared in the current generation
             satisfied_individual = self.is_satisfied()
             # Increase the generation
-            generation_counter = generation_counter + 1
-            print(generation_counter)
+            print(child)
+            self.generation_counter = self.generation_counter + 1
 
         # Return a satisfying assignment if there exists one
         if satisfied_individual is not None:
@@ -562,108 +566,23 @@ class GA:
             # assignment found
             return self.population[0]
 
-        # -------------------------------------------------------------------------------------------------------------
+    def attach(self, observer):
+        observer._subject = self
+        self._observers.add(observer)
 
-# Old Tests
-# if __name__ == "__main__":
-#     # TESTS
-#     num_fail = 0
-#     print("Testing SAT instance : f1000")
-#     test_individual = GA("../examples/f1000.cnf")
-#     if len(test_individual.formula) == test_individual.numberOfClauses:
-#         print("    len(formula) == numberOfClauses => pass")
-#     else:
-#         print("    len(formula) == numberOfClauses => fail")
-#         num_fail += 1
-#     if test_individual.formula[0] == (119, 325, -401):
-#         print("    formula[0] == (119, 325, -401) => pass")
-#     else:
-#         print("    formula[0] == (119, 325, -401) => fail")
-#         num_fail += 1
-#     if test_individual.formula[-1] == (-839, -494, 718):
-#         print("    formula[-1] == (-839, -494, 718) => pass")
-#     else:
-#         print("    formula[-1] == (-839, -494, 718) => fail")
-#         num_fail += 1
-#
-#     print()
-#     print("Testing SAT instance : f2000")
-#     test_individual = GA("../examples/f2000.cnf")
-#     if len(test_individual.formula) == test_individual.numberOfClauses:
-#         print("    len(formula) == numberOfClauses => pass")
-#     else:
-#         print("    len(formula) == numberOfClauses => fail")
-#         num_fail += 1
-#     if test_individual.formula[0] == (1295, 1303, -1372):
-#         print("    formula[0] == (1295, 1303, -1372) => pass")
-#     else:
-#         print("    formula[0] == (1295, 1303, -1372) => fail")
-#         num_fail += 1
-#     if test_individual.formula[-1] == (1952, -450, 952):
-#         print("    formula[-1] == (1952, -450, 952) => pass")
-#     else:
-#         print("    formula[-1] == (1952, -450, 952) => fail")
-#         num_fail += 1
-#
-#     print()
-#     print("Testing SAT instance : par16-4-c")
-#     test_individual = GA("../examples/par16-4-c.cnf")
-#     if len(test_individual.formula) == test_individual.numberOfClauses:
-#         print("    len(formula) == numberOfClauses => pass")
-#     else:
-#         print("    len(formula) == numberOfClauses => fail")
-#         num_fail += 1
-#     if test_individual.formula[0] == (-2, 1):
-#         print("    formula[0] == (-2, 1) => pass")
-#     else:
-#         print("    formula[0] == (-2, 1) => fail")
-#         num_fail += 1
-#     if test_individual.formula[-1] == (132, 324, -140):
-#         print("    formula[-1] == (132, 324, -140) => pass")
-#     else:
-#         print("    formula[-1] == (132, 324, -140) => fail")
-#         num_fail += 1
-#
-#     print()
-#     print("Testing SAT instance : par32-5")
-#     test_individual = GA("../examples/par32-5.cnf")
-#     if len(test_individual.formula) == test_individual.numberOfClauses:
-#         print("    len(formula) == numberOfClauses => pass")
-#     else:
-#         print("    len(formula) == numberOfClauses => fail")
-#         num_fail += 1
-#     if test_individual.formula[0] == (-1,):
-#         print("    formula[0] == (-1,) => pass")
-#     else:
-#         print("    formula[0] == (-1,) => fail")
-#         num_fail += 1
-#     if test_individual.formula[-1] == (-3176,):
-#         print("    formula[-1] == (-3176,) => pass")
-#     else:
-#         print("    formula[-1] == (-3176,) => fail")
-#         num_fail += 1
-#
-#     print()
-#     print("Testing SAT instance : par32-5-c")
-#     test_individual = GA("../examples/par32-5-c.cnf")
-#     if len(test_individual.formula) == test_individual.numberOfClauses:
-#         print("    len(formula) == numberOfClauses => pass")
-#     else:
-#         print("    len(formula) == numberOfClauses => fail")
-#         num_fail += 1
-#     if test_individual.formula[0] == (-2, 1):
-#         print("    formula[0] == (-2, 1) => pass")
-#     else:
-#         print("    formula[0] == (-2, 1) => fail")
-#         num_fail += 1
-#     if test_individual.formula[-1] == (450, -408, 1339):
-#         print("    formula[-1] == (450, -408, 1339) => pass")
-#     else:
-#         print("    formula[-1] == (450, -408, 1339) => fail")
-#         num_fail += 1
-#
-#     print("----------------------")
-#     if num_fail == 0:
-#         print("Passed all benchmarks.")
-#     else:
-#         print(str(num_fail) + " benchmarks failed.")
+    def detach(self, observer):
+        observer._subject = None
+        self._observers.discard(observer)
+
+    def _notify(self):
+        for observer in self._observers:
+            observer.update(self._generation_counter)
+            
+    @property
+    def generation_counter(self):
+        return self._generation_counter
+
+    @generation_counter.setter
+    def generation_counter(self, arg):
+        self._generation_counter = arg
+        self._notify()
