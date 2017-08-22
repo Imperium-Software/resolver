@@ -27,13 +27,13 @@ var error_log = new Vue({
 
 // Create connection and establish callbacks.
 
-let conn = new net.Socket();
+conn = new net.Socket();
 
-if (process.env.SAT_SOLVER_PORT != null) {
-  client.connect(process.env.SAT_SOLVER_PORT, '127.0.0.1', function() {
+// if (process.env.SAT_SOLVER_PORT != null) {
+  client.connect(55555, '127.0.0.1', function() {
 	  console.log('Connected');
   });
-}
+// }
 conn.on('data', function(data) {
 	console.log('Received: ' + data);
 });

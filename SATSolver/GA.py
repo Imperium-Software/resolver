@@ -550,7 +550,7 @@ class GA:
             satisfied_individual = self.is_satisfied()
             # Increase the generation
             generation_counter = generation_counter + 1
-            print(generation_counter)
+            print(str(generation_counter) + " " + str(child))
 
         # Return a satisfying assignment if there exists one
         if satisfied_individual is not None:

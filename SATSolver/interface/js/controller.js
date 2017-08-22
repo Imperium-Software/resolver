@@ -3,9 +3,6 @@ const {
     dialog
 } = require('electron').remote;
 
-let HOST = 'localhost';
-let PORT = 23;
-
 function construct_request(type) {
     
     if (type == 'SOLVE') {
@@ -80,7 +77,9 @@ function construct_request(type) {
 
 function make_request(type, filename) {
     try {
-        console.log(construct_request('SOLVE'));
+        var request = construct_request('SOLVE');
+        console.log(request);
+        conn.send("{}#");
         terminal.text = "";
         error_log.text = "";
     } catch (e) {
