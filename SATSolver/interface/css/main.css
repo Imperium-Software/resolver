@@ -107,7 +107,8 @@
   }
 
   .btn {
-  	text-transform: none;
+    text-transform: none;
+    background-color: var(--theme-four) !important;
   }
 
    ::-webkit-scrollbar {

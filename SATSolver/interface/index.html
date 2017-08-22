@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>SATSolver</title>
+  <title>resolver</title>
   <link rel="stylesheet" type="text/css" href="css/materialize.min.css">
   <link rel="stylesheet" type="text/css" href="css/current-theme-init.css">
   <link rel="stylesheet" type="text/css" href="css/main.css">
@@ -16,7 +16,7 @@
   <div id='app'>
     <ul id="slide-out" class="side-nav SAT-roayal-blue">
       <li>
-        <div id="side-bar-title" class="white-text"><b>SAT</b>Solver</div>
+        <div id="side-bar-title" class="white-text"><b>SAT</b></div>
       </li>
       <div class="container">
         <li class="divider"></li>
@@ -31,6 +31,11 @@
           <button data-activates="slide-out" class="btn button-collapse"><b>SAT</b>Home</button>
           <div class="container">
             <p class="right" id="perc"><b>{{percentage}}</b>%</p>
+          </div>
+          <div class="right">
+            <svg height=20 width=20>
+              <circle cx=10 cy=10 class="right" id="connected-indicator" r=4 fill="red" />
+            </svg>
           </div>
         </div>
       </div>
@@ -113,70 +118,74 @@
 
                         <!-- Advanced options -->
 
-                        <ul class="collapsible" data-collapsible="accordion">
-                          <li>
-                            <div class="collapsible-header">Advanced</div>
-                            <div class="collapsible-body">
+                        <div class="modal modal-fixed-footer" id="advanced">
+                          <div class="modal-content container">
 
-                              <!-- ["max_generations", "population_size", "sub_population_size",,
-                                    "max_flip",, "method"] -->
-
-                              <div class="row">
-                                <div class="input-field col s6 tooltip">
-                                  <input id="max_generations" type="number">
-                                  <label for="max_generations">Max Generations</label>
-                                  <span class="tooltiptext">The maximum number of times evolution will iterate.</span>
-                                </div>
-                                <div class="input-field col s6 tooltip">
-                                  <input id="max_flip" type="number">
-                                  <label for="max_flip">Max Flips</label>
-                                  <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
-                                </div>
+                            <h5>Advanced Settings</h5>
+                            <div class="row container">
+                              <div class="input-field col s6 tooltip">
+                                <input id="max_generations" type="number">
+                                <label for="max_generations">Max Generations</label>
+                                <span class="tooltiptext">The maximum number of times evolution will iterate.</span>
                               </div>
-
-                              <div class="row">
-                                <div class="input-field col s6 tooltip">
-                                  <input id="population_size" type="number">
-                                  <label for="population_size">Population Size</label>
-                                  <span class="tooltiptext">The maximum number of individuals at any given time.</span>
-                                </div>
-                                <div class="input-field col s6 tooltip">
-                                  <input id="sub_population_size" type="number">
-                                  <label for="sub_population_size">Sub-population Size</label>
-                                  <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
-                                </div>
-                              </div>
-
-                              <div class="input-field col s12 tooltip gray">
-                                <select id="method">
-                                  <option value="" disabled selected>Method</option>
-                                  <option value="bitvector">BitVector</option>
-                                  <option value="bitarray">bitarray</option>
-                                </select>
-                                <span class="tooltiptext">Underlying implementation method.</span>
-                              </div>
-
-                              <div class="input-field col s12e">
-                                <select id="crossover_operator">
-                                  <option value="" disabled selected>Crossover Operator</option>
-                                  <option value="corrective-clause">Corrective Clause</option>
-                                  <option value="cctm">CCTM</option>
-                                  <option value="fleurent-and-ferland">Fleurent and Ferland</option>
-                                  <option value="uniform">Uniform Crossover</option>
-                                </select>
-                              </div>
-                              <div>
-                                <div class="input-field col s12">
-                                  <select multiple id='tabu-settings'>
-                                    <option value="" disabled selected>Tabu Search Settings</option>
-                                    <option value="rvcf">> RVCF</option>
-                                    <option value="diversification">> Diversification</option> <!-- these are not final -->
-                                  </select>
-                                </div>
+                              <div class="input-field col s6 tooltip">
+                                <input id="max_flip" type="number">
+                                <label for="max_flip">Max Flips</label>
+                                <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
                               </div>
                             </div>
-                          </li>
-                        </ul>
+
+                            <div class="row container">
+                              <div class="input-field col s6 tooltip">
+                                <input id="population_size" type="number">
+                                <label for="population_size">Population Size</label>
+                                <span class="tooltiptext">The maximum number of individuals at any given time.</span>
+                              </div>
+                              <div class="input-field col s6 tooltip">
+                                <input id="sub_population_size" type="number">
+                                <label for="sub_population_size">Sub-population Size</label>
+                                <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
+                              </div>
+                            </div>
+                            
+                            <div class="row container">
+                            <div class="input-field col s12 tooltip gray">
+                              <select id="method">
+                                <option value="" disabled selected>Method</option>
+                                <option value="bitvector">BitVector</option>
+                                <option value="bitarray">bitarray</option>
+                              </select>
+                              <span class="tooltiptext">Underlying implementation method.</span>
+                            </div>
+                            </div>
+
+                            <div class="input-field col s12e">
+                              <select id="crossover_operator">
+                                <option value="" disabled selected>Crossover Operator</option>
+                                <option value="corrective-clause">Corrective Clause</option>
+                                <option value="cctm">CCTM</option>
+                                <option value="fleurent-and-ferland">Fleurent and Ferland</option>
+                                <option value="uniform">Uniform Crossover</option>
+                              </select>
+                            </div>
+                            <div>
+                              <div class="input-field col s12">
+                                <select multiple id='tabu-settings'>
+                                  <option value="" disabled selected>Tabu Search Settings</option>
+                                  <option value="rvcf">> RVCF</option>
+                                  <option value="diversification">> Diversification</option> <!-- these are not final -->
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="modal-footer">
+                              <a href="#!" class="modal-action modal-close waves-effect btn btn-flat">Close</a>
+                          </div>
+
+                        </div>
+
+                        <a class="btn modal-trigger" href="#advanced">Advanced Settings</a>
                       </div>
                     </li>
                   </ul>
@@ -206,6 +215,9 @@
         </div>
         <br>
       </div>
+
+
+
     </div>
 </body>
 <script src="node_modules/hammerjs/hammer.js"></script>

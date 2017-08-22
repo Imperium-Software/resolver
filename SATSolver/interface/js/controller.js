@@ -103,6 +103,8 @@ $('.button-collapse').sideNav({
     draggable: true,
 });
 
+$("#advanced").modal();
+
 // Progress Circle
 
 $('#circle').circleProgress({
@@ -122,6 +124,8 @@ function navigate(filename) {
         $('.collapsible').collapsible({
             accordion: true
         });
+        $("#advanced").modal();
+        $("#connected-indicator")[0].style.fill = connected;
         render();
 
         // Re-render percentage
