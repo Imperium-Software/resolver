@@ -1,11 +1,12 @@
-from unittest import TestCase
 from server import SATServer
 from threading import Thread
 from time import sleep
+import os
 import socket
+import unittest
 
 
-class TestSATServer(TestCase):
+class TestSATServer(unittest.TestCase):
 
     class TesterClient(Thread):
 
@@ -48,6 +49,7 @@ class TestSATServer(TestCase):
             finally:
                 sock.close()
 
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_push_to_all(self):
         # Test Message
         msg = "Test Message#"
@@ -89,6 +91,7 @@ class TestSATServer(TestCase):
         server_thread.push_to_all(msg)
         server_thread.close()
 
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_push_to_one(self):
         # Test Messages
         msg = "Test Message#"
