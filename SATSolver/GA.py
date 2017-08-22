@@ -553,8 +553,8 @@ class GA:
             # Determine whether any individual that satisfies the formula appeared in the current generation
             satisfied_individual = self.is_satisfied()
             # Increase the generation
-            print(child)
-            self.generation_counter = self.generation_counter + 1
+            generation_counter = generation_counter + 1
+            print(str(generation_counter) + " " + str(child))
 
         # Return a satisfying assignment if there exists one
         if satisfied_individual is not None:

@@ -1,6 +1,6 @@
 <head>
   <meta charset="utf-8">
-  <title>SATSolver</title>
+  <title>resolver</title>
   <link rel="stylesheet" type="text/css" href="css/materialize.min.css">
   <link rel="stylesheet" type="text/css" href="css/current-theme-init.css">
   <link rel="stylesheet" type="text/css" href="css/main.css">
@@ -20,9 +20,16 @@
   </ul>
   <nav class="navbar-fixed">
     <div class="nav-wrapper nav-bar">
-      <button data-activates="slide-out" class="btn button-collapse"><b>SAT</b>Settings</button>
-      <div class="container">
-        <p class="right" id="perc"><b>{{percentage}}</b>%</p>
+      <div class='row'>
+        <button data-activates="slide-out" class="btn button-collapse"><b>SAT</b>Home</button>
+        <div class="container">
+          <p class="right" id="perc"><b>{{percentage}}</b>%</p>
+        </div>
+        <div class="right">
+          <svg height=20 width=20>
+            <circle cx=10 cy=10 class="right" id="connected-indicator" r=4 fill="red" />
+          </svg>
+        </div>
       </div>
     </div>
   </nav>
