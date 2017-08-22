@@ -2,7 +2,6 @@ import sys, os
 myPath = os.path.dirname(os.path.abspath(__file__))
 print(myPath)
 sys.path.insert(0, myPath + '/../SATSolver')
-sys.path.insert(0, myPath + '/../')
 
 from GA import GA
 from unittest import TestCase
@@ -15,7 +14,8 @@ class TestGA(TestCase):
     class FormulaReader:
 
         def __init__(self, filename):
-
+            filename = os.path.join(os.path.dirname(__file__), filename)
+            print(filename)
             f = open(filename, "r")
             # Read all the lines from the file that aren't comments
             lines = [line.replace("\n", "") for line in f.readlines() if line[0] != "c" and line.strip() != ""]

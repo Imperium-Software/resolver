@@ -1,10 +1,1 @@
-{
-  "tests/test_GA.py::TestGA::test_choose_rvcf": true,
-  "tests/test_GA.py::TestGA::test_corrective_clause": true,
-  "tests/test_GA.py::TestGA::test_evaluate": true,
-  "tests/test_GA.py::TestGA::test_improvement": true,
-  "tests/test_GA.py::TestGA::test_is_satisfied": true,
-  "tests/test_GA.py::TestGA::test_standard_tabu": true,
-  "tests/test_GA.py::TestGA::test_standard_tabu_choose": true,
-  "tests/test_GA.py::TestGA::test_weight": true
-}
+{}
