@@ -49,7 +49,6 @@ class ClientThread(Thread):
         except socket.error:
             return
 
-
     def send_to_client(self, msg):
         """
         Sends a msg to the client.
@@ -90,6 +89,7 @@ class SATServer(Thread):
 
     def __init__(self, host, port, message_decoder):
         super(SATServer, self).__init__()
+        self.threads = []
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -101,7 +101,6 @@ class SATServer(Thread):
             return
         self.thread_id_iter = 1
         self.lock = Lock()
-        self.threads = []
         self.message_decoder = message_decoder
 
     def run(self):
@@ -196,8 +195,8 @@ class SATServer(Thread):
         Terminates server operation.
         """
 
-        while len(self.threads) > 0:
-            self.threads[0].kill()
+        if self.threads is not None:
+            while len(self.threads) > 0:
+                self.threads[0].kill()
         self.socket.close()
         print("Server closed.")
-        

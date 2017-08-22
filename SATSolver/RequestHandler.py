@@ -85,19 +85,23 @@ class RequestHandler:
             else:
                 raise RequestHandlerError("Unsupported command: " + str(list(command.keys())[0]))
         except RequestHandlerError as e:
-            error_response = RequestHandler.encode("ERROR", e)
+            error_response = RequestHandler.encode("ERROR", [e])
             server.push_to_one(client_id, error_response)
         except Exception as e:
-            error_response = RequestHandler.encode("ERROR", "A fatal error occurred: " + str(e))
+            error_response = RequestHandler.encode("ERROR", ["A fatal error occurred: " + str(e)])
             server.push_to_one(client_id, error_response)
 
     @staticmethod
-    def encode(message_type, message):
+    def encode(message_type, data):
 
-        def error(msg):
-            return '{"RESPONSE":{"ERROR":"' + str(msg) + '"}}#'
+        def error(data_arr):
+            return '{"RESPONSE":{"ERROR":"' + str(data_arr[0]) + '"}}#'
+
+        def report_progress(data_arr):
+            return '{"RESPONSE":{"PROGRESS": {"GENERATION":' + str(data_arr[0]) + '}}}#'
 
         options = {
-            "ERROR": error
+            "ERROR": error,
+            "PROGRESS": report_progress
         }
-        return options[message_type](message)
+        return options[message_type](data)

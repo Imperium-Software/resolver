@@ -1,11 +1,48 @@
+import sys, os
+myPath = os.path.dirname(os.path.abspath(__file__))
+print(myPath)
+sys.path.insert(0, myPath + '/../SATSolver')
+
 from GA import GA
 from unittest import TestCase
 from BitVector import BitVector
 from individual import Individual
-from formula_reader_test import FormulaReader
 
 
 class TestGA(TestCase):
+
+    class FormulaReader:
+
+        def __init__(self, filename):
+
+            f = open(filename, "r")
+            # Read all the lines from the file that aren't comments
+            lines = [line.replace("\n", "") for line in f.readlines() if line[0] != "c" and line.strip() != ""]
+            (self.numberOfVariables, self.numberOfClauses) = int(lines[0].split()[2]), int(lines[0].split()[3])
+            self.formula = []
+
+            # Go through the lines and create numberOfClauses clauses
+            line = 1
+            # for line in range(1, len(lines)):
+            while line < len(lines):
+                clause = []
+                # We need a while loop as a clause may be split over many lines, but eventually ends with a 0
+                end_of_clause = False
+                while line < len(lines) and not end_of_clause:
+                    # Split the line and append a list of all integers, excluding 0, to clause
+                    clause.append(
+                        [int(variable.strip()) for variable in lines[line].split() if int(variable.strip()) != 0])
+                    # If this line ended with a 0, we reached the end of the clause
+                    if int(lines[line].split()[-1].strip()) == 0:
+                        end_of_clause = True
+                        line += 1
+                    # Otherwise continue reading this clause from the next line
+                    else:
+                        line += 1
+                # clause is now a list of lists, so we need to flatten it and convert it to a list
+                self.formula.append(tuple([item for sublist in clause for item in sublist]))
+            f.close()
+
     def test_sat(self):
         ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
@@ -23,7 +60,7 @@ class TestGA(TestCase):
         self.assertEqual(GA.sat_crossover(ind, [9, -5]), True)
 
     def test_evaluate(self):
-        reader = FormulaReader("../examples/trivial.cnf")
+        reader = self.FormulaReader("../examples/trivial.cnf")
         ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
@@ -34,7 +71,7 @@ class TestGA(TestCase):
         self.assertEqual(ga.evaluate(ind), 2)
 
     def test_improvement(self):
-        reader = FormulaReader("../examples/trivial.cnf")
+        reader = self.FormulaReader("../examples/trivial.cnf")
         ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
@@ -44,7 +81,7 @@ class TestGA(TestCase):
         self.assertEqual(ga.improvement(ind, 6), -1)
 
     def test_corrective_clause(self):
-        file_reader = FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
         ga = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # Creates two parent bitvectors manually.
         parent1 = Individual(9)
@@ -86,7 +123,7 @@ class TestGA(TestCase):
     def test_standard_tabu_choose(self):
         # TEST 1 - All positions are tabu and best is the same as the individual........................................
         # An instance of the GA class which will be used to test the standard_tabu_choose function
-        file_reader = FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # The tabu list is set to the size which was received as parameter i.e. [5]
         ga_implementation.tabu = ga_implementation.tabu[:ga_implementation.tabu_list_length]
@@ -110,7 +147,7 @@ class TestGA(TestCase):
 
         # TEST 2 - All positions are tabu and best individual is guaranteed to be better................................
 
-        file_reader = FormulaReader("../examples/trivial2.cnf")
+        file_reader = self.FormulaReader("../examples/trivial2.cnf")
         ga_implementation = GA(file_reader.formula, 1, 3, 5, 5, 5, 5)
         ga_implementation.tabu = ga_implementation.tabu[:ga_implementation.tabu_list_length]
 
@@ -130,7 +167,7 @@ class TestGA(TestCase):
         # Test 1 - Satisfying assignment Passed - Nothing to intensify..................................................
         # An instance of the GA class which will be used to test the standard_tabu function
 
-        file_reader = FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # Creating an individual that will represent the individual we want to intensify using tabu search
         ind = Individual(9)
@@ -141,7 +178,7 @@ class TestGA(TestCase):
         self.assertEqual(list(ind.data), list(BitVector(bitlist=[0, 0, 0, 0, 0, 1, 1, 1, 1])))
         # .............................................................................................................
         # Test 2 - Max Number of Flips is Zero..........................................................................
-        file_reader = FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, max_flip=0)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
@@ -149,7 +186,7 @@ class TestGA(TestCase):
         self.assertEqual(list(ind.data), list(BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])))
         # .............................................................................................................
         # Test 3 - No diversification..................................................................................
-        file_reader = FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, is_diversification=False)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
@@ -165,7 +202,7 @@ class TestGA(TestCase):
         # .............................................................................................................
     def test_choose_rvcf(self):
         # An instance of the GA class which will be used to test the standard_tabu_choose function
-        file_reader = FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # Creating an individual that will represent the best individual during a tabu search procedure
         ind = Individual(9)
@@ -174,14 +211,14 @@ class TestGA(TestCase):
         # A test
         self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [6])
 
-        file_reader = FormulaReader("../examples/trivial2.cnf")
+        file_reader = self.FormulaReader("../examples/trivial2.cnf")
         ga_implementation = GA(file_reader.formula, 1, 3, 5, 5, 5, 5)
         ind.data = BitVector(bitlist=[0, 0, 0])
         self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [1, 2, 3])
 
     def test_weight(self):
 
-        file_reader = FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -213,7 +250,7 @@ class TestGA(TestCase):
         self.assertEqual(1, 1)
 
     def test_is_satisfied(self):
-        reader = FormulaReader("../examples/trivial.cnf")
+        reader = self.FormulaReader("../examples/trivial.cnf")
         ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])

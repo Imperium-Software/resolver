@@ -1,4 +1,5 @@
 import sys
+import abc
 from SATSolver.GA import GA
 from RequestHandler import *
 from optparse import OptionParser
@@ -19,10 +20,36 @@ def singleton(class_):
     return get_instance
 
 
-@singleton
-class SATController:
+class Observer(metaclass=abc.ABCMeta):
+    """
+    Define an updating interface for objects that should be notified of
+    changes in a subject.
+    """
+
     def __init__(self):
+        self._subject = None
+        self._observer_state = None
+
+    @abc.abstractmethod
+    def update(self, arg):
+        pass
+
+@singleton
+class SATController(Observer):
+    def __init__(self):
+        Observer.__init__(self)
         self.GA = None
+        self.server_thread = None
+
+    def update(self, arg):
+        self._observer_state = arg
+        if not self.server_thread is None:
+            self.send_update(RequestHandler.encode("PROGRESS", [arg]))
+        else:
+            print(arg)
+
+    def send_update(self, msg):
+        self.server_thread.push_to_all(msg)
 
     def has_ga_instance(self):
         return self.GA is None
@@ -31,6 +58,7 @@ class SATController:
 
         new_params = {key: ga_parameters[key] for key in ga_parameters.keys() if ga_parameters[key] is not None}
         self.GA = GA(**new_params)
+        self.GA.attach(self)
 
     def parse_formula(self, raw_formula):
         """
@@ -77,8 +105,8 @@ def main(argv):
 
     if len(argv) == 0:
         # Start the interface
-        server_thread = SATServer(default_host, default_port, message_decoder.decode)
-        server_thread.start()
+        controller.server_thread = SATServer(default_host, default_port, message_decoder.decode)
+        controller.server_thread.start()
     else:
         parser = OptionParser()
         parser.add_option("-p", "--port", dest="port", type="int", help="Port number on which the server should run.",
@@ -86,9 +114,12 @@ def main(argv):
         parser.add_option("-f", "--file", dest="file", type="string", help="The CNF source.", metavar="<filename>")
         parser.add_option("--tabu-list-length", dest="tabu_list_length", type="int", help="",
                           metavar="<tabu list length>")
-        parser.add_option("--max-false", dest="max_false", type="int", help="", metavar="<max false>")
+        parser.add_option("--max-false", dest="max_false", type="int",
+                          help='How many times a clause must be false to be considered a "stumble-clause".',
+                          metavar="<max false>")
         parser.add_option("--rec", dest="rec", type="int", help="", metavar="<rec>")
-        parser.add_option("-k", dest="k", type="int", help="", metavar="<k>")
+        parser.add_option("-k", dest="k", type="int", help="How long an atom in a stumble-clause is prevented from "
+                                                           "flipping.", metavar="<k>")
         parser.add_option("--max-generations", dest="max_generations", type="int", help="", metavar="<max generations>")
         parser.add_option("--population-size", dest="population_size", type="int", help="", metavar="<population size>")
         parser.add_option("--sub-population-size", dest="sub_population_size", type="int", help="",
@@ -104,19 +135,18 @@ def main(argv):
         options = vars(options)
         if options["port"] is not None:
             # Port has been specified start server
-            server_thread = SATServer(default_host, options["port"])
-            server_thread.start()
-        else:
-            f = open("../examples/hgen2-a.cnf", "r")  # TODO: Get filename passed in
-            formula, number_of_variables, number_of_clauses = controller.parse_formula(f.readlines())
-            del options['port']
-            del options['file']
-            options['formula'] = formula
-            options['number_of_variables'] = number_of_variables
-            options['number_of_clauses'] = number_of_clauses
-            controller.create_ga(options)
-            print(controller.GA.gasat())
-            # TODO: Create the headless, local GA instance here
+            controller.server_thread = SATServer(default_host, options["port"], RequestHandler.decode)
+            controller.server_thread.start()
+        f = open("../examples/hgen2-a.cnf", "r")  # TODO: Get filename passed in
+        formula, number_of_variables, number_of_clauses = controller.parse_formula(f.readlines())
+        del options['port']
+        del options['file']
+        options['formula'] = formula
+        options['number_of_variables'] = number_of_variables
+        options['number_of_clauses'] = number_of_clauses
+        controller.create_ga(options)
+        print("Going into the dark GA hole now from which there apparently is no return.")
+        print(controller.GA.gasat())
 
 
 if __name__ == '__main__':

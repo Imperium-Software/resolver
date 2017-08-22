@@ -1,3 +1,8 @@
+import sys, os
+myPath = os.path.dirname(os.path.abspath(__file__))
+print(myPath)
+sys.path.insert(0, myPath + '/../SATSolver')
+
 from unittest import TestCase
 from individual import Individual
 from BitVector import BitVector

@@ -1,5 +1,5 @@
 {
-  "name": "interface",
+  "name": "SATSolver",
   "version": "0.0.1",
   "description": "The interface for the SAT solving application",
   "main": "index.js",
@@ -15,5 +15,8 @@
     "mathjax": "^2.7.1",
     "mathjax-electron": "^2.0.1",
     "vue": "^2.4.1"
+  },
+  "devDependencies": {
+    "electron": "1.4.15"
   }
 }
