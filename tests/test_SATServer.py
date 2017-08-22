@@ -52,7 +52,6 @@ class TestSATServer(TestCase):
         # Test Message
         msg = "Test Message#"
 
-        # Server with two clients connected
         server_thread = SATServer("localhost", 55555, None)
         server_thread.start()
         client1 = self.TesterClient(port=55555, wait=True)
@@ -67,18 +66,6 @@ class TestSATServer(TestCase):
 
         # Clients disconnected test send message
         server_thread.push_to_all(msg)
-
-        # New client connects
-        client2 = self.TesterClient(port=55555, wait=True)
-        client2.start()
-        sleep(0.01)
-        while len(server_thread.threads) < 1:
-            pass
-        client2_response = None
-        server_thread.push_to_all(msg)
-        while client2_response is None:
-            client2_response = client2.received
-        self.assertEqual(msg, client2_response, "Client three did not receive the correct message.")
 
         server_thread.close()
 
@@ -124,19 +111,6 @@ class TestSATServer(TestCase):
 
         # Send message to client which does not exist.
         server_thread.push_to_one(3, msg)
-
-        # New client connects
-        client2 = self.TesterClient(port=55559, wait=True)
-        client2.start()
-        sleep(0.01)
-        while len(server_thread.threads) < 1:
-            pass
-        server_thread.push_to_one(2, msg3)
-        client2_response = None
-        while client2_response is None:
-            client2_response = client2.received
-        self.assertEqual(msg3, client2_response, "Client three did not receive the correct message.")
-
         server_thread.close()
 
         # Server with one client connected
