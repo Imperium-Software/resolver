@@ -98,7 +98,7 @@ class RequestHandler:
             return '{"RESPONSE":{"ERROR":"' + str(data_arr[0]) + '"}}#'
 
         def report_progress(data_arr):
-            return '{"RESPONSE":{"PROGRESS": {"GENERATION":' + str(data_arr[0]) + '}}}#'
+            return '{"RESPONSE":{"PROGRESS": {"GENERATION":[' + str(data_arr[0][0]) + ',' + str(data_arr[0][1]) + ']}}}#'
 
         options = {
             "ERROR": error,

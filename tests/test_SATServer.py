@@ -130,6 +130,7 @@ class TestSATServer(unittest.TestCase):
         self.assertEqual(msg, client1_response, "The client did not receive the correct message.")
         server_thread.close()
 
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_address_in_use_exception(self):
         server_thread = SATServer("localhost", 55555, None)
         server_thread.start()
@@ -137,6 +138,7 @@ class TestSATServer(unittest.TestCase):
         another_server_thread.close()
         server_thread.close()
 
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_process_message_from_client(self):
         # Test message
         msg = "Test Message#"
@@ -159,6 +161,7 @@ class TestSATServer(unittest.TestCase):
         get_message_from_client(None, None, None)
         server_thread.close()
 
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_get_port(self):
         server_thread = SATServer("localhost", 55556, None)
         server_thread.start()
@@ -166,6 +169,7 @@ class TestSATServer(unittest.TestCase):
                                                           "number")
         server_thread.close()
 
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_close(self):
         server_thread = SATServer("localhost", 55557, None)
         server_thread.start()

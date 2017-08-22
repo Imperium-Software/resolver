@@ -522,7 +522,7 @@ class GA:
         self.create_population()
 
         # Counts the current number of iterations completed
-        self._generation_counter = 0
+        self.generation_counter = 0
 
         # An individual that satisfies the formula or None
         satisfied_individual = None
@@ -553,8 +553,7 @@ class GA:
             # Determine whether any individual that satisfies the formula appeared in the current generation
             satisfied_individual = self.is_satisfied()
             # Increase the generation
-            generation_counter = generation_counter + 1
-            print(str(generation_counter) + " " + str(child))
+            self.generation_counter = self.generation_counter + 1
 
         # Return a satisfying assignment if there exists one
         if satisfied_individual is not None:

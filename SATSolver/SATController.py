@@ -28,7 +28,7 @@ class Observer(metaclass=abc.ABCMeta):
 
     def __init__(self):
         self._subject = None
-        self._observer_state = None
+        self._generation_count = None
 
     @abc.abstractmethod
     def update(self, arg):
@@ -42,9 +42,9 @@ class SATController(Observer):
         self.server_thread = None
 
     def update(self, arg):
-        self._observer_state = arg
-        if not self.server_thread is None:
-            self.send_update(RequestHandler.encode("PROGRESS", [arg]))
+        self._generation_count = arg
+        if self.server_thread is not None:
+            self.send_update(RequestHandler.encode("PROGRESS", [[self._generation_count, self.GA.max_generations]]))
         else:
             print(arg)
 
