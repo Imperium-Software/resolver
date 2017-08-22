@@ -183,3 +183,7 @@ body:not(.loaded) {
     border-color: transparent var(--theme-four) transparent transparent;
 }
 
+#progress-circle {
+  margin: 5px;
+  width: 50px;
+}
