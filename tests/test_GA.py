@@ -2,6 +2,7 @@ import sys, os
 myPath = os.path.dirname(os.path.abspath(__file__))
 print(myPath)
 sys.path.insert(0, myPath + '/../SATSolver')
+sys.path.insert(0, myPath + '/../')
 
 from GA import GA
 from unittest import TestCase

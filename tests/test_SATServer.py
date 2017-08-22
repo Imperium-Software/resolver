@@ -1,10 +1,7 @@
-import sys, os
-myPath = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, myPath + '/../SATSolver')
-
 from unittest import TestCase
 from server import SATServer
 from threading import Thread
+from time import sleep
 import socket
 
 
@@ -28,6 +25,8 @@ class TestSATServer(TestCase):
                 if self.msg is None:
                     total_msg = ""
                     msg_chunk = ""
+                    if self.wait:
+                        sleep(0.1)
                     while msg_chunk == "" or msg_chunk[-1] != '#':
                         msg_chunk = sock.recv(1024).strip().decode("utf-8").strip()
                         if msg_chunk == "":
@@ -40,6 +39,7 @@ class TestSATServer(TestCase):
                         total_msg = ""
                         msg_chunk = ""
                         while msg_chunk == "" or msg_chunk[-1] != '#':
+                            sock.sendall(self.msg.encode())
                             msg_chunk = sock.recv(1024).strip().decode("utf-8").strip()
                             if msg_chunk == "":
                                 break
@@ -55,42 +55,37 @@ class TestSATServer(TestCase):
         # Server with two clients connected
         server_thread = SATServer("localhost", 55555, None)
         server_thread.start()
-        client1 = self.TesterClient()
+        client1 = self.TesterClient(port=55555, wait=True)
         client1.start()
-        client2 = self.TesterClient()
-        client2.start()
-        while len(server_thread.threads) < 2:
+        while len(server_thread.threads) < 1:
             pass
         server_thread.push_to_all(msg)
         client1_response = None
         while client1_response is None:
             client1_response = client1.received
-        client2_response = None
-        while client2_response is None:
-            client2_response = client2.received
         self.assertEqual(msg, client1_response, "Client one did not receive the correct message.")
-        self.assertEqual(msg, client2_response, "Client two did not receive the correct message.")
 
         # Clients disconnected test send message
         server_thread.push_to_all(msg)
 
         # New client connects
-        client3 = self.TesterClient()
-        client3.start()
+        client2 = self.TesterClient(port=55555, wait=True)
+        client2.start()
+        sleep(0.01)
         while len(server_thread.threads) < 1:
             pass
+        client2_response = None
         server_thread.push_to_all(msg)
-        client3_response = None
-        while client3_response is None:
-            client3_response = client3.received
-        self.assertEqual(msg, client3_response, "Client three did not receive the correct message.")
+        while client2_response is None:
+            client2_response = client2.received
+        self.assertEqual(msg, client2_response, "Client three did not receive the correct message.")
 
         server_thread.close()
 
         # Server with one client connected
         server_thread = SATServer("localhost", 55555, None)
         server_thread.start()
-        client1 = self.TesterClient()
+        client1 = self.TesterClient(port=55555, wait=True)
         client1.start()
         while len(server_thread.threads) < 1:
             pass
@@ -117,49 +112,43 @@ class TestSATServer(TestCase):
         # Server with two clients connected
         server_thread = SATServer("localhost", 55559, None)
         server_thread.start()
-        client1 = self.TesterClient(port=55559)
+        client1 = self.TesterClient(port=55559, wait=True)
         client1.start()
-        client2 = self.TesterClient(port=55559)
-        client2.start()
-        while len(server_thread.threads) < 2:
+        while len(server_thread.threads) < 1:
             pass
-        client2_response = None
-        while client2_response is None:
-            server_thread.push_to_one(2, msg2)
-            client2_response = client2.received
+        server_thread.push_to_one(1, msg1)
         client1_response = None
         while client1_response is None:
-            server_thread.push_to_one(1, msg1)
             client1_response = client1.received
         self.assertEqual(msg1, client1_response, "Client one did not receive the correct message.")
-        self.assertEqual(msg2, client2_response, "Client two did not receive the correct message.")
 
         # Send message to client which does not exist.
         server_thread.push_to_one(3, msg)
 
         # New client connects
-        client3 = self.TesterClient(port=55559)
-        client3.start()
+        client2 = self.TesterClient(port=55559, wait=True)
+        client2.start()
+        sleep(0.01)
         while len(server_thread.threads) < 1:
             pass
-        client3_response = None
-        while client3_response is None:
-            client3_response = client3.received
-            server_thread.push_to_one(3, msg3)
-        self.assertEqual(msg3, client3_response, "Client three did not receive the correct message.")
+        server_thread.push_to_one(2, msg3)
+        client2_response = None
+        while client2_response is None:
+            client2_response = client2.received
+        self.assertEqual(msg3, client2_response, "Client three did not receive the correct message.")
 
         server_thread.close()
 
         # Server with one client connected
         server_thread = SATServer("localhost", 55560, None)
         server_thread.start()
-        client1 = self.TesterClient(port=55560)
+        client1 = self.TesterClient(port=55560, wait=True)
         client1.start()
         while len(server_thread.threads) < 1:
             pass
+        server_thread.push_to_one(1, msg)
         client1_response = None
         while client1_response is None:
-            server_thread.push_to_one(1, msg)
             client1_response = client1.received
         self.assertEqual(msg, client1_response, "The client did not receive the correct message.")
         server_thread.close()
@@ -203,11 +192,11 @@ class TestSATServer(TestCase):
     def test_close(self):
         server_thread = SATServer("localhost", 55557, None)
         server_thread.start()
-        client1 = self.TesterClient(port=55557)
+        client1 = self.TesterClient(port=55557, wait=True)
         client1.start()
-        client2 = self.TesterClient(port=55557)
+        client2 = self.TesterClient(port=55557, wait=True)
         client2.start()
-        client3 = self.TesterClient(port=55557)
+        client3 = self.TesterClient(port=55557, wait=True)
         client3.start()
         while len(server_thread.threads) < 3:
             pass
