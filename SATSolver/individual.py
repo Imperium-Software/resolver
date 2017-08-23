@@ -40,7 +40,6 @@ class Individual:
             if value is not None:
                 self.data = BitVector(bitlist=value)
 
-
         elif self.method == Individual.BIT_ARRAY:
             self.defined = bitarray(length)
             self.data = bitarray(length)
@@ -141,7 +140,8 @@ class Individual:
         """ Allocates uniformly from either first or second parent. """
 
         for i in range(self.length):
-            #i is inconsistently indexed in comparison to other places get_defined and set are called thus 1 must be added
+            # i is inconsistently indexed in comparison to other places get_defined and set are called thus 1
+            # must be added
             index = i + 1
             if not self.get_defined(index):
                 if bool(random.getrandbits(1)):

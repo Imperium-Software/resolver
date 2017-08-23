@@ -6,13 +6,13 @@
 import copy
 import random
 from decimal import Decimal
-from individual import Individual
+from SATSolver.individual import Individual
 
 
 class GA:
-    def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length, max_false, rec, k, max_generations=1000, population_size=100,
-                 sub_population_size=15, crossover_operator=0, max_flip=10000, is_rvcf=False,
-                 is_diversification=False, method=None):
+    def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length, max_false, rec, k,
+                 max_generations=1000, population_size=100, sub_population_size=15, crossover_operator=0,
+                 max_flip=10000, is_rvcf=False, is_diversification=False, method=None):
 
         self.formula = formula
         self.numberOfClauses = number_of_clauses
@@ -507,8 +507,6 @@ class GA:
             self.population.append(child)
 
         return
-
-
 
     def gasat(self):
         """
