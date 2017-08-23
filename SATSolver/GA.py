@@ -217,11 +217,11 @@ class GA:
                     if x.get(abs(clause[i])) == 1 or y.get(abs(clause[i])) == 1:
                         current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
                         z_new = copy.deepcopy(z)
-                        z_new.set(i, 1)
-                        z_new.set_defined(best_pos)
+                        z_new.set(abs(clause[i]), 1)
+                        z_new.set_defined(abs(clause[i]))
                         if current_improvement < minimum_improvement and self.sat_crossover(z_new, clause):
                             minimum_improvement = current_improvement
-                            best_pos = i
+                            best_pos = abs(clause[i])
                 if not best_pos == -1:
                     z.set(best_pos, 1)
                     z.set_defined(best_pos)
