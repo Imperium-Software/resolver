@@ -196,7 +196,7 @@ class GA:
         z = Individual(self.numberOfVariables, self.method, False)
         for clause in self.formula:
             best_pos = 0
-            maximum_improvement = self.improvement(x, 0) + self.improvement(y, 0)
+            maximum_improvement = 0
             if not self.sat(x, clause) and not self.sat(y, clause) and not self.sat_crossover(z, clause):
                 for i in range(len(clause)):
                     current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
@@ -215,7 +215,7 @@ class GA:
             if self.sat(x, clause) and self.sat(y, clause) and not self.sat_crossover(z, clause):
                 for i in range(len(clause)):
                     if x.get(i) == 1 or y.get(i) == 1:
-                        current_improvement = self.improvement(x, i) + self.improvement(y, i)
+                        current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
                         z_new = copy.deepcopy(z)
                         z_new.set(best_pos, 1)
                         z_new.set_defined(best_pos)
@@ -485,7 +485,7 @@ class GA:
 
         individual_counter = 0
         while individual_counter < self.population_size:
-            self.population.append(Individual(self.numberOfVariables))
+            self.population.append(Individual(self.numberOfVariables, self.method, False))
             individual_counter = individual_counter + 1
 
         return
