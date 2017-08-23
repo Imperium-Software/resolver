@@ -52,7 +52,7 @@ class SATController(Observer):
         self.server_thread.push_to_all(msg)
 
     def has_ga_instance(self):
-        return self.GA is None
+        return self.GA is not None
 
     def create_ga(self, ga_parameters):
 

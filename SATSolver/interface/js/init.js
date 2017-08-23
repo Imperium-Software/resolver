@@ -3,18 +3,15 @@ var ProgressBar = require('progressbar.js');
 
 var progress_bar = new ProgressBar.Circle('#progress-circle', {
   color: '#FFF',
-  // This has to be the same size as the maximum width to
-  // prevent clipping
-  strokeWidth: 10,
-  trailWidth: 3,
+  strokeWidth: 15,
+  trailWidth: 4,
   easing: 'easeInOut',
   duration: 1400,
   text: {
     autoStyleContainer: true
   },
-  from: { color: '#aaa', width: 4 },
-  to: { color: '#333', width: 4 },
-  // Set default step function for all animate calls
+  from: { color: '#0EBFE9', width: 4 },
+  to: { color: '#0EBFE9', width: 4 },
   step: function(state, circle) {
     circle.path.setAttribute('stroke', state.color);
     circle.path.setAttribute('stroke-width', state.width);
@@ -54,7 +51,7 @@ var error_log = new Vue({
   }
 });
 
-connected = "red";
+connected = false;
 
 // Connection
 
@@ -65,20 +62,26 @@ conn = new net.Socket();
 conn.connect(55555, '127.0.0.1', function() {
     console.log('Connected');
     $("#connected-indicator")[0].style.fill = "lime";
-    connected = "lime"
+    connected = true;
 });
 
 conn.on('data', function(data) {
   data = data.slice(0, -1);
   console.log('Received: ' + data);
   terminal.text += "\n" + data;
-  progressObject = JSON.parse(data);
-  progressArray = progressObject["RESPONSE"]["PROGRESS"]["GENERATION"];
-  perc.percentage = progressArray[0] / progressArray[1];
-  progress_bar.animate(progressArray[0] / progressArray[1]);
+  try {
+    progressObject = JSON.parse(data);
+    progressArray = progressObject["RESPONSE"]["PROGRESS"]["GENERATION"];
+    perc.percentage = progressArray[0] / progressArray[1];
+    perc.percentage = progressArray[0] / progressArray[1];
+  } catch(e) {
+    perc.percentage = 1.0;
+  }
+  progress_bar.animate(perc.percentage);
 });
+
 conn.on('close', function() {
   console.log('Connection closed');
   $("#connected-indicator")[0].style.fill = "red";
-  connected = "red";
+  connected = false;
 });

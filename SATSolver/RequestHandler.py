@@ -44,11 +44,13 @@ class RequestHandler:
                         raise RequestHandlerError("This server is already solving. No `SOLVE` requests can be handled "
                                                   "until it has completed.")
                     else:
-                        raw_formula = json_data["SOLVE"]["raw_input"].split()
+                        raw_formula = json_data["SOLVE"]["raw_input"]
                         json_data["SOLVE"]["formula"], json_data["SOLVE"]["number_of_variables"], json_data["SOLVE"][
                             "number_of_clauses"] = controller.parse_formula(raw_formula)
                         del json_data["SOLVE"]["raw_input"]
                         controller.create_ga(json_data["SOLVE"])
+                        server.push_to_one(client_id, str(controller.GA.gasat().data) + "#")
+                        controller.GA = None
                 else:
                     raise RequestHandlerError("Unexpected arguments found for SOLVE command: " + ', '.join(set(list(
                         json_data["SOLVE"].keys())) - set(required_parameters + optional_parameters)))
