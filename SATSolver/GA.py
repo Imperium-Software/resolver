@@ -214,10 +214,10 @@ class GA:
             minimum_improvement = self.numberOfClauses + 1
             if self.sat(x, clause) and self.sat(y, clause) and not self.sat_crossover(z, clause):
                 for i in range(len(clause)):
-                    if x.get(i) == 1 or y.get(i) == 1:
+                    if x.get(abs(clause[i])) == 1 or y.get(abs(clause[i])) == 1:
                         current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
                         z_new = copy.deepcopy(z)
-                        z_new.set(best_pos, 1)
+                        z_new.set(i, 1)
                         z_new.set_defined(best_pos)
                         if current_improvement < minimum_improvement and self.sat_crossover(z_new, clause):
                             minimum_improvement = current_improvement
@@ -225,6 +225,28 @@ class GA:
                 if not best_pos == -1:
                     z.set(best_pos, 1)
                     z.set_defined(best_pos)
+        z.allocate(x, y)
+        return z
+
+    def fluerent_and_ferland(self, x, y):
+        """
+        Performs the Fluerent & Ferland cross-over operator.
+
+        :param x: The first parent parameter.
+        :param y: The second parent parameter.
+        :return: The generated individual z.
+        """
+
+        z = Individual(self.numberOfVariables, self.method, False)
+        for clause in self.formula:
+            if self.sat(x, clause) and not self.sat(y, clause):
+                for i in range(len(clause)):
+                    z.set(abs(clause[i]), x(abs(clause[i])))
+                    z.set_defined(abs(clause[i]))
+            elif not self.sat(x, clause) and self.sat(y, clause):
+                for i in range(len(clause)):
+                    z.set(abs(clause[i], y(abs(clause[i]))))
+                    z.set_defined(abs(clause[i]))
         z.allocate(x, y)
         return z
 
@@ -439,28 +461,6 @@ class GA:
             # Otherwise add pos to the dictionary with an initial count of 1
             iteration_dict[pos] = 1
             individual.flip(pos)
-
-    def fluerent_and_ferland(self, x, y):
-        """
-        Performs the Fluerent & Ferland cross-over operator.
-
-        :param x: The first parent parameter.
-        :param y: The second parent parameter.
-        :return: The generated individual z.
-        """
-
-        z = Individual(self.numberOfVariables, self.method, False)
-        for clause in self.formula:
-            if self.sat(x, clause) and not self.sat(y, clause):
-                for i in range(len(clause)):
-                    z.set(i, x(i))
-                    z.set_defined(i)
-            elif not self.sat(x, clause) and self.sat(y, clause):
-                for i in range(len(clause)):
-                    z.set(i, y(i))
-                    z.set_defined(i)
-        z.allocate(x, y)
-        return z
 
     def select(self):
         """
