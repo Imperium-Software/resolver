@@ -117,8 +117,10 @@ class TestGA(TestCase):
             child = ga.corrective_clause(parent1, parent2)
             child_eval = ga.evaluate(child)
             # Compare child with parents. These will fail on occasion as child will be worse sometimes.
-            # self.assertLessEqual(child_eval, par1_eval, "child sucks")
-            # self.assertLessEqual(child_eval, par2_eval, "child sucks")
+            # self.assertLessEqual(child_eval, par1_eval, "child less satisfactory")
+            # self.assertLessEqual(child_eval, par2_eval, "child less satisfactory")
+
+        self.assertEqual(1, 1)
 
     def test_corrective_clause_with_truth_maintenance(self):
         self.assertEqual(1, 1)
@@ -201,7 +203,15 @@ class TestGA(TestCase):
             self.assertEqual(1, 0)
         # .............................................................................................................
         # Test 4 - Diversification.....................................................................................
-
+        # ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, is_diversification=True)
+        # ind = Individual(9)
+        # ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+        # ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
+        # if (list(ind.data) == list(BitVector(bitlist=[1, 1, 1, 0, 1, 1, 1, 1, 1])) or
+        #         list(ind.data) == list(BitVector(bitlist=[1, 1, 1, 1, 1, 0, 1, 1, 1]))):
+        #     self.assertEqual(1, 1)
+        # else:
+        #     self.assertEqual(1, 0)
         # .............................................................................................................
     def test_choose_rvcf(self):
         # An instance of the GA class which will be used to test the standard_tabu_choose function
@@ -238,10 +248,19 @@ class TestGA(TestCase):
         self.assertEqual(GA.degree(ind, [7, 8, -3]), 3)
 
     def test_tabu_with_diversification(self):
+        # file_reader = self.FormulaReader("../examples/trivial.cnf")
+        # ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
+        # ga_implementation.tabu = [0, 0, 0, 0, 5]
         self.assertEqual(1, 1)
 
     def test_check_flip(self):
-        self.assertEqual(1, 1)
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
+        forbidden_flips = {}
+        ind = Individual(9)
+        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+        ga_implementation.check_flip(ind, ga_implementation.formula[4], forbidden_flips)
+        self.assertEqual(ind.data, BitVector(bitlist=[1, 1, 1, 1, 1, 0, 1, 1, 1]))
 
     def test_fluerent_and_ferland(self):
         self.assertEqual(1, 1)

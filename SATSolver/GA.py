@@ -151,7 +151,7 @@ class GA:
 
         new_individual = copy.deepcopy(individual)
         # Flips the bit at the specified index
-        new_individual.flip(index)
+        new_individual.flip(abs(index))
 
         # Calculates improvement in fitness
         return original_individual_fitness - self.evaluate(new_individual)
@@ -286,14 +286,12 @@ class GA:
             # index = self.choose(individual_in)
             index = choose_function(individual_in)
             individual_temp = copy.deepcopy(individual_in)
-            individual_temp.flip(index[0])
-            if self.evaluate(individual_temp) < self.evaluate(self.best):
-                self.best = individual_temp
-            num_flips += 1
-            individual_in = individual_temp
-            if self.tabu:
-                self.tabu.pop()
-            self.tabu = [index[0]] + self.tabu
+            if not index[0] in self.tabu:
+                individual_temp.flip(index[0])
+                if self.evaluate(individual_temp) < self.evaluate(self.best):
+                    self.best = individual_temp
+                num_flips += 1
+                individual_in = individual_temp
             if self.is_diversification:
                 self.tabu_with_diversification(individual_in)
         return self.best
@@ -423,7 +421,7 @@ class GA:
             value = max(temp_clause, key=lambda c: self.improvement(individual, c))
         except ValueError as e:
             raise e
-        pos = temp_clause.index(value)
+        pos = abs(value)
 
         # Check if pos has been flipped before
         # flips this one stubborn bit and refuse to flip it back before k flips.
