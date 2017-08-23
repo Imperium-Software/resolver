@@ -21,6 +21,8 @@ class Individual:
         implementation.  """
 
         self.length = length
+        self.fitness = 0
+        self.isCacheValid = False
 
         if method not in [0, 1]:
             self.method = Individual.BIT_VECTOR
@@ -87,6 +89,7 @@ class Individual:
 
         """ Sets the bit at position b to value v. """
 
+        self.isCacheValid = False
         b -= 1
         if b >= self.length or b < 0:
             return
@@ -100,6 +103,7 @@ class Individual:
 
         """ Flips the bit at position b. """
 
+        self.isCacheValid = False
         b -= 1
         if b >= self.length or b < 0:
             return

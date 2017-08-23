@@ -116,6 +116,11 @@ class GA:
         :return: the number of clauses of F which are not satisfied by X.
         """
 
+        if individual.isCacheValid:
+            return individual.fitness
+
+        individual.isCacheValid = True
+
         # Keeps count of unsatisfied clauses
         num_unsatisfied_clauses = 0
 
@@ -126,6 +131,7 @@ class GA:
             if not self.sat(individual, clause):
                 num_unsatisfied_clauses = num_unsatisfied_clauses + 1
 
+        individual.fitness = num_unsatisfied_clauses
         return num_unsatisfied_clauses
 
     def improvement(self, individual, index):
