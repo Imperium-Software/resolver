@@ -300,7 +300,7 @@ class GA:
         :param choose_function: A function object
         :return: An individual that conforms to the Tabu restrictions.
         """
-
+        false_clauses = []
         self.tabu = self.tabu[:self.tabu_list_length]
         self.best = individual_in
         num_flips = 0
@@ -315,7 +315,37 @@ class GA:
                 num_flips += 1
                 individual_in = individual_temp
             if self.is_diversification:
-                self.tabu_with_diversification(individual_in)
+                # self.tabu_with_diversification(individual_in)
+                for i in range(len(self.formula)):
+                    if not self.sat(individual_in, self.formula[i]):
+                        self.false_clauses[i] += 1
+                        # if self.false_clauses[i] == self.max_false:
+                        #     false_clauses.append(self.formula[i])
+                        #     self.false_counts[i] = 0
+
+                individual_temp = copy.deepcopy(individual_in)
+                # forbidden_flips = {}
+                # for clause in false_clauses:
+                #     self.check_flip(individual_temp, clause, forbidden_flips)
+
+                for clause_check in false_clauses:
+                    if clause_check == self.max_false:
+                        some_flips += some_flips + (num_flips mod k)
+                        if some_flips >= k:
+                            temp_clause = [c for c in clause if c not in iteration_dict.keys()]
+                            try:
+                                value = max(temp_clause, key=lambda c: self.improvement(individual, c))
+                            except ValueError as e:
+                                raise e
+                            pos = abs(value)
+                            some_flips = 0
+                            individual_in.flip(pos)
+                        for _ in range(self.rec):
+                            non_false_clauses = [self.formula[i] for i in range(len(self.formula))
+                                                 if self.sat(individual_temp, clause) and not self.sat(individual, clause)]
+                            for nested_clause in non_false_clauses:
+                                self.check_flip(individual_temp, nested_clause, forbidden_flips)
+                # return individual_temp
         return self.best
 
     def choose_rvcf(self, individual_in):
