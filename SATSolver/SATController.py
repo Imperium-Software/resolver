@@ -1,5 +1,6 @@
 import sys
 import abc
+import time
 from SATSolver.GA import GA
 from RequestHandler import *
 from optparse import OptionParser
@@ -41,11 +42,16 @@ class SATController(Observer):
         Observer.__init__(self)
         self.GA = None
         self.server_thread = None
+        self.time_started = None
 
     def update(self, arg):
         self._generation_count = arg
         if self.server_thread is not None:
-            self.send_update(RequestHandler.encode("PROGRESS", [[self._generation_count, self.GA.max_generations]]))
+            self.send_update(RequestHandler.encode("PROGRESS", [[self._generation_count, self.GA.max_generations],
+                                                                [self.time_started],
+                                                                [self.GA.best_individual]]
+                                                   )
+                             )
         else:
             print(arg)
 
@@ -60,6 +66,11 @@ class SATController(Observer):
         new_params = {key: ga_parameters[key] for key in ga_parameters.keys() if ga_parameters[key] is not None}
         self.GA = GA(**new_params)
         self.GA.attach(self)
+
+    def start_ga(self):
+        self.time_started = int(time.time())
+        print(self.GA.gasat())
+        self.server_thread.close()
 
     def parse_formula(self, raw_formula):
         """
@@ -138,7 +149,7 @@ def main(argv):
             # Port has been specified start server
             controller.server_thread = SATServer(default_host, options["port"], RequestHandler.decode)
             controller.server_thread.start()
-        f = open("../examples/hgen2-a.cnf", "r")  # TODO: Get filename passed in
+        f = open("../examples/trivial.cnf", "r")  # TODO: Get filename passed in
         formula, number_of_variables, number_of_clauses = controller.parse_formula(f.readlines())
         del options['port']
         del options['file']
@@ -147,7 +158,7 @@ def main(argv):
         options['number_of_clauses'] = number_of_clauses
         controller.create_ga(options)
         print("Going into the dark GA hole now from which there apparently is no return.")
-        print(controller.GA.gasat())
+        controller.start_ga()
 
 
 if __name__ == '__main__':

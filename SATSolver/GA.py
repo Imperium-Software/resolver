@@ -32,6 +32,7 @@ class GA:
         self.method = method
         self._observers = set()
         self._generation_counter = None
+        self.best_individual = None;
 
         # Initialize tabu, population and the sub_population to empty lists
         self.tabu = []
@@ -467,6 +468,7 @@ class GA:
         """
 
         self.population.sort(key=self.evaluate)
+        self.best_individual = self.population[0].fitness
         self.sub_population = self.population[0:self.sub_population_size]
         child_x = random.choice(self.sub_population)
         child_y = random.choice(self.sub_population)
@@ -551,7 +553,7 @@ class GA:
                 child = self.standard_tabu(child, self.choose_rvcf)
 
             self.replace(child)
-
+            self.best_individual = child.fitness
             # Determine whether any individual that satisfies the formula appeared in the current generation
             satisfied_individual = self.is_satisfied()
             # Increase the generation
@@ -559,12 +561,14 @@ class GA:
 
         # Return a satisfying assignment if there exists one
         if satisfied_individual is not None:
+            print(satisfied_individual.fitness)
             return satisfied_individual
         else:
             # Sort the population by fitness value
             self.population.sort(key=self.evaluate)
             # The first individual in the sorted population has the lowest number of unsatisfied clauses - best
             # assignment found
+            print(self.population[0].fitness)
             return self.population[0]
 
     def attach(self, observer):

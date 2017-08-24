@@ -51,6 +51,21 @@ var error_log = new Vue({
   }
 });
 
+var time_elapsed = new Vue({
+   el: "#time",
+    data: {
+     elapsed: 0,
+        started: 0
+    }
+});
+
+var fitness = new Vue({
+    el: "#fitness",
+    data: {
+      fitness: 0
+    }
+});
+
 connected = false;
 
 // Connection
@@ -71,11 +86,15 @@ conn.on('data', function(data) {
   terminal.text += "\n" + data;
   try {
     progressObject = JSON.parse(data);
-    progressArray = progressObject["RESPONSE"]["PROGRESS"]["GENERATION"];
-    perc.percentage = progressArray[0] / progressArray[1];
-    perc.percentage = progressArray[0] / progressArray[1];
+    progressArray = progressObject["RESPONSE"]["PROGRESS"];
+    perc.percentage = progressArray["GENERATION"][0] / progressArray["GENERATION"][1];
+    perc.percentage = progressArray["GENERATION"][0] / progressArray["GENERATION"][1];
+    fitness.fitness = progressArray["BEST_INDIVIDUAL"][0];
+    time_elapsed.started = progressArray["TIME_STARTED"][0]*1000;
   } catch(e) {
-    perc.percentage = 1.0;
+    $("#connected-indicator")[0].style.fill = "yellow";
+    //alert("WTF man, wat even is this.")
+      console.log(e)
   }
   progress_bar.animate(perc.percentage);
 });
@@ -85,3 +104,7 @@ conn.on('close', function() {
   $("#connected-indicator")[0].style.fill = "red";
   connected = false;
 });
+
+window.setInterval(function(){
+  time_elapsed.elapsed = moment(((new Date).getTime() - time_elapsed.started)-7200000).format('HH:mm:ss');
+}, 1000);

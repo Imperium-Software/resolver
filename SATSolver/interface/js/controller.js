@@ -128,7 +128,7 @@ function navigate(filename) {
             accordion: true
         });
         $("#advanced").modal();
-        $("#connected-indicator")[0].style.fill = connected ? "lime" : "red" ;
+        $("#connected-indicator")[0].style.fill = connected ? "lime" : "red";
         
         // Progress circle
 
@@ -182,6 +182,20 @@ function navigate(filename) {
             el: '#err',
             data: {
                 text: error_log.text
+            }
+        });
+
+        time_elapsed = new Vue({
+           el: "#time",
+            data: {
+             elapsed: time_elapsed.elapsed
+            }
+        });
+
+        var fitness = new Vue({
+            el: "#fitness",
+            data: {
+              fitness: 0
             }
         });
 

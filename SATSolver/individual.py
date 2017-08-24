@@ -57,7 +57,6 @@ class Individual:
         for i in range(1, length+1):
             if bool(random.getrandbits(1)):
                 self.flip(i)
-        print(self)
 
     def __str__(self):
 
