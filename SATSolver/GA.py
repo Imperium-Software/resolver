@@ -300,7 +300,8 @@ class GA:
         :param choose_function: A function object
         :return: An individual that conforms to the Tabu restrictions.
         """
-        false_clauses = []
+        if self.is_diversification:
+            forbidden_flips = {}
         self.tabu = self.tabu[:self.tabu_list_length]
         self.best = individual_in
         num_flips = 0
@@ -313,40 +314,96 @@ class GA:
                 if self.evaluate(individual_temp) < self.evaluate(self.best):
                     self.best = individual_temp
                 num_flips += 1
+
+                # This is for diversifiaction
+                if self.is_diversification:
+                    # Increment all bits that have been flipped to make a Max_false clause positive
+                    for index in range(len(forbidden_flips)):
+                        forbidden_flips[forbidden_flips[index]] += 1
+                        # Check if pos has been flipped k times since last flip and remove it if it has
+                        # this frees that variable up to be flipped next time it is maximal in a max_false clause
+                        if forbidden_flips[forbidden_flips[index]] == self.k:
+                            del forbidden_flips[forbidden_flips[index]]
+
                 individual_in = individual_temp
             if self.is_diversification:
                 # self.tabu_with_diversification(individual_in)
+                # ......................................................................................
+                # false_clauses = []
+
                 for i in range(len(self.formula)):
                     if not self.sat(individual_in, self.formula[i]):
-                        self.false_clauses[i] += 1
-                        # if self.false_clauses[i] == self.max_false:
-                        #     false_clauses.append(self.formula[i])
-                        #     self.false_counts[i] = 0
+                        self.false_counts[i] += 1
+                        if self.false_counts[i] == self.max_false:
+                            # false_clauses.append(self.formula[i])
+                            # this is where an old function call went
+                            # self.check_flip(individual_temp, clause, forbidden_flips)
 
-                individual_temp = copy.deepcopy(individual_in)
-                # forbidden_flips = {}
-                # for clause in false_clauses:
-                #     self.check_flip(individual_temp, clause, forbidden_flips)
-
-                for clause_check in false_clauses:
-                    if clause_check == self.max_false:
-                        some_flips += some_flips + (num_flips mod k)
-                        if some_flips >= k:
-                            temp_clause = [c for c in clause if c not in iteration_dict.keys()]
+                            # ...................................................................
+                            #  removed because I think this becomes redundant if you keep a list of all the stuff
+                            # temp_clause = [c for c in self.false_counts[i] if abs(c) not in forbidden_flips.keys()]
                             try:
-                                value = max(temp_clause, key=lambda c: self.improvement(individual, c))
+                                value = max(self.formula[i], key=lambda c: self.improvement(individual_in, abs(c)))
                             except ValueError as e:
                                 raise e
                             pos = abs(value)
-                            some_flips = 0
-                            individual_in.flip(pos)
-                        for _ in range(self.rec):
-                            non_false_clauses = [self.formula[i] for i in range(len(self.formula))
-                                                 if self.sat(individual_temp, clause) and not self.sat(individual, clause)]
-                            for nested_clause in non_false_clauses:
-                                self.check_flip(individual_temp, nested_clause, forbidden_flips)
-                # return individual_temp
-        return self.best
+
+                            individual_temp = copy.deepcopy(individual_in)
+                            # Check if pos has been flipped before
+                            # flips this one stubborn bit and refuse to flip it back before k flips.
+                            if pos not in forbidden_flips.keys():
+                                # set to 0 and not 1 because it means that if k is 5 only on flip 6 can
+                                # pos be flipped
+                                forbidden_flips[pos] = 0
+                                individual_temp.flip(pos)
+                                # flips this clause to being positive only if the maximal bit was flipped. a loop could
+                                # be set into the structure to say if the maximal bit cant be flipped due to not having
+                                # had enough flips then the next maximul could be flipped.
+                                self.false_counts[i] = 0
+                            # Huge removal of code as maintaining the count of flips since a forbidden variable can be
+                            # flipped again has been moved up to incorporate the flips of the crossover and not just
+                            #  the flips of the variable at pos which should only be flipped after k, not flipped until
+                            #  k is reached.
+
+                            #     # or increment it if it hasn't
+                            #                 if iteration_dict[pos] < self.k:
+                                  #     iteration_dict[pos] = iteration_dict[pos] + 1
+                                  #     individual.flip(pos)
+                                  # else:
+                                  #     del iteration_dict[pos]
+                            # else:
+
+                            # ...................................................................
+
+                            for _ in range(self.rec):
+                                non_false_clauses = [self.formula[x] for x in range(len(self.formula))
+                                                     if
+                                                     self.sat(individual_temp, self.formula[i]) and not self.sat(individual_in, self.formula[i])]
+                                for nested_clause in non_false_clauses:
+                                    # self.check_flip(individual_temp, nested_clause, forbidden_flips)
+                                    # ...................................................................
+
+                                    temp_clause = [c for c in nested_clause if c not in forbidden_flips.keys()]
+                                    try:
+                                        value = max(temp_clause, key=lambda c: self.improvement(individual_temp, c))
+                                    except ValueError as e:
+                                        raise e
+                                    pos = abs(value)
+                                    if pos not in forbidden_flips.keys():
+                                        # set to 0 and not 1 because it means that if k is 5 only on flip 6 can
+                                        # pos be flipped
+                                        forbidden_flips[pos] = 0
+                                        individual_temp.flip(pos)
+                                        # increment all remaining forbidden flips as a flip has taken place
+                                        for index in range(len(forbidden_flips)):
+                                            forbidden_flips[forbidden_flips[index]] += 1
+                                            # Check if pos has been flipped k times since last flip and remove it if it has
+                                            # this frees that variable up to be flipped next time it is maximal in a max_false clause
+                                            if forbidden_flips[forbidden_flips[index]] == self.k:
+                                                del forbidden_flips[forbidden_flips[index]]
+                                    # not sure if a secondary maximal should be taken for the false clause.
+                            
+                            individual_in = individual_temp
 
     def choose_rvcf(self, individual_in):
         """

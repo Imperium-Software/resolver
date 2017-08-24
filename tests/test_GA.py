@@ -248,9 +248,13 @@ class TestGA(TestCase):
         self.assertEqual(GA.degree(ind, [7, 8, -3]), 3)
 
     def test_tabu_with_diversification(self):
-        # file_reader = self.FormulaReader("../examples/trivial.cnf")
-        # ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
-        # ga_implementation.tabu = [0, 0, 0, 0, 5]
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
+        ga_implementation.tabu = [0, 0, 0, 0, 5]
+        ind = Individual(9)
+        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+        ga_implementation.tabu_with_diversification(ind)
+
         self.assertEqual(1, 1)
 
     def test_check_flip(self):
