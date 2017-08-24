@@ -32,6 +32,7 @@ class GA:
         self.method = method
         self._observers = set()
         self._generation_counter = None
+        self.best_individual = None;
 
         # Initialize tabu, population and the sub_population to empty lists
         self.tabu = []
@@ -505,9 +506,10 @@ class GA:
         :return: void (NONE)
         """
 
-        weakest_individual = max(self.sub_population, key=self.evaluate)
-        if not self.evaluate(weakest_individual) > self.evaluate(child):
-            self.population.remove(weakest_individual)
+        self.population.sort(key=self.evaluate)
+        self.best_individual = self.population[0].fitness
+        if self.population[0].fitness > child.fitness:
+            self.population.remove(self.population[len(self.population)-1])
             self.population.append(child)
 
         return
@@ -551,7 +553,6 @@ class GA:
                 child = self.standard_tabu(child, self.choose_rvcf)
 
             self.replace(child)
-
             # Determine whether any individual that satisfies the formula appeared in the current generation
             satisfied_individual = self.is_satisfied()
             # Increase the generation

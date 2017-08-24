@@ -187,3 +187,16 @@ body:not(.loaded) {
   margin: 5px;
   width: 50px;
 }
+
+h5>small {
+    font-size: .8rem;
+    color: #9e9e9e;
+}
+
+#progress label {
+    color: #F37259;
+}
+
+#progress h4,h5 {
+    margin-top: 0;
+}
