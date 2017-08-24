@@ -40,9 +40,31 @@
     </nav>
     <br>
     <div class="container">
-      <div class="card">
-        <p id="time">{{elapsed}}</p>
-        <p id="fitness">{{fitness}}</p>
+      <div class="card" id="progress">
+        <br>
+        <div class="container">
+          <h4>Progress</h4>
+          <hr>
+          <div class="row">
+            <div class="col s6">
+              <label for="time">time elapsed</label>
+              <h4 id="time">{{elapsed}}</h4>
+            </div>
+            <div class="col s6">
+              <label for="generations">generations</label>
+              <h5 id="generations">{{generations}}/{{max_generations}}</h5>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s6">
+              <label for="fitness">fittest individual</label>
+              <h5 id="fitness">{{fitness}}<small> unsolved clauses</small></h5>
+            </div>
+            <div class="col s6">
+            </div>
+          </div>
+        </div>
+        <br>
       </div>
       <div class="card">
         <br>

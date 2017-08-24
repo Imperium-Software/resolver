@@ -66,6 +66,14 @@ var fitness = new Vue({
     }
 });
 
+var generations = new Vue({
+    el: "#generations",
+    data: {
+      generations: 0,
+      max_generations: 1000
+    }
+});
+
 connected = false;
 
 // Connection
@@ -88,7 +96,8 @@ conn.on('data', function(data) {
     progressObject = JSON.parse(data);
     progressArray = progressObject["RESPONSE"]["PROGRESS"];
     perc.percentage = progressArray["GENERATION"][0] / progressArray["GENERATION"][1];
-    perc.percentage = progressArray["GENERATION"][0] / progressArray["GENERATION"][1];
+    generations.generations = progressArray["GENERATION"][0];
+    generations.max_generations = progressArray["GENERATION"][1];
     fitness.fitness = progressArray["BEST_INDIVIDUAL"][0];
     time_elapsed.started = progressArray["TIME_STARTED"][0]*1000;
   } catch(e) {
@@ -106,5 +115,22 @@ conn.on('close', function() {
 });
 
 window.setInterval(function(){
-  time_elapsed.elapsed = moment(((new Date).getTime() - time_elapsed.started)-7200000).format('HH:mm:ss');
+  var calculated_elapsed = (((new Date).getTime() - time_elapsed.started));
+  console.log(calculated_elapsed);
+  console.log(calculated_elapsed);
+  if (calculated_elapsed < 10000) {
+    time_elapsed.elapsed = moment(calculated_elapsed).format('s') + 's';
+  } else if (calculated_elapsed < 60000) {
+    time_elapsed.elapsed = moment(calculated_elapsed).format('ss') + 's';
+  } else if (calculated_elapsed < 600000) {
+    time_elapsed.elapsed = moment(calculated_elapsed).format('m:ss');
+  } else if (calculated_elapsed < 3600000) {
+    time_elapsed.elapsed = moment(calculated_elapsed).format('mm:ss');
+  } else if (calculated_elapsed < 36000000) {
+    time_elapsed.elapsed = moment(calculated_elapsed-7200000).format('H:mm:ss');
+  } else if (calculated_elapsed < 86400000) {
+    time_elapsed.elapsed = moment(calculated_elapsed-7200000).format('HH:mm:ss');
+  } else {
+    time_elapsed.elapsed = moment(calculated_elapsed-93600000).format('DD:HH:mm:ss');
+  }
 }, 1000);

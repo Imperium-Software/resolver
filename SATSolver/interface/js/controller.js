@@ -199,6 +199,14 @@ function navigate(filename) {
             }
         });
 
+        var generations = new Vue({
+            el: "#generations",
+            data: {
+              generations: 0,
+              max_generations: 1000
+            }
+        });
+
     })
 }
 
