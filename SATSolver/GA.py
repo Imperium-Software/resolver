@@ -468,7 +468,6 @@ class GA:
         """
 
         self.population.sort(key=self.evaluate)
-        self.best_individual = self.population[0].fitness
         self.sub_population = self.population[0:self.sub_population_size]
         child_x = random.choice(self.sub_population)
         child_y = random.choice(self.sub_population)
@@ -507,9 +506,10 @@ class GA:
         :return: void (NONE)
         """
 
-        weakest_individual = max(self.sub_population, key=self.evaluate)
-        if not self.evaluate(weakest_individual) > self.evaluate(child):
-            self.population.remove(weakest_individual)
+        self.population.sort(key=self.evaluate)
+        self.best_individual = self.population[0].fitness
+        if self.population[0].fitness > child.fitness:
+            self.population.remove(self.population[len(self.population)-1])
             self.population.append(child)
 
         return
@@ -553,7 +553,6 @@ class GA:
                 child = self.standard_tabu(child, self.choose_rvcf)
 
             self.replace(child)
-            self.best_individual = child.fitness
             # Determine whether any individual that satisfies the formula appeared in the current generation
             satisfied_individual = self.is_satisfied()
             # Increase the generation
@@ -561,14 +560,12 @@ class GA:
 
         # Return a satisfying assignment if there exists one
         if satisfied_individual is not None:
-            print(satisfied_individual.fitness)
             return satisfied_individual
         else:
             # Sort the population by fitness value
             self.population.sort(key=self.evaluate)
             # The first individual in the sorted population has the lowest number of unsatisfied clauses - best
             # assignment found
-            print(self.population[0].fitness)
             return self.population[0]
 
     def attach(self, observer):

@@ -100,17 +100,33 @@ class RequestHandler:
             return '{"RESPONSE":{"ERROR":"' + str(data_arr[0]) + '"}}#'
 
         def report_progress(data_arr):
-            response = {"RESPONSE": {
-                "PROGRESS": {
-                    "GENERATION": data_arr[0],
-                    "TIME_STARTED": data_arr[1],
-                    "BEST_INDIVIDUAL": data_arr[2]
+            response = {
+                "RESPONSE": {
+                    "PROGRESS": {
+                        "GENERATION": data_arr[0],
+                        "TIME_STARTED": data_arr[1],
+                        "BEST_INDIVIDUAL": data_arr[2]
+                    }
                 }
-            }}
+            }
             return json.dumps(response) + '#'
+
+        def finished(data_arr):
+            response = {
+                "RESPONSE": {
+                    "DONE": {
+                        "SUCCESSFUL": data_arr[0],
+                        "GENERATIONS": data_arr[1],
+                        "TIME_STARTED": data_arr[2],
+                        "TIME_FINISHED": data_arr[3]
+                    }
+                }
+            }
+
 
         options = {
             "ERROR": error,
-            "PROGRESS": report_progress
+            "PROGRESS": report_progress,
+            "FINISHED": finished
         }
         return options[message_type](data)
