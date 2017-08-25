@@ -1,0 +1,15 @@
+language: python
+
+python:
+  - "3.6.0"
+
+cache: pip
+
+install:
+  - pip install -r dependencies.txt
+
+notifications:
+    slack: imperium-se:mBOzfUzNqfrDwonqXmBzg4Nl
+    email: false
+
+script: export PYTHONPATH=`pwd`; cd test; py.test

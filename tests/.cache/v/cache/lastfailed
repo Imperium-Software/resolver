@@ -1,0 +1,9 @@
+{
+  "test_GA.py::TestGA::test_choose_rvcf": true,
+  "test_GA.py::TestGA::test_degree": true,
+  "test_GA.py::TestGA::test_standard_tabu_choose": true,
+  "test_GA.py::TestGA::test_weight": true,
+  "test_SATServer.py::TestSATServer::test_close": true,
+  "test_SATServer.py::TestSATServer::test_push_to_all": true,
+  "test_SATServer.py::TestSATServer::test_push_to_one": true
+}

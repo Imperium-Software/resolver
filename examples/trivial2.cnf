@@ -1,0 +1,9 @@
+c FILE: trivial2.cnf
+c
+c DESCRIPTION: Very simple single clause formula.
+c
+c
+p cnf 3 3
+1 -1 0
+2 -2 0
+3 -3 0
