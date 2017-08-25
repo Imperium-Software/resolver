@@ -1,9 +1,11 @@
 import sys
 import abc
+import time
 from SATSolver.GA import GA
 from RequestHandler import *
 from optparse import OptionParser
 from SATSolver.server import SATServer
+from SATSolver.server import BColors
 
 default_port = 55555
 default_host = "localhost"
@@ -41,13 +43,19 @@ class SATController(Observer):
         Observer.__init__(self)
         self.GA = None
         self.server_thread = None
+        self.time_started = None
 
     def update(self, arg):
         self._generation_count = arg
+        encoded_message = RequestHandler.encode("PROGRESS", [[self._generation_count, self.GA.max_generations],
+                                                             [self.time_started],
+                                                             [self.GA.best_individual]]
+                                                )
         if self.server_thread is not None:
-            self.send_update(RequestHandler.encode("PROGRESS", [[self._generation_count, self.GA.max_generations]]))
-        else:
-            print(arg)
+            self.send_update(encoded_message)
+        print("Generations: " + str(self._generation_count) + "/" + str(self.GA.max_generations) + "\t|\tElapsed Time: "
+              + str(int(time.time())-self.time_started) + "s\t|\tBest Individual's Fitness: "
+              + str(self.GA.best_individual))
 
     def send_update(self, msg):
         self.server_thread.push_to_all(msg)
@@ -60,6 +68,16 @@ class SATController(Observer):
         new_params = {key: ga_parameters[key] for key in ga_parameters.keys() if ga_parameters[key] is not None}
         self.GA = GA(**new_params)
         self.GA.attach(self)
+
+    def start_ga(self):
+        self.time_started = int(time.time())
+        result = self.GA.gasat()
+        if result.fitness == 0:
+            print(BColors.OKGREEN + "Successfully found a solution!" + BColors.ENDC)
+        else:
+            print(BColors.FAIL + "Could not find a solution in the given amount of generations." + BColors.ENDC)
+        print(result)
+        self.server_thread.close()
 
     def parse_formula(self, raw_formula):
         """
@@ -146,8 +164,7 @@ def main(argv):
         options['number_of_variables'] = number_of_variables
         options['number_of_clauses'] = number_of_clauses
         controller.create_ga(options)
-        print("Going into the dark GA hole now from which there apparently is no return.")
-        print(controller.GA.gasat())
+        controller.start_ga()
 
 
 if __name__ == '__main__':

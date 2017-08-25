@@ -49,7 +49,7 @@ class RequestHandler:
                             "number_of_clauses"] = controller.parse_formula(raw_formula)
                         del json_data["SOLVE"]["raw_input"]
                         controller.create_ga(json_data["SOLVE"])
-                        server.push_to_one(client_id, str(controller.GA.gasat().data) + "#")
+                        controller.start_ga()
                         controller.GA = None
                 else:
                     raise RequestHandlerError("Unexpected arguments found for SOLVE command: " + ', '.join(set(list(
@@ -72,7 +72,7 @@ class RequestHandler:
 
         try:
             try:
-                print("Request handler got this juicy data " + str(data[:data.index('#')]))
+                # print("Request handler got this juicy data " + str(data[:data.index('#')]))
                 command = json.loads(data[:data.index('#')])
             except json.JSONDecodeError as e:
                 raise RequestHandlerError("JSON could not be decoded: " + str(e))
@@ -100,10 +100,33 @@ class RequestHandler:
             return '{"RESPONSE":{"ERROR":"' + str(data_arr[0]) + '"}}#'
 
         def report_progress(data_arr):
-            return '{"RESPONSE":{"PROGRESS": {"GENERATION":[' + str(data_arr[0][0]) + ',' + str(data_arr[0][1]) + ']}}}#'
+            response = {
+                "RESPONSE": {
+                    "PROGRESS": {
+                        "GENERATION": data_arr[0],
+                        "TIME_STARTED": data_arr[1],
+                        "BEST_INDIVIDUAL": data_arr[2]
+                    }
+                }
+            }
+            return json.dumps(response) + '#'
+
+        def finished(data_arr):
+            response = {
+                "RESPONSE": {
+                    "DONE": {
+                        "SUCCESSFUL": data_arr[0],
+                        "GENERATIONS": data_arr[1],
+                        "TIME_STARTED": data_arr[2],
+                        "TIME_FINISHED": data_arr[3]
+                    }
+                }
+            }
+
 
         options = {
             "ERROR": error,
-            "PROGRESS": report_progress
+            "PROGRESS": report_progress,
+            "FINISHED": finished
         }
         return options[message_type](data)
