@@ -72,7 +72,7 @@ class RequestHandler:
 
         try:
             try:
-                print("Request handler got this juicy data " + str(data[:data.index('#')]))
+                # print("Request handler got this juicy data " + str(data[:data.index('#')]))
                 command = json.loads(data[:data.index('#')])
             except json.JSONDecodeError as e:
                 raise RequestHandlerError("JSON could not be decoded: " + str(e))

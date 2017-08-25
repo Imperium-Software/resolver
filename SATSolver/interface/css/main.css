@@ -27,6 +27,8 @@
   	border-style: none;
   	border-color: Transparent;
   	font-family: Arial, Helvetica, sans-serif;
+      max-width: 100%;
+      min-height: 160px;
   }
 
   #circle {}

@@ -156,7 +156,7 @@ def main(argv):
             # Port has been specified start server
             controller.server_thread = SATServer(default_host, options["port"], RequestHandler.decode)
             controller.server_thread.start()
-        f = open("../examples/trivial.cnf", "r")  # TODO: Get filename passed in
+        f = open("../examples/hgen2-a.cnf", "r")  # TODO: Get filename passed in
         formula, number_of_variables, number_of_clauses = controller.parse_formula(f.readlines())
         del options['port']
         del options['file']
