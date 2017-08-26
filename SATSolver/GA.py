@@ -42,7 +42,7 @@ class GA:
         self.best = None
 
         self.false_counts = [0 for _ in range(len(self.formula))]
-        
+
         # This function should be called outside this class after instantiating an object of this class: self.gasat()
 
     @staticmethod
@@ -259,7 +259,7 @@ class GA:
         from which it was randomly chosen.
         """
 
-        # A list to maintain the position(s) where the gain (by flip) is the best. 
+        # A list to maintain the position(s) where the gain (by flip) is the best.
         positions = []
         # The current overall best gain observed. Initially, it is set to a large negative value.
         best_sigma = Decimal('-Infinity')
@@ -280,18 +280,18 @@ class GA:
                     positions = []
                     best_sigma = gain
                     positions.append(position)
-                # If the gain calculated is equal to the best gain calculated so far, we simply append the position.     
+                # If the gain calculated is equal to the best gain calculated so far, we simply append the position.
                 elif gain == best_sigma:
                     positions.append(position)
             # This will only fire in the case that the we have not yet managed to find neither an individual who wasn't
             # in the tabu list nor one with a better evaluation in each iteration of the for loop above.
             elif best_sigma == Decimal('-Infinity'):
                 positions.append(position)
-        # Return a position that is randomly selected in those which have the maximum sigma 
+        # Return a position that is randomly selected in those which have the maximum sigma
         # i.e. out of those elements in the positions list.
         # Also return the positions list for the purposes of testing
         return random.choice(positions), positions
-    
+
     def standard_tabu(self, individual_in, choose_function):
         """
         Performs the standard Tabu algorithm.
@@ -327,21 +327,12 @@ class GA:
 
                 individual_in = individual_temp
             if self.is_diversification:
-                # self.tabu_with_diversification(individual_in)
-                # ......................................................................................
-                # false_clauses = []
-
                 for i in range(len(self.formula)):
                     if not self.sat(individual_in, self.formula[i]):
                         self.false_counts[i] += 1
-                        if self.false_counts[i] == self.max_false:
-                            # false_clauses.append(self.formula[i])
-                            # this is where an old function call went
-                            # self.check_flip(individual_temp, clause, forbidden_flips)
 
-                            # ...................................................................
-                            #  removed because I think this becomes redundant if you keep a list of all the stuff
-                            # temp_clause = [c for c in self.false_counts[i] if abs(c) not in forbidden_flips.keys()]
+                        # if this clause has reached or exceeded max_false counts, making it a stumble clause
+                        if self.false_counts[i] >= self.max_false:
                             try:
                                 value = max(self.formula[i], key=lambda c: self.improvement(individual_in, abs(c)))
                             except ValueError as e:
@@ -360,29 +351,12 @@ class GA:
                                 # be set into the structure to say if the maximal bit cant be flipped due to not having
                                 # had enough flips then the next maximul could be flipped.
                                 self.false_counts[i] = 0
-                            # Huge removal of code as maintaining the count of flips since a forbidden variable can be
-                            # flipped again has been moved up to incorporate the flips of the crossover and not just
-                            #  the flips of the variable at pos which should only be flipped after k, not flipped until
-                            #  k is reached.
-
-                            #     # or increment it if it hasn't
-                            #                 if iteration_dict[pos] < self.k:
-                                  #     iteration_dict[pos] = iteration_dict[pos] + 1
-                                  #     individual.flip(pos)
-                                  # else:
-                                  #     del iteration_dict[pos]
-                            # else:
-
-                            # ...................................................................
 
                             for _ in range(self.rec):
-                                non_false_clauses = [self.formula[x] for x in range(len(self.formula))
+                                now_false_clauses = [self.formula[x] for x in range(len(self.formula))
                                                      if
                                                      self.sat(individual_temp, self.formula[i]) and not self.sat(individual_in, self.formula[i])]
-                                for nested_clause in non_false_clauses:
-                                    # self.check_flip(individual_temp, nested_clause, forbidden_flips)
-                                    # ...................................................................
-
+                                for nested_clause in now_false_clauses:
                                     temp_clause = [c for c in nested_clause if c not in forbidden_flips.keys()]
                                     try:
                                         value = max(temp_clause, key=lambda c: self.improvement(individual_temp, c))
@@ -402,7 +376,6 @@ class GA:
                                             if forbidden_flips[forbidden_flips[index]] == self.k:
                                                 del forbidden_flips[forbidden_flips[index]]
                                     # not sure if a secondary maximal should be taken for the false clause.
-                            
                             individual_in = individual_temp
 
     def choose_rvcf(self, individual_in):
@@ -510,9 +483,9 @@ class GA:
         for clause in false_clauses:
             self.check_flip(individual_temp, clause, forbidden_flips)
             for _ in range(self.rec):
-                non_false_clauses = [self.formula[i] for i in range(len(self.formula))
+                now_false_clauses = [self.formula[i] for i in range(len(self.formula))
                                      if self.sat(individual_temp, clause) and not self.sat(individual, clause)]
-                for nested_clause in non_false_clauses:
+                for nested_clause in now_false_clauses:
                     self.check_flip(individual_temp, nested_clause, forbidden_flips)
         return individual_temp
 
@@ -665,7 +638,7 @@ class GA:
     def _notify(self):
         for observer in self._observers:
             observer.update(self._generation_counter)
-            
+
     @property
     def generation_counter(self):
         return self._generation_counter
