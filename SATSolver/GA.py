@@ -318,12 +318,12 @@ class GA:
                 # This is for diversifiaction
                 if self.is_diversification:
                     # Increment all bits that have been flipped to make a Max_false clause positive
-                    for index in range(len(forbidden_flips)):
-                        forbidden_flips[forbidden_flips[index]] += 1
+                    for index2 in range(len(forbidden_flips)):
+                        forbidden_flips[forbidden_flips[index2]] += 1
                         # Check if pos has been flipped k times since last flip and remove it if it has
                         # this frees that variable up to be flipped next time it is maximal in a max_false clause
-                        if forbidden_flips[forbidden_flips[index]] == self.k:
-                            del forbidden_flips[forbidden_flips[index]]
+                        if forbidden_flips[forbidden_flips[index2]] == self.k:
+                            del forbidden_flips[forbidden_flips[index2]]
 
                 individual_in = individual_temp
             if self.is_diversification:
@@ -369,12 +369,12 @@ class GA:
                                         forbidden_flips[pos] = 0
                                         individual_temp.flip(pos)
                                         # increment all remaining forbidden flips as a flip has taken place
-                                        for index in range(len(forbidden_flips)):
-                                            forbidden_flips[forbidden_flips[index]] += 1
+                                        for index3 in range(len(forbidden_flips)):
+                                            forbidden_flips[forbidden_flips[index3]] += 1
                                             # Check if pos has been flipped k times since last flip and remove it if it has
                                             # this frees that variable up to be flipped next time it is maximal in a max_false clause
-                                            if forbidden_flips[forbidden_flips[index]] == self.k:
-                                                del forbidden_flips[forbidden_flips[index]]
+                                            if forbidden_flips[forbidden_flips[index3]] == self.k:
+                                                del forbidden_flips[forbidden_flips[index3]]
                                     # not sure if a secondary maximal should be taken for the false clause.
                             individual_in = individual_temp
 
