@@ -74,9 +74,10 @@ class SATController(Observer):
         result = self.GA.gasat()
         if result.fitness == 0:
             print(BColors.OKGREEN + "Successfully found a solution!" + BColors.ENDC)
+            print('A solution is: ' + str(result))
         else:
             print(BColors.FAIL + "Could not find a solution in the given amount of generations." + BColors.ENDC)
-        print(result)
+            print('The best solution found is: ' + str(result))
         if self.server_thread is not None:
             self.server_thread.close()
 
@@ -144,7 +145,7 @@ def main(argv):
         parser.add_option("--population-size", dest="population_size", type="int", help="", metavar="<population size>")
         parser.add_option("--sub-population-size", dest="sub_population_size", type="int", help="",
                           metavar="<sub population size>")
-        parser.add_option("--crossover-operator", dest="crossover_operator", type="string", help="",
+        parser.add_option("--crossover-operator", dest="crossover_operator", type="int", help="",
                           metavar="<crossover operator>")
         parser.add_option("--max-flip", dest="max_flip", type="int", help="", metavar="<max flip>")
         parser.add_option("--rvcf", dest="is_rvcf", type="string", help="")
@@ -157,7 +158,7 @@ def main(argv):
             # Port has been specified start server
             controller.server_thread = SATServer(default_host, options["port"], RequestHandler.decode)
             controller.server_thread.start()
-        f = open("../examples/hgen2-a.cnf", "r")  # TODO: Get filename passed in
+        f = open(options['file'], "r")  # TODO: Get filename passed in
         formula, number_of_variables, number_of_clauses = controller.parse_formula(f.readlines())
         del options['port']
         del options['file']

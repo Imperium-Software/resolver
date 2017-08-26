@@ -21,10 +21,10 @@ class GA:
         self.max_generations = max_generations
         self.population_size = population_size
         self.sub_population_size = sub_population_size
-        self.crossover_operator = int(crossover_operator)
+        self.crossover_operator = crossover_operator
         self.tabu_list_length = tabu_list_length
         self.max_flip = max_flip
-        self.is_rvcf = is_rvcf
+        self.is_rvcf = bool(is_rvcf)
         self.is_diversification = is_diversification
         self.max_false = max_false
         self.rec = rec
@@ -52,7 +52,7 @@ class GA:
         sat (X,c) - by literature
         Indicates whether the clause c is true or false for the individual X i.e. satisfied or not by the assignment
         corresponding to X.
-        :param individual: Individual class (Implemented by Regan) representing a particular assignment of truth values
+        :param individual: Individual class representing a particular assignment of truth values
         to variables.
         :param clause: Python tuple of integers - should be the same tuple as in the DIMACS format.
         :return: returns a boolean value indicating whether the assignment represented by the individual satisfies the

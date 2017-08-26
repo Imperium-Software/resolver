@@ -64,14 +64,21 @@ class TestGA(TestCase):
         ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
-        ind.isCacheValid = False;
+        ind.isCacheValid = False
         self.assertEqual(ga.evaluate(ind), 1)
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 0])
-        ind.isCacheValid = False;
+        ind.isCacheValid = False
         self.assertEqual(ga.evaluate(ind), 2)
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 0])
-        ind.isCacheValid = False;
+        ind.isCacheValid = False
         self.assertEqual(ga.evaluate(ind), 2)
+
+    def test_evaluate_unsolvable(self):
+        reader = self.FormulaReader("../examples/trivial3.cnf")
+        ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
+        ind = Individual(9)
+        ind.isCacheValid = False
+        self.assertTrue(ga.evaluate(ind) != 0, "Evaluate says unsolvable formula is solved.")
 
     def test_improvement(self):
         reader = self.FormulaReader("../examples/trivial.cnf")
@@ -283,7 +290,7 @@ class TestGA(TestCase):
         self.assertIsNone(ga.is_satisfied())
 
         ga.population[0].data = BitVector(bitlist=[1, 1, 1, 0, 1, 1, 1, 1, 1])
-        ga.population[0].isCacheValid = False;
+        ga.population[0].isCacheValid = False
 
         # Population now has one satisfying assignment.
         self.assertIsNotNone(ga.is_satisfied())
