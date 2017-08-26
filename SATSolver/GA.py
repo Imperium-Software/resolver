@@ -21,7 +21,7 @@ class GA:
         self.max_generations = max_generations
         self.population_size = population_size
         self.sub_population_size = sub_population_size
-        self.crossover_operator = crossover_operator
+        self.crossover_operator = int(crossover_operator)
         self.tabu_list_length = tabu_list_length
         self.max_flip = max_flip
         self.is_rvcf = is_rvcf

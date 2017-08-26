@@ -77,7 +77,8 @@ class SATController(Observer):
         else:
             print(BColors.FAIL + "Could not find a solution in the given amount of generations." + BColors.ENDC)
         print(result)
-        self.server_thread.close()
+        if self.server_thread is not None:
+            self.server_thread.close()
 
     def parse_formula(self, raw_formula):
         """
