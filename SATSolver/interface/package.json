@@ -9,11 +9,10 @@
   "author": "Imperium",
   "license": "ISC",
   "dependencies": {
+    "electron-canvas-to-buffer": "^2.0.0",
     "hammerjs": "^2.0.8",
     "jquery": "^3.2.1",
     "jquery-circle-progress": "^1.2.2",
-    "mathjax": "^2.7.1",
-    "mathjax-electron": "^2.0.1",
     "progressbar.js": "^1.0.1",
     "vue": "^2.4.1"
   },

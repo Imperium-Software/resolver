@@ -1,5 +1,12 @@
 const net = require('net');
 var ProgressBar = require('progressbar.js');
+const remote =  require('electron').remote;
+const canvasBuffer = require('electron-canvas-to-buffer');
+
+const {
+  Menu,
+  MenuItem
+} = require('electron').remote;
 
 var progress_bar = new ProgressBar.Circle('#progress-circle', {
   color: '#FFF',

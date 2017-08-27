@@ -63,18 +63,18 @@ function construct_request(type) {
         if (tabu_settings_input.indexOf('rvcf') != -1) {
             request_string += ',"is_rvcf" : true';
         }
-        
+
         if (tabu_settings_input.indexOf('diversification') != -1) {
             request_string += ',"is_diversification" : true';
         }
 
         request_string += ',"raw_input" : [ "' + dimacs.split('\n').join('","') + '"]';
-        request_string = request_string.replace(/(\r\n|\n|\r)/gm,"");
+        request_string = request_string.replace(/(\r\n|\n|\r)/gm, "");
     } else if (type == 'POLL') {
         request_string += "'POLL'";
     }
     // Add terminating character.
-    return request_string + '}}#' ;
+    return request_string + '}}#';
     // return '{ "SOLVE" : {"tabu_list_length" : 10,"max_false" : 5,"rec" : 5,"k" : 5,"raw_input" : [ "c FILE: trivial.cnf","c","c DESCRIPTION: Small expression used for testing purposes.","c","c NOTE: Satisfiable by design","c","p cnf 9 5","9 -5 0","1 3 6 0","2 -4 6 0","7 8 -3 0","-6 -4 0"]}}#'
 }
 
@@ -129,7 +129,7 @@ function navigate(filename) {
         });
         $("#advanced").modal();
         $("#connected-indicator")[0].style.fill = connected ? "lime" : "red";
-        
+
         // Progress circle
 
         var new_progress_bar = new ProgressBar.Circle('#progress-circle', {
@@ -139,24 +139,30 @@ function navigate(filename) {
             easing: 'easeInOut',
             duration: 1400,
             text: {
-              autoStyleContainer: true
+                autoStyleContainer: true
             },
-            from: { color: '#0EBFE9', width: 4 },
-            to: { color: '#0EBFE9', width: 4 },
-            step: function(state, circle) {
-              circle.path.setAttribute('stroke', state.color);
-              circle.path.setAttribute('stroke-width', state.width);
-              var value = Math.round(circle.value() * 1000) / 10;
-          
-              if (value === 0) {
-                circle.setText('0');
-              } else {
-                circle.setText(value);
-              }
-          
+            from: {
+                color: '#0EBFE9',
+                width: 4
+            },
+            to: {
+                color: '#0EBFE9',
+                width: 4
+            },
+            step: function (state, circle) {
+                circle.path.setAttribute('stroke', state.color);
+                circle.path.setAttribute('stroke-width', state.width);
+                var value = Math.round(circle.value() * 1000) / 10;
+
+                if (value === 0) {
+                    circle.setText('0');
+                } else {
+                    circle.setText(value);
+                }
+
             }
-          });
-          
+        });
+
         //new_progress_bar.animate(progress_bar)
         new_progress_bar.animate(perc.percentage);
         progress_bar = new_progress_bar;
@@ -186,24 +192,24 @@ function navigate(filename) {
         });
 
         time_elapsed = new Vue({
-           el: "#time",
+            el: "#time",
             data: {
-             elapsed: time_elapsed.elapsed
+                elapsed: time_elapsed.elapsed
             }
         });
 
         var fitness = new Vue({
             el: "#fitness",
             data: {
-              fitness: 0
+                fitness: 0
             }
         });
 
         var generations = new Vue({
             el: "#generations",
             data: {
-              generations: 0,
-              max_generations: 1000
+                generations: 0,
+                max_generations: 1000
             }
         });
 
@@ -265,3 +271,51 @@ function input_method_change() {
         $('#input-cnf-text').attr('hidden', false);
     }
 }
+
+let fitness_chart = $("#fitness-chart")[0];
+var menu = new Menu();
+menu.append(new MenuItem({
+    label: 'Save Graph To JPG',
+    click: function (e) {
+        dialog.showSaveDialog(function (fileName) {
+            if (fileName != undefined) {
+                destinationCanvas = document.createElement("canvas");
+                destinationCanvas.width = fitness_chart.width;
+                destinationCanvas.height = fitness_chart.height;
+                destCtx = destinationCanvas.getContext('2d');
+                //create a rectangle with the desired color
+                destCtx.fillStyle = "#FFFFFF";
+                destCtx.fillRect(0,0,fitness_chart.width,fitness_chart.height);
+                //draw the original canvas onto the destination canvas
+                destCtx.drawImage(fitness_chart, 0, 0);
+                var buffer = canvasBuffer(destinationCanvas, 'image/jpg')
+                fs.writeFile(fileName, buffer, function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                })
+            }
+        });
+    }
+}));
+
+menu.append(new MenuItem({
+    label: 'Save Graph To CSV',
+    click: function (e) {
+        dialog.showSaveDialog(function (fileName) {
+            if (fileName != undefined) {
+                fs.writeFile(fileName + ".best.csv", chart.data["datasets"][0].data, function (err) {
+                    console.log(err);
+                });
+                fs.writeFile(fileName + ".child.csv", chart.data["datasets"][1].data, function (err) {
+                    console.log(err);
+                });
+            }
+        });
+    }
+}));
+
+fitness_chart.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+    menu.popup(remote.getCurrentWindow());
+}, false);
