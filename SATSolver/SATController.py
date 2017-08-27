@@ -49,7 +49,8 @@ class SATController(Observer):
         self._generation_count = arg
         encoded_message = RequestHandler.encode("PROGRESS", [[self._generation_count, self.GA.max_generations],
                                                              [self.time_started],
-                                                             [self.GA.best_individual]]
+                                                             [self.GA.best_individual],
+                                                             [self.GA.current_child_fitness]],
                                                 )
         if self.server_thread is not None:
             self.send_update(encoded_message)

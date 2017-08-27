@@ -196,7 +196,7 @@ h5>small {
 }
 
 #progress label {
-    color: #F37259;
+    color: var(--theme-four);
 }
 
 #progress h4,h5 {

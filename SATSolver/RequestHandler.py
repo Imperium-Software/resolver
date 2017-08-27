@@ -44,13 +44,18 @@ class RequestHandler:
                         raise RequestHandlerError("This server is already solving. No `SOLVE` requests can be handled "
                                                   "until it has completed.")
                     else:
-                        raw_formula = json_data["SOLVE"]["raw_input"]
+                        raw_formula_array = json_data["SOLVE"]["raw_input"]
+                        raw_formula = ''
+                        for line in raw_formula_array:
+                            raw_formula += '\n' + line
+
+                        print(raw_formula)
                         json_data["SOLVE"]["formula"], json_data["SOLVE"]["number_of_variables"], json_data["SOLVE"][
                             "number_of_clauses"] = controller.parse_formula(raw_formula)
                         del json_data["SOLVE"]["raw_input"]
                         controller.create_ga(json_data["SOLVE"])
                         controller.start_ga()
-                        controller.GA = None
+
                 else:
                     raise RequestHandlerError("Unexpected arguments found for SOLVE command: " + ', '.join(set(list(
                         json_data["SOLVE"].keys())) - set(required_parameters + optional_parameters)))
@@ -105,7 +110,8 @@ class RequestHandler:
                     "PROGRESS": {
                         "GENERATION": data_arr[0],
                         "TIME_STARTED": data_arr[1],
-                        "BEST_INDIVIDUAL": data_arr[2]
+                        "BEST_INDIVIDUAL": data_arr[2],
+                        "CURRENT_CHILD_FITNESS": data_arr[3]
                     }
                 }
             }

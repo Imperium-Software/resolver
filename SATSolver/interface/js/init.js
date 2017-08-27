@@ -100,6 +100,13 @@ conn.on('data', function(data) {
     generations.max_generations = progressArray["GENERATION"][1];
     fitness.fitness = progressArray["BEST_INDIVIDUAL"][0];
     time_elapsed.started = progressArray["TIME_STARTED"][0]*1000;
+
+    if (!chart.data.labels.includes(progressArray["GENERATION"][0])) {
+      chart.data.labels.push(progressArray["GENERATION"][0]);
+      chart.data.datasets[0].data.push(progressArray["BEST_INDIVIDUAL"][0]);
+      chart.data.datasets[1].data.push(progressArray["CURRENT_CHILD_FITNESS"][0]);
+      chart.update();
+    }
   } catch(e) {
     $("#connected-indicator")[0].style.fill = "yellow";
     //alert("WTF man, wat even is this.")
@@ -114,10 +121,68 @@ conn.on('close', function() {
   connected = false;
 });
 
+var chart;
+$(document).ready(function () {
+    var accent_colour = $('button').css('backgroundColor');
+    var ctx = document.getElementById('fitness-chart').getContext('2d');
+    chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'line',
+
+        // The data for our dataset
+        data: {
+            labels: [],
+            datasets: [{
+                label: "Fittest Individual",
+                backgroundColor: accent_colour,
+                borderColor: accent_colour,
+                fill: false,
+                lineTension: 0,
+                data: []
+            },{
+                label: "Newest Child Fitness",
+                backgroundColor: '#ccc',
+                borderColor: '#ccc',
+                fill: false,
+                data: []
+            }]
+        },
+
+        // Configuration options go here
+        options: {
+            elements: {
+                line: {
+                    tension: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Generations'
+                  },
+                  ticks: {
+                      autoSkip: true,
+                      maxTicksLimit: 25
+                  }
+              }],
+              yAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Fitness (Unsolved Clauses)'
+                  },
+                  ticks: {
+                      autoSkip: true,
+                      maxTicksLimit: 25
+                  }
+              }]
+            }
+        }
+    });
+});
+
 window.setInterval(function(){
   var calculated_elapsed = (((new Date).getTime() - time_elapsed.started));
-  console.log(calculated_elapsed);
-  console.log(calculated_elapsed);
   if (calculated_elapsed < 10000) {
     time_elapsed.elapsed = moment(calculated_elapsed).format('s') + 's';
   } else if (calculated_elapsed < 60000) {
