@@ -318,65 +318,83 @@ class GA:
                 # This is for diversifiaction
                 if self.is_diversification:
                     # Increment all bits that have been flipped to make a Max_false clause positive
-                    for index2 in range(len(forbidden_flips)):
-                        forbidden_flips[forbidden_flips[index2]] += 1
+                    temp_flips = copy.deepcopy(forbidden_flips);
+                    for index2 in temp_flips.items():
+                        forbidden_flips[index2[0]] += 1
                         # Check if pos has been flipped k times since last flip and remove it if it has
                         # this frees that variable up to be flipped next time it is maximal in a max_false clause
-                        if forbidden_flips[forbidden_flips[index2]] == self.k:
-                            del forbidden_flips[forbidden_flips[index2]]
+                        if forbidden_flips[index2[0]] == self.k:
+                            del forbidden_flips[index2[0]]
 
                 individual_in = individual_temp
-            if self.is_diversification:
-                for i in range(len(self.formula)):
-                    if not self.sat(individual_in, self.formula[i]):
-                        self.false_counts[i] += 1
+                if self.is_diversification:
+                    temp_indavidual_in = copy.deepcopy(individual_in)
+                    for i in range(len(self.formula)):
+                        if not self.sat(individual_in, self.formula[i]):
+                            self.false_counts[i] += 1
 
-                        # if this clause has reached or exceeded max_false counts, making it a stumble clause
-                        if self.false_counts[i] >= self.max_false:
-                            try:
-                                value = max(self.formula[i], key=lambda c: self.improvement(individual_in, abs(c)))
-                            except ValueError as e:
-                                raise e
-                            pos = abs(value)
+                            # if this clause has reached or exceeded max_false counts, making it a stumble clause
+                            if self.false_counts[i] >= self.max_false:
+                                try:
+                                    value = max(self.formula[i], key=lambda c: self.improvement(individual_in, abs(c)))
+                                except ValueError as e:
+                                    raise e
+                                pos = abs(value)
 
-                            individual_temp = copy.deepcopy(individual_in)
-                            # Check if pos has been flipped before
-                            # flips this one stubborn bit and refuse to flip it back before k flips.
-                            if pos not in forbidden_flips.keys():
-                                # set to 0 and not 1 because it means that if k is 5 only on flip 6 can
-                                # pos be flipped
-                                forbidden_flips[pos] = 0
-                                individual_temp.flip(pos)
-                                # flips this clause to being positive only if the maximal bit was flipped. a loop could
-                                # be set into the structure to say if the maximal bit cant be flipped due to not having
-                                # had enough flips then the next maximul could be flipped.
-                                self.false_counts[i] = 0
+                                individual_temp = copy.deepcopy(temp_indavidual_in)
+                                # Check if pos has been flipped before
+                                # flips this one stubborn bit and refuse to flip it back before k flips.
+                                if pos not in forbidden_flips.keys():
+                                    # set to 0 and not 1 because it means that if k is 5 only on flip 6 can
+                                    # pos be flipped
+                                    individual_temp.flip(pos)
+                                    temp_flips = copy.deepcopy(forbidden_flips);
+                                    for index4 in temp_flips.items():
+                                        forbidden_flips[index4[0]] += 1
+                                        # Check if pos has been flipped k times since last flip and remove it if it has
+                                        # this frees that variable up to be flipped next time it is maximal in a max_false clause
+                                        if forbidden_flips[index4[0]] == self.k:
+                                            del forbidden_flips[index4[0]]
+                                    forbidden_flips[pos] = 0
+                                    # flips this clause to being positive only if the maximal bit was flipped. a loop could
+                                    # be set into the structure to say if the maximal bit cant be flipped due to not having
+                                    # had enough flips then the next maximul could be flipped.
+                                    self.false_counts[i] = 0
 
-                            for _ in range(self.rec):
-                                now_false_clauses = [self.formula[x] for x in range(len(self.formula))
-                                                     if
-                                                     self.sat(individual_temp, self.formula[i]) and not self.sat(individual_in, self.formula[i])]
-                                for nested_clause in now_false_clauses:
-                                    temp_clause = [c for c in nested_clause if c not in forbidden_flips.keys()]
-                                    try:
-                                        value = max(temp_clause, key=lambda c: self.improvement(individual_temp, c))
-                                    except ValueError as e:
-                                        raise e
-                                    pos = abs(value)
-                                    if pos not in forbidden_flips.keys():
-                                        # set to 0 and not 1 because it means that if k is 5 only on flip 6 can
-                                        # pos be flipped
-                                        forbidden_flips[pos] = 0
-                                        individual_temp.flip(pos)
-                                        # increment all remaining forbidden flips as a flip has taken place
-                                        for index3 in range(len(forbidden_flips)):
-                                            forbidden_flips[forbidden_flips[index3]] += 1
-                                            # Check if pos has been flipped k times since last flip and remove it if it has
-                                            # this frees that variable up to be flipped next time it is maximal in a max_false clause
-                                            if forbidden_flips[forbidden_flips[index3]] == self.k:
-                                                del forbidden_flips[forbidden_flips[index3]]
-                                    # not sure if a secondary maximal should be taken for the false clause.
-                            individual_in = individual_temp
+                                for _ in range(self.rec):
+                                    now_false_clauses = [self.formula[x] for x in range(len(self.formula))
+                                                         if
+                                                         self.sat(individual_temp, self.formula[x]) and not self.sat(individual_in, self.formula[x])]
+                                    for nested_clause in now_false_clauses:
+                                        temp_clause = [c for c in nested_clause if c not in forbidden_flips.keys()]
+
+                                        if len(temp_clause) > 0:
+                                            try:
+
+                                                value = max(temp_clause, key=lambda c: self.improvement(individual_temp, c))
+                                            except ValueError as e:
+                                                raise e
+                                            pos = abs(value)
+                                            if pos not in forbidden_flips.keys():
+                                                # set to 0 and not 1 because it means that if k is 5 only on flip 6 can
+                                                # pos be flipped
+                                                individual_temp.flip(pos)
+                                                # increment all remaining forbidden flips as a flip has taken place
+                                                temp_flips = copy.deepcopy(forbidden_flips);
+                                                for index3 in temp_flips.items():
+                                                    forbidden_flips[index3[0]] += 1
+                                                    # Check if pos has been flipped k times since last flip and remove it if it has
+                                                    # this frees that variable up to be flipped next time it is maximal in a max_false clause
+                                                    if forbidden_flips[index3[0]] == self.k:
+                                                        del forbidden_flips[index3[0]]
+
+                                                forbidden_flips[pos] = 0
+                                            # not sure if a secondary maximal should be taken for the false clause.
+
+                                individual_in = individual_temp
+                                if self.evaluate(individual_temp) < self.evaluate(self.best):
+                                    self.best = individual_temp
+        return self.best
 
     def choose_rvcf(self, individual_in):
         """

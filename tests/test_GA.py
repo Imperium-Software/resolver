@@ -201,17 +201,30 @@ class TestGA(TestCase):
             self.assertEqual(1, 1)
         else:
             self.assertEqual(1, 0)
+
         # .............................................................................................................
-        # Test 4 - Diversification.....................................................................................
-        # ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, is_diversification=True)
-        # ind = Individual(9)
-        # ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
-        # ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
-        # if (list(ind.data) == list(BitVector(bitlist=[1, 1, 1, 0, 1, 1, 1, 1, 1])) or
-        #         list(ind.data) == list(BitVector(bitlist=[1, 1, 1, 1, 1, 0, 1, 1, 1]))):
-        #     self.assertEqual(1, 1)
-        # else:
-        #     self.assertEqual(1, 0)
+        # Test 4 - No diversification - complex..................................................................................
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, is_diversification=False)
+        ind = Individual(9)
+        ind.data = BitVector(bitlist=[0, 0, 0, 1, 1, 0, 0, 0, 0])
+        ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
+        if ind.fitness == 0:
+            self.assertEqual(1, 1)
+        else:
+            self.assertEqual(1, 0)
+        # .............................................................................................................
+        # Test 5 - Diversification.....................................................................................
+        file_reader = self.FormulaReader("../examples/par16-4-c.cnf")
+        ga_implementation = GA(file_reader.formula, 1292, 324, 10, 5, 5, 5, is_diversification=True)
+        ind = Individual(324)
+        val1 = ga_implementation.evaluate(ind)
+        ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
+        val2 = ga_implementation.evaluate(ind)
+        if ind.fitness == 0:
+            self.assertEqual(1, 1)
+        else:
+            self.assertEqual(1, 0)
         # .............................................................................................................
     def test_choose_rvcf(self):
         # An instance of the GA class which will be used to test the standard_tabu_choose function
