@@ -191,18 +191,10 @@ $(document).ready(function () {
 window.setInterval(function(){
   var calculated_elapsed = (((new Date).getTime() - time_elapsed.started));
   if (calculated_elapsed < 10000) {
-    time_elapsed.elapsed = moment(calculated_elapsed).format('s') + 's';
-  } else if (calculated_elapsed < 60000) {
-    time_elapsed.elapsed = moment(calculated_elapsed).format('ss') + 's';
-  } else if (calculated_elapsed < 600000) {
-    time_elapsed.elapsed = moment(calculated_elapsed).format('m:ss');
+    time_elapsed.elapsed = moment(calculated_elapsed).format('s') + 's ' + (calculated_elapsed.toString()).slice(-2);
   } else if (calculated_elapsed < 3600000) {
-    time_elapsed.elapsed = moment(calculated_elapsed).format('mm:ss');
-  } else if (calculated_elapsed < 36000000) {
-    time_elapsed.elapsed = moment(calculated_elapsed-7200000).format('H:mm:ss');
-  } else if (calculated_elapsed < 86400000) {
-    time_elapsed.elapsed = moment(calculated_elapsed-7200000).format('HH:mm:ss');
+    time_elapsed.elapsed = moment(calculated_elapsed).format('m') + 'm ' + moment(calculated_elapsed).format('s') + 's ' + (calculated_elapsed.toString()).slice(-3);
   } else {
-    time_elapsed.elapsed = moment(calculated_elapsed-93600000).format('DD:HH:mm:ss');
+    time_elapsed.elapsed = moment(calculated_elapsed-93600000).format('H') + 'h ' + moment(calculated_elapsed-93600000).format('m') + 'm ' + moment(calculated_elapsed-93600000).format('s') + 's ' + (calculated_elapsed.toString()).slice(-3);
   }
-}, 1000);
+}, 1);

@@ -3,12 +3,10 @@ const {
     dialog
 } = require('electron').remote;
 
-function construct_request(type) {
-    var request_string = '{ "command" :';
-    var request_string = '';
+function construct_request(type) {;
     if (type == 'SOLVE') {
 
-        var request_string = '{ "SOLVE" : {';
+        var request_string;
 
         if ($('#cnf-input-method')[0].value == 'file') {
             let filename = $('#selected-file').prop('files')[0].path;
@@ -16,17 +14,6 @@ function construct_request(type) {
         } else {
             dimacs = $('#manual-cnf')[0].value;
         }
-
-        // Mandatory parameters
-
-        request_string += '"tabu_list_length" : ' + $("#tabu_list_length")[0].value;
-        request_string += ',"max_false" : ' + $("#max_false")[0].value;
-        request_string += ',"rec" : ' + $("#rec")[0].value;
-        request_string += ',"k" : ' + $("#k")[0].value;
-
-        // Optional parameters
-
-        // Get optional inputs
 
         let max_generations_input = $('#max_generations')[0].value;
         let population_size_input = $('#population_size')[0].value;
@@ -36,46 +23,60 @@ function construct_request(type) {
         let method_input = $('#method')[0].value;
         let tabu_settings_input = $('#tabu-settings').val();
 
+        var request = {
+            "SOLVE": {
+                "raw_input": null,
+                "tabu_list_length": null,
+                "max_false": null,
+                "rec": null,
+                "k": null
+            }
+        };
+
+        request.SOLVE.tabu_list_length = $("#tabu_list_length")[0].value;
+        request.SOLVE.max_false = $("#max_false")[0].value;
+        request.SOLVE.rec = $("#rec")[0].value;
+        request.SOLVE.k = $("#k")[0].value;
+
         if (population_size_input != undefined && population_size_input != '') {
-            request_string += ',"population_size" : ' + population_size_input;
+            request.SOLVE["population_size"] = population_size_input;
         }
 
         if (sub_population_size_input != undefined && sub_population_size_input != '') {
-            request_string += ',"sub_population_size" : ' + sub_population_size_input;
+            request.SOLVE["sub_population_size"] = parseInt(sub_population_size_input);
         }
 
         if (crossover_operator_input != undefined && crossover_operator_input != '') {
-            request_string += ',"crossover_operator" : ' + crossover_operator_input;
+            request.SOLVE["crossover_operator"] = parseInt(crossover_operator_input);
         }
 
         if (max_flip_input != undefined && max_flip_input != '') {
-            request_string += ',"max_flip" : ' + max_flip_input;
+            request.SOLVE["max_flip"] = parseInt(max_flip_input);
         }
 
         if (max_generations_input != undefined && max_generations_input != '') {
-            request_string += ',"max_generations" : ' + max_generations_input;
+            request.SOLVE["max_generations"] = parseInt(max_generations_input);
         }
 
         if (method_input != undefined && method_input != '') {
-            request_string += ',"method" : "' + method_input + '"';
+            request.SOLVE["method"] = parseInt(method_input);
         }
 
         if (tabu_settings_input.indexOf('rvcf') != -1) {
-            request_string += ',"is_rvcf" : true';
+            request.SOLVE["is_rvcf"] = true;
         }
 
         if (tabu_settings_input.indexOf('diversification') != -1) {
-            request_string += ',"is_diversification" : true';
+            request.SOLVE["is_diversification"] = true;
         }
 
-        request_string += ',"raw_input" : [ "' + dimacs.split('\n').join('","') + '"]';
-        request_string = request_string.replace(/(\r\n|\n|\r)/gm, "");
+        request.SOLVE.raw_input = dimacs.split('\n');
+        request_string = JSON.stringify(request);
     } else if (type == 'POLL') {
         request_string += "'POLL'";
     }
     // Add terminating character.
-    return request_string + '}}#';
-    // return '{ "SOLVE" : {"tabu_list_length" : 10,"max_false" : 5,"rec" : 5,"k" : 5,"raw_input" : [ "c FILE: trivial.cnf","c","c DESCRIPTION: Small expression used for testing purposes.","c","c NOTE: Satisfiable by design","c","p cnf 9 5","9 -5 0","1 3 6 0","2 -4 6 0","7 8 -3 0","-6 -4 0"]}}#'
+    return request_string + '#';
 }
 
 function make_request(type, filename) {

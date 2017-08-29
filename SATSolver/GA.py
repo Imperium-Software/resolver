@@ -15,20 +15,20 @@ class GA:
                  max_flip=10000, is_rvcf=False, is_diversification=False, method=None):
 
         self.formula = formula
-        self.numberOfClauses = number_of_clauses
-        self.numberOfVariables = number_of_variables
+        self.numberOfClauses = int(number_of_clauses)
+        self.numberOfVariables = int(number_of_variables)
         # Creating member variables for each of the parameters
-        self.max_generations = max_generations
-        self.population_size = population_size
-        self.sub_population_size = sub_population_size
-        self.crossover_operator = crossover_operator
-        self.tabu_list_length = tabu_list_length
-        self.max_flip = max_flip
+        self.max_generations = int(max_generations)
+        self.population_size = int(population_size)
+        self.sub_population_size = int(sub_population_size)
+        self.crossover_operator = int(crossover_operator)
+        self.tabu_list_length = int(tabu_list_length)
+        self.max_flip = int(max_flip)
         self.is_rvcf = bool(is_rvcf)
-        self.is_diversification = is_diversification
-        self.max_false = max_false
-        self.rec = rec
-        self.k = k
+        self.is_diversification = bool(is_diversification)
+        self.max_false = int(max_false)
+        self.rec = int(rec)
+        self.k = int(k)
         self.method = method
         self._observers = set()
         self._generation_counter = None
