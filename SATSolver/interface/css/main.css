@@ -195,6 +195,10 @@ h5>small {
     color: #9e9e9e;
 }
 
+#fitness-chart {
+    min-height: 250px;
+}
+
 #progress label {
     color: var(--theme-four);
 }

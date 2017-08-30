@@ -53,8 +53,13 @@ class SATController(Observer, SingletonMixin):
                                  )
         if self.server_thread is not None:
             self.server_thread.push_to_all(encoded_message)
+        time_elapsed = int(time.time()*1000)-self.time_started
+        if time_elapsed >= 1000:
+            time_elapsed = str(time_elapsed/1000) + 's'
+        else:
+            time_elapsed = str(time_elapsed) + 'ms'
         print("Generations: " + str(self._generation_count) + "/" + str(self.GA.max_generations) + "\t|\tElapsed Time: "
-              + str(int(time.time())-self.time_started) + "s\t|\tBest Individual's Fitness: "
+              + time_elapsed + "\t|\tBest Individual's Fitness: "
               + str(self.GA.best_individual))
 
     def send_update(self, msg):
@@ -70,13 +75,17 @@ class SATController(Observer, SingletonMixin):
         self.GA.attach(self)
 
     def start_ga(self):
-        dt = datetime.now()
         self.time_started = int(time.time()*1000)
         result = self.GA.gasat()
-        dt = datetime.now()
         self.time_finished = int(time.time()*1000)
+        time_elapsed = self.time_finished - self.time_started
+        if time_elapsed >= 1000:
+            time_elapsed = str(time_elapsed / 1000) + 's'
+        else:
+            time_elapsed = str(time_elapsed) + 'ms'
         if result.fitness == 0:
-            print(BColors.OKGREEN + "Successfully found a solution!" + BColors.ENDC)
+            print(BColors.OKGREEN + "Successfully found a solution in " +
+                  time_elapsed + BColors.ENDC)
             print('A solution is: ' + str(result))
         else:
             print(BColors.FAIL + "Could not find a solution in the given amount of generations." + BColors.ENDC)

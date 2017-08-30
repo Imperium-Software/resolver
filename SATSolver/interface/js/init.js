@@ -82,8 +82,6 @@ var generations = new Vue({
     }
 });
 
-connected = false;
-
 // Connection
 
 // Create connection and establish callbacks.
@@ -93,7 +91,7 @@ conn = new net.Socket();
 conn.connect(55555, '127.0.0.1', function() {
     console.log('Connected');
     $("#connected-indicator")[0].style.fill = "lime";
-    connected = true;
+    conn.connected = true;
 });
 
 conn.on('data', function(data) {
@@ -116,6 +114,12 @@ conn.on('data', function(data) {
         generations.max_generations = progressArray["GENERATION"][1];
         fitness.fitness = progressArray["BEST_INDIVIDUAL"][0];
         time_elapsed.start = progressArray["TIME_STARTED"][0];
+
+
+        if ($('#progress').is(":hidden")) {
+            $('.setup').collapsible('close', 0);
+            $('#progress').slideDown(2000);
+        }
 
         if (!chart.data.labels.includes(progressArray["GENERATION"][0])) {
           chart.data.labels.push(progressArray["GENERATION"][0]);
@@ -171,11 +175,12 @@ conn.on('data', function(data) {
 conn.on('close', function() {
   console.log('Connection closed');
   $("#connected-indicator")[0].style.fill = "red";
-  connected = false;
+  conn.connected = false;
 });
 
 var chart;
 $(document).ready(function () {
+    $('#progress').hide();
     var accent_colour = $('button').css('backgroundColor');
     var ctx = document.getElementById('fitness-chart').getContext('2d');
     chart = new Chart(ctx, {
@@ -252,3 +257,13 @@ window.setInterval(function() {
         time_elapsed.elapsed = moment(calculated_elapsed-93600000).format('H') + 'h ' + moment(calculated_elapsed-93600000).format('m') + 'm ' + moment(calculated_elapsed-93600000).format('s') + 's ' + (calculated_elapsed.toString()).slice(-3);
     }
 }, 1);
+
+window.setInterval(function() {
+    if (conn.connected === false) {
+        conn.connect(55555, '127.0.0.1', function() {
+            console.log('Connected');
+            $("#connected-indicator")[0].style.fill = "lime";
+            conn.connected = true;
+        });
+    }
+}, 5000);

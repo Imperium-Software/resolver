@@ -3,7 +3,7 @@ const {
     dialog
 } = require('electron').remote;
 
-function construct_request(type) {;
+function construct_request(type) {
     if (type == 'SOLVE') {
 
         var request_string;
