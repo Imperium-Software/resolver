@@ -4,7 +4,7 @@
 """
 import json
 import threading
-from SATSingleton import SingletonMixin
+from SATController import SingletonMixin
 from SATSolver.main import SATController
 
 
@@ -43,7 +43,7 @@ def decode(data, server, client_id):
                     raw_formula_array = json_data["SOLVE"]["raw_input"]
 
                     json_data["SOLVE"]["formula"], json_data["SOLVE"]["number_of_variables"], json_data["SOLVE"][
-                        "number_of_clauses"] = controller.parse_formula(raw_formula_array)
+                        "number_of_clauses"] = controller.parse_formula(raw_formula_array, False)
                     del json_data["SOLVE"]["raw_input"]
                     controller.create_ga(json_data["SOLVE"])
                     thread = threading.Thread(target=controller.start_ga())
@@ -112,11 +112,12 @@ def encode(message_type, data):
     def finished(data_arr):
         response = {
             "RESPONSE": {
-                "DONE": {
+                "FINISHED": {
                     "SUCCESSFUL": data_arr[0],
-                    "GENERATIONS": data_arr[1],
-                    "TIME_STARTED": data_arr[2],
-                    "TIME_FINISHED": data_arr[3]
+                    "FITNESS": data_arr[1],
+                    "GENERATION": data_arr[2],
+                    "TIME_STARTED": data_arr[3],
+                    "TIME_FINISHED": data_arr[4]
                 }
             }
         }

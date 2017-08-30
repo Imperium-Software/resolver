@@ -1,11 +1,12 @@
 import sys
-from SATSolver.SATSingleton import SATController
+from SATSolver.SATController import SATController
 from optparse import OptionParser
 from SATSolver.server import SATServer
 
 
 default_port = 55555
 default_host = "localhost"
+
 
 def main(argv):
     """
@@ -16,7 +17,6 @@ def main(argv):
         And finally returns the exit code
     """
     controller = SATController.instance()
-    controller2 = SATController.instance()
     from RequestHandler import decode
 
     if len(argv) == 0:

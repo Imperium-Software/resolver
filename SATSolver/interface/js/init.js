@@ -62,7 +62,8 @@ var time_elapsed = new Vue({
    el: "#time",
     data: {
      elapsed: 0,
-        started: 0
+        start: 0,
+        finish: 0
     }
 });
 
@@ -99,26 +100,71 @@ conn.on('data', function(data) {
   data = data.slice(0, -1);
   console.log('Received: ' + data);
   terminal.text += "\n" + data;
-  try {
-    progressObject = JSON.parse(data);
-    progressArray = progressObject["RESPONSE"]["PROGRESS"];
-    perc.percentage = progressArray["GENERATION"][0] / progressArray["GENERATION"][1];
-    generations.generations = progressArray["GENERATION"][0];
-    generations.max_generations = progressArray["GENERATION"][1];
-    fitness.fitness = progressArray["BEST_INDIVIDUAL"][0];
-    time_elapsed.started = progressArray["TIME_STARTED"][0]*1000;
 
-    if (!chart.data.labels.includes(progressArray["GENERATION"][0])) {
-      chart.data.labels.push(progressArray["GENERATION"][0]);
-      chart.data.datasets[0].data.push(progressArray["BEST_INDIVIDUAL"][0]);
-      chart.data.datasets[1].data.push(progressArray["CURRENT_CHILD_FITNESS"][0]);
-      chart.update();
-    }
-  } catch(e) {
-    $("#connected-indicator")[0].style.fill = "yellow";
-    //alert("WTF man, wat even is this.")
-      console.log(e)
+  var response = JSON.parse(data);
+  var message_type;
+  for (var key in response["RESPONSE"]) {
+      message_type = key;
   }
+
+  function progress() {
+      try {
+        progressObject = JSON.parse(data);
+        progressArray = progressObject["RESPONSE"]["PROGRESS"];
+        perc.percentage = progressArray["GENERATION"][0] / progressArray["GENERATION"][1];
+        generations.generations = progressArray["GENERATION"][0];
+        generations.max_generations = progressArray["GENERATION"][1];
+        fitness.fitness = progressArray["BEST_INDIVIDUAL"][0];
+        time_elapsed.start = progressArray["TIME_STARTED"][0];
+
+        if (!chart.data.labels.includes(progressArray["GENERATION"][0])) {
+          chart.data.labels.push(progressArray["GENERATION"][0]);
+          chart.data.datasets[0].data.push(progressArray["BEST_INDIVIDUAL"][0]);
+          chart.data.datasets[1].data.push(progressArray["CURRENT_CHILD_FITNESS"][0]);
+          chart.update();
+        }
+      } catch(e) {
+        $("#connected-indicator")[0].style.fill = "yellow";
+        console.log(e)
+      }
+  }
+
+  function finished() {
+      try {
+        var progressObject = JSON.parse(data);
+        var finishedArray = progressObject["RESPONSE"]["FINISHED"];
+        perc.percentage = 1;
+        generations.generations = finishedArray["GENERATION"][0];
+        generations.max_generations = finishedArray["GENERATION"][1];
+        fitness.fitness = finishedArray["FITNESS"];
+        time_elapsed.start = finishedArray["TIME_STARTED"];
+        time_elapsed.finish = finishedArray["TIME_FINISHED"];
+        chart.update();
+      } catch(e) {
+        $("#connected-indicator")[0].style.fill = "yellow";
+        console.log(e)
+      }
+  }
+
+  function error() {
+      try {
+          var errorObject = JSON.parse(data);
+          error_log.text += "\n" + errorObject["RESPONSE"]["ERROR"];
+          alert("Server says: " + errorObject["RESPONSE"]["ERROR"]);
+      } catch(e) {
+        $("#connected-indicator")[0].style.fill = "yellow";
+        console.log(e)
+      }
+  }
+
+  var options = {
+    "PROGRESS": progress,
+    "FINISHED": finished,
+    "ERROR": error
+  };
+
+  options[message_type](data);
+
   progress_bar.animate(perc.percentage);
 });
 
@@ -188,13 +234,21 @@ $(document).ready(function () {
     });
 });
 
-window.setInterval(function(){
-  var calculated_elapsed = (((new Date).getTime() - time_elapsed.started));
-  if (calculated_elapsed < 10000) {
-    time_elapsed.elapsed = moment(calculated_elapsed).format('s') + 's ' + (calculated_elapsed.toString()).slice(-2);
-  } else if (calculated_elapsed < 3600000) {
-    time_elapsed.elapsed = moment(calculated_elapsed).format('m') + 'm ' + moment(calculated_elapsed).format('s') + 's ' + (calculated_elapsed.toString()).slice(-3);
-  } else {
-    time_elapsed.elapsed = moment(calculated_elapsed-93600000).format('H') + 'h ' + moment(calculated_elapsed-93600000).format('m') + 'm ' + moment(calculated_elapsed-93600000).format('s') + 's ' + (calculated_elapsed.toString()).slice(-3);
-  }
+window.setInterval(function() {
+    var calculated_elapsed;
+    if (time_elapsed.finish === 0) {
+        calculated_elapsed = (((new Date).getTime() - time_elapsed.start));
+    } else {
+        calculated_elapsed = time_elapsed.finish - time_elapsed.start;
+    }
+
+    if (calculated_elapsed < 1000) {
+        time_elapsed.elapsed = (calculated_elapsed.toString()).slice(-3) + 'ms';
+    } else if (calculated_elapsed < 60000) {
+        time_elapsed.elapsed = moment(calculated_elapsed).format('s') + 's ' + (calculated_elapsed.toString()).slice(-3);
+    } else if (calculated_elapsed < 3600000) {
+        time_elapsed.elapsed = moment(calculated_elapsed).format('m') + 'm ' + moment(calculated_elapsed).format('s') + 's ' + (calculated_elapsed.toString()).slice(-3);
+    } else {
+        time_elapsed.elapsed = moment(calculated_elapsed-93600000).format('H') + 'h ' + moment(calculated_elapsed-93600000).format('m') + 'm ' + moment(calculated_elapsed-93600000).format('s') + 's ' + (calculated_elapsed.toString()).slice(-3);
+    }
 }, 1);
