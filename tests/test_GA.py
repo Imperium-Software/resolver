@@ -214,14 +214,27 @@ class TestGA(TestCase):
         else:
             self.assertEqual(1, 0)
         # .............................................................................................................
-        # Test 5 - Diversification.....................................................................................
+        # Test 5 - Real non diversification.....................................................................................
+        # file_reader = self.FormulaReader("../examples/par16-4-c.cnf")
+        # ga_implementation = GA(file_reader.formula, 1292, 324, 10, 5, 5, 5, max_flip=20)
+        # ind = Individual(324)
+        # val1 = ga_implementation.evaluate(ind)
+        # ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
+        # val2 = ga_implementation.evaluate(ind)
+        # if val2 < val1:
+        #     self.assertEqual(1, 1)
+        # else:
+        #     self.assertEqual(1, 0)
+        # ..................................................................................................
+        # .............................................................................................................
+        # Test 6 - Diversification.....................................................................................
         file_reader = self.FormulaReader("../examples/par16-4-c.cnf")
-        ga_implementation = GA(file_reader.formula, 1292, 324, 10, 5, 5, 5, is_diversification=True)
+        ga_implementation = GA(file_reader.formula, 1292, 324, 10, 5, 5, 5, max_flip=50, is_diversification=True)
         ind = Individual(324)
         val1 = ga_implementation.evaluate(ind)
         ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
         val2 = ga_implementation.evaluate(ind)
-        if ind.fitness == 0:
+        if val2 < val1:
             self.assertEqual(1, 1)
         else:
             self.assertEqual(1, 0)

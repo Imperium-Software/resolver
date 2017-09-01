@@ -307,6 +307,9 @@ class GA:
         num_flips = 0
         while not (self.evaluate(self.best) == 0) and (self.max_flip > num_flips):
             # index = self.choose(individual_in)
+            # Access fault debugging for more then 50 flips
+            if num_flips > 50:
+                break
             index = choose_function(individual_in)
             individual_temp = copy.deepcopy(individual_in)
             if not index[0] in self.tabu:
@@ -328,20 +331,20 @@ class GA:
 
                 individual_in = individual_temp
                 if self.is_diversification:
-                    temp_indavidual_in = copy.deepcopy(individual_in)
+                    temp_individual_in = copy.deepcopy(individual_in)
                     for i in range(len(self.formula)):
-                        if not self.sat(individual_in, self.formula[i]):
+                        if not self.sat(temp_individual_in, self.formula[i]):
                             self.false_counts[i] += 1
 
                             # if this clause has reached or exceeded max_false counts, making it a stumble clause
                             if self.false_counts[i] >= self.max_false:
                                 try:
-                                    value = max(self.formula[i], key=lambda c: self.improvement(individual_in, abs(c)))
+                                    value = max(self.formula[i], key=lambda c: self.improvement(temp_individual_in, abs(c)))
                                 except ValueError as e:
                                     raise e
                                 pos = abs(value)
 
-                                individual_temp = copy.deepcopy(temp_indavidual_in)
+                                individual_temp = copy.deepcopy(temp_individual_in)
                                 # Check if pos has been flipped before
                                 # flips this one stubborn bit and refuse to flip it back before k flips.
                                 if pos not in forbidden_flips.keys():
@@ -364,14 +367,14 @@ class GA:
                                 for _ in range(self.rec):
                                     now_false_clauses = [self.formula[x] for x in range(len(self.formula))
                                                          if
-                                                         self.sat(individual_temp, self.formula[x]) and not self.sat(individual_in, self.formula[x])]
+                                                         not self.sat(individual_temp, self.formula[x]) and self.sat(temp_individual_in, self.formula[x])]
                                     for nested_clause in now_false_clauses:
                                         temp_clause = [c for c in nested_clause if c not in forbidden_flips.keys()]
 
                                         if len(temp_clause) > 0:
                                             try:
 
-                                                value = max(temp_clause, key=lambda c: self.improvement(individual_temp, c))
+                                                value = max(temp_clause, key=lambda c: self.improvement(individual_temp,c))
                                             except ValueError as e:
                                                 raise e
                                             pos = abs(value)
@@ -391,11 +394,10 @@ class GA:
                                                 forbidden_flips[pos] = 0
                                             # not sure if a secondary maximal should be taken for the false clause.
 
+                                temp_individual_in = individual_temp
 
-
-                                individual_in = individual_temp
-                                if self.evaluate(individual_temp) < self.evaluate(self.best):
-                                    self.best = individual_temp
+                                if self.evaluate(temp_individual_in) < self.evaluate(self.best):
+                                    self.best = temp_individual_in
         return self.best
 
     def choose_rvcf(self, individual_in):
