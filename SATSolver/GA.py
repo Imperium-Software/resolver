@@ -391,6 +391,8 @@ class GA:
                                                 forbidden_flips[pos] = 0
                                             # not sure if a secondary maximal should be taken for the false clause.
 
+
+
                                 individual_in = individual_temp
                                 if self.evaluate(individual_temp) < self.evaluate(self.best):
                                     self.best = individual_temp
