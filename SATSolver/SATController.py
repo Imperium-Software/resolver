@@ -2,6 +2,7 @@ import threading
 import abc
 import time
 from SATSolver.GA import GA
+from SATSolver.GA import GAStop
 from SATSolver.server import BColors
 from datetime import datetime
 
@@ -65,7 +66,7 @@ class SATController(Observer, SingletonMixin):
             time_elapsed = str(time_elapsed) + 'ms'
         print("Generations: " + str(self._generation_count) + "/" + str(self.GA.max_generations) + "\t|\tElapsed Time: "
               + time_elapsed + "\t|\tBest Individual's Fitness: "
-              + str(self.GA.best_individual))
+              + str(self.GA.best_individual_fitness))
 
     def send_update(self, msg):
         self.server_thread.push_to_all(msg)
@@ -80,34 +81,66 @@ class SATController(Observer, SingletonMixin):
         self.GA.attach(self)
 
     def start_ga(self):
-        self.time_started = int(time.time()*1000)
-        result = self.GA.gasat()
-        self.time_finished = int(time.time()*1000)
-        time_elapsed = self.time_finished - self.time_started
-        if time_elapsed >= 1000:
-            time_elapsed = str(time_elapsed / 1000) + 's'
-        else:
-            time_elapsed = str(time_elapsed) + 'ms'
-        if result.fitness == 0:
-            print(BColors.OKGREEN + "Successfully found a solution in " +
-                  time_elapsed + BColors.ENDC)
-            print('A solution is: ' + str(result))
-        else:
-            print(BColors.FAIL + "Could not find a solution in the given amount of generations." + BColors.ENDC)
-            print('The best solution found is: ' + str(result))
-        if self.server_thread is not None:
-            from RequestHandler import encode
-            encoded_message = encode("FINISHED", [
-                result.fitness == 0,
-                result.fitness,
-                [self._generation_count, self.GA.max_generations],
-                self.time_started,
-                self.time_finished
-            ])
-            time.sleep(0.1)
-            self.server_thread.push_to_all(encoded_message)
+        try:
+            self.time_started = int(time.time()*1000)
+            result = self.GA.gasat()
+            self.time_finished = int(time.time()*1000)
+            time_elapsed = self.time_finished - self.time_started
+            if time_elapsed >= 1000:
+                time_elapsed = str(time_elapsed / 1000) + 's'
+            else:
+                time_elapsed = str(time_elapsed) + 'ms'
+            if result.fitness == 0:
+                print(BColors.OKGREEN + "Successfully found a solution in " +
+                      time_elapsed + BColors.ENDC)
+                print('A solution is: ' + str(result))
+            else:
+                print(BColors.FAIL + "Could not find a solution in the given amount of generations." + BColors.ENDC)
+                print('The best solution found is: ' + str(result))
+            if self.server_thread is not None:
+                from RequestHandler import encode
+                encoded_message = encode("FINISHED", [
+                    result.fitness == 0,
+                    result.fitness,
+                    [self._generation_count, self.GA.max_generations],
+                    self.time_started,
+                    self.time_finished,
+                    str(result)
+                ])
+                time.sleep(0.1)
+                self.server_thread.push_to_all(encoded_message)
 
-            self.GA = None
+                self.GA = None
+
+        except GAStop:
+            self.time_finished = int(time.time() * 1000)
+            time_elapsed = self.time_finished - self.time_started
+            if time_elapsed >= 1000:
+                time_elapsed = str(time_elapsed / 1000) + 's'
+            else:
+                time_elapsed = str(time_elapsed) + 'ms'
+            result = self.GA.best_individual
+            if result.fitness == 0:
+                print(BColors.OKGREEN + "Successfully found a solution in " +
+                      time_elapsed + BColors.ENDC)
+                print('A solution is: ' + str(result))
+            else:
+                print(BColors.FAIL + "Could not find a solution, solving stopped by client." + BColors.ENDC)
+                print('The best solution found is: ' + str(result))
+            if self.server_thread is not None:
+                from RequestHandler import encode
+                encoded_message = encode("FINISHED", [
+                    result.fitness == 0,
+                    result.fitness,
+                    [self._generation_count, self.GA.max_generations],
+                    self.time_started,
+                    self.time_finished,
+                    str(self.GA.best_individual)
+                ])
+                self.server_thread.push_to_all(encoded_message)
+
+                self.GA = None
+
 
 
     def parse_formula(self, raw_formula, local=True):

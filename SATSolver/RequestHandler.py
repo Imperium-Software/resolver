@@ -3,7 +3,7 @@
     Description: Defines a c
 """
 import json
-import threading
+from threading import Thread
 from SATController import SingletonMixin
 from SATSolver.main import SATController
 
@@ -46,7 +46,7 @@ def decode(data, server, client_id):
                         "number_of_clauses"] = controller.parse_formula(raw_formula_array, False)
                     del json_data["SOLVE"]["raw_input"]
                     controller.create_ga(json_data["SOLVE"])
-                    controller.ga_thread = threading.Thread(target=controller.start_ga())
+                    controller.ga_thread = Thread(target=controller.start_ga)
                     controller.ga_thread.start()
             else:
                 raise RequestHandlerError("Unexpected arguments found for SOLVE command: " + ', '.join(set(list(
@@ -65,11 +65,10 @@ def decode(data, server, client_id):
         print("Poll called")
         pass
 
-    def stop():
+    def stop(json_data):
         controller = SATController.instance()
         if controller.GA is not None:
-            controller.ga_thread.terminate()
-            controller.GA = None
+            controller.GA.stop = True
         else:
             raise RequestHandlerError("Server has nothing to stop.")
 
@@ -82,7 +81,7 @@ def decode(data, server, client_id):
             raise RequestHandlerError("JSON could not be decoded: " + str(e))
 
         # Execute the command if it is a supported command. If it is not supported return a error message.
-        if list(command.keys())[0] in ["SOLVE", "POLL"]:
+        if list(command.keys())[0] in ["SOLVE", "POLL", "STOP"]:
             options = {
                 "SOLVE": solve,
                 "POLL": poll,
@@ -97,7 +96,6 @@ def decode(data, server, client_id):
     except Exception as e:
         error_response = encode("ERROR", ["A fatal error occurred: " + str(e)])
         server.push_to_one(client_id, error_response)
-
 
 def encode(message_type, data):
 
@@ -129,7 +127,8 @@ def encode(message_type, data):
                     "FITNESS": data_arr[1],
                     "GENERATION": data_arr[2],
                     "TIME_STARTED": data_arr[3],
-                    "TIME_FINISHED": data_arr[4]
+                    "TIME_FINISHED": data_arr[4],
+                    "INDIVIDUAL": data_arr[5]
                 }
             }
         }

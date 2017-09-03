@@ -125,7 +125,6 @@ conn.on('data', function(data) {
       try {
         progressObject = JSON.parse(data);
         progressArray = progressObject["RESPONSE"]["PROGRESS"];
-        console.log((progressArray["NUM_CLAUSES"][0]-progressArray["BEST_INDIVIDUAL_FITNESS"][0]).toString() + ' / ' + (progressArray["NUM_CLAUSES"][0]).toString());
         perc.percentage = (progressArray["NUM_CLAUSES"][0]-progressArray["BEST_INDIVIDUAL_FITNESS"][0]) / progressArray["NUM_CLAUSES"][0];
         generations.generations = progressArray["GENERATION"][0];
         generations.max_generations = progressArray["GENERATION"][1];
@@ -160,13 +159,30 @@ conn.on('data', function(data) {
       try {
         var progressObject = JSON.parse(data);
         var finishedArray = progressObject["RESPONSE"]["FINISHED"];
-        perc.percentage = 1;
+        perc.percentage = (progressArray["NUM_CLAUSES"][0]-finishedArray["FITNESS"][0]) / progressArray["NUM_CLAUSES"][0];
         generations.generations = finishedArray["GENERATION"][0];
         generations.max_generations = finishedArray["GENERATION"][1];
         best_individual.fitness = finishedArray["FITNESS"];
         time_elapsed.start = finishedArray["TIME_STARTED"];
         time_elapsed.finish = finishedArray["TIME_FINISHED"];
         chart.update();
+
+        var status_title = $('#status-title');
+        if (finishedArray["SUCCESSFUL"] === true) {
+            status_title.addClass('success');
+            status_title.html('Successfully found a solution.');
+        } else {
+            status_title.addClass('failed');
+            status_title.html('Could not find a solution.');
+        }
+
+        $('#status').removeClass('hide');
+
+        var answer = $('#answer');
+        answer.removeClass('hide');
+        answer.html(finishedArray["INDIVIDUAL"]);
+
+
       } catch(e) {
         $("#connected-indicator")[0].style.fill = "yellow";
         console.log(e)

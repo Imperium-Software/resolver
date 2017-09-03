@@ -9,6 +9,10 @@ from decimal import Decimal
 from SATSolver.individual import Individual
 
 
+class GAStop(Exception):
+    """This exception should be raised when GA should stop"""
+
+
 class GA:
     def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length, max_false, rec, k,
                  max_generations=1000, population_size=100, sub_population_size=15, crossover_operator=0,
@@ -33,7 +37,7 @@ class GA:
         self._observers = set()
         self._generation_counter = None
         self.best_individual_fitness = None
-        self.best_individual = None
+        self.best_individual = Individual(3)
         self.current_child_fitness = None
         self.current_child = None
 
@@ -121,6 +125,9 @@ class GA:
         to variables.
         :return: the number of clauses of F which are not satisfied by X.
         """
+
+        if self.stop:
+            raise GAStop("GA needs to be stopped.")
 
         if individual.isCacheValid:
             return individual.fitness

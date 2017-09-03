@@ -206,3 +206,19 @@ h5>small {
 #progress h4,h5 {
     margin-top: 0;
 }
+
+#status {
+    margin-bottom: 0;
+}
+
+#status-title.success{
+    color: #5A9889;
+}
+
+#status-title.failed {
+    color: #FF6159;
+}
+
+#answer {
+    word-break: break-all;
+}

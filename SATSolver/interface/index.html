@@ -45,6 +45,11 @@
         <div class="container">
           <h4>Progress</h4>
           <hr>
+          <div id="status" class="row hide">
+            <div class="col s12">
+              <h5 id="status-title" class="success"></h5>
+            </div>
+          </div>
           <div class="row">
             <div class="col s6">
               <label for="time">time elapsed</label>
@@ -73,12 +78,16 @@
               <canvas style="background-color: white" id="fitness-chart"></canvas>
             </div>
           </div>
+          <div class="input-field row">
+            <h5>Solution:</h5>
+            <p id="answer" class="hide left-align"></p>
+          </div>
           <div class="row">
             <div class="col s6">
 
             </div>
             <div class="col s6 right-align">
-              <button onclick="stop()">Stop</button>
+              <button class="btn" onclick="make_request('STOP')">Stop</button>
             </div>
           </div>
         </div>
@@ -231,7 +240,7 @@
                       </div>
                     </li>
                   </ul>
-                  <button onclick='make_request(); return false' class='btn'>Start</button>
+                  <button onclick='make_request("SOLVE"); return false' class='btn'>Start</button>
                 </form>
               </div>
             </li>

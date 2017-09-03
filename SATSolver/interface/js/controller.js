@@ -4,7 +4,7 @@ const {
 } = require('electron').remote;
 
 function construct_request(type) {
-    if (type == 'SOLVE') {
+    if (type === 'SOLVE') {
 
         var request_string;
         var dimacs;
@@ -78,21 +78,33 @@ function construct_request(type) {
             }
         }
         request_string = JSON.stringify(request);
-    } else if (type == 'POLL') {
+    } else if (type === 'POLL') {
         request_string += "'POLL'";
+    } else if (type === 'STOP') {
+        request = {
+            "STOP": {}
+        };
+        request_string = JSON.stringify(request);
     }
     // Add terminating character.
     return request_string + '#';
 }
 
-function make_request(type, filename) {
-    reset();
+function make_request(type) {
     try {
-        var request = construct_request('SOLVE');
-        console.log(request);
-        conn.write(request);
-        terminal.text = "";
-        error_log.text = "";
+        var request;
+        if (type === 'SOLVE') {
+            reset();
+            request = construct_request('SOLVE');
+            console.log(request);
+            conn.write(request);
+            terminal.text = "";
+            error_log.text = "";
+        } else if (type === 'STOP') {
+            request = construct_request('STOP');
+            console.log(request);
+            conn.write(request);
+        }
     } catch (e) {
         console.log(e);
     }
