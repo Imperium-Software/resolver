@@ -48,8 +48,12 @@ class SATController(Observer, SingletonMixin):
         self._generation_count = arg
         encoded_message = encode("PROGRESS", [[self._generation_count, self.GA.max_generations],
                                               [self.time_started],
-                                              [self.GA.best_individual],
-                                              [self.GA.current_child_fitness]],
+                                              [self.GA.best_individual_fitness],
+                                              [str(self.GA.best_individual)],
+                                              [self.GA.current_child_fitness],
+                                              [str(self.GA.current_child)],
+                                              [self.GA.numberOfVariables],
+                                              [self.GA.numberOfClauses]]
                                  )
         if self.server_thread is not None:
             self.server_thread.push_to_all(encoded_message)
@@ -101,8 +105,9 @@ class SATController(Observer, SingletonMixin):
             ])
             time.sleep(0.1)
             self.server_thread.push_to_all(encoded_message)
-            print()
-            self.server_thread.close()
+
+            self.GA = None
+
 
     def parse_formula(self, raw_formula, local=True):
         """

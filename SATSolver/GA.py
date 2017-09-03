@@ -32,8 +32,10 @@ class GA:
         self.method = method
         self._observers = set()
         self._generation_counter = None
+        self.best_individual_fitness = None
         self.best_individual = None
         self.current_child_fitness = None
+        self.current_child = None
 
         # Initialize tabu, population and the sub_population to empty lists
         self.tabu = []
@@ -508,7 +510,8 @@ class GA:
         """
 
         self.population.sort(key=self.evaluate)
-        self.best_individual = self.population[0].fitness
+        self.best_individual_fitness = self.population[0].fitness
+        self.best_individual = self.population[0]
         if self.population[0].fitness > child.fitness:
             self.population.remove(self.population[len(self.population)-1])
             self.population.append(child)
@@ -554,6 +557,7 @@ class GA:
                 child = self.standard_tabu(child, self.choose_rvcf)
 
             self.current_child_fitness = self.evaluate(child)
+            self.current_child = child
             self.replace(child)
             # Determine whether any individual that satisfies the formula appeared in the current generation
             satisfied_individual = self.is_satisfied()

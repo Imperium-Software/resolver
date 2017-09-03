@@ -61,10 +61,17 @@
               <h5 id="fitness">{{fitness}}<small> unsolved clauses</small></h5>
             </div>
             <div class="col s6">
+              <label for="formula-info">formula information</label>
+              <div id="formula-info">
+                <h5>{{num_clauses}}<small> clauses</small></h5>
+                <h5>{{num_variables}}<small> variables</small></h5>
+              </div>
             </div>
           </div>
           <div class="row">
-            <canvas style="background-color: white" id="fitness-chart"></canvas>
+            <div id="chart-container">
+              <canvas style="background-color: white" id="fitness-chart"></canvas>
+            </div>
           </div>
           <div class="row">
             <p>I'm a p element</p>

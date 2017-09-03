@@ -86,6 +86,7 @@ function construct_request(type) {
 }
 
 function make_request(type, filename) {
+    reset();
     try {
         var request = construct_request('SOLVE');
         console.log(request);
@@ -128,7 +129,7 @@ $('#circle').circleProgress({
 function navigate(filename) {
     fs.readFile(filename, 'utf8', (err, data) => {
         document.getElementById('base').innerHTML = data;
-        document.body.classList.add('loaded')
+        document.body.classList.add('loaded');
         $(".button-collapse").sideNav();
         $('select').material_select();
         $('.collapsible').collapsible({
@@ -205,10 +206,26 @@ function navigate(filename) {
             }
         });
 
-        var fitness = new Vue({
+        var best_individual = new Vue({
             el: "#fitness",
             data: {
-                fitness: 0
+              fitness: 0,
+              individual: null
+            }
+        });
+
+        var current_child = new Vue({
+            data: {
+              fitness: 0,
+              individual: null
+            }
+        });
+
+        var formula_info = new Vue({
+            el: "#formula-info",
+            data: {
+                num_clauses: 0,
+                num_variables: 0
             }
         });
 
@@ -219,6 +236,8 @@ function navigate(filename) {
                 max_generations: 1000
             }
         });
+
+        var g
 
     })
 }

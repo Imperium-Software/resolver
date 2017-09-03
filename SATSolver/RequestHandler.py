@@ -102,8 +102,12 @@ def encode(message_type, data):
                 "PROGRESS": {
                     "GENERATION": data_arr[0],
                     "TIME_STARTED": data_arr[1],
-                    "BEST_INDIVIDUAL": data_arr[2],
-                    "CURRENT_CHILD_FITNESS": data_arr[3]
+                    "BEST_INDIVIDUAL_FITNESS": data_arr[2],
+                    "BEST_INDIVIDUAL": data_arr[3],
+                    "CURRENT_CHILD_FITNESS": data_arr[4],
+                    "CURRENT_CHILD": data_arr[5],
+                    "NUM_VARIABLES": data_arr[6],
+                    "NUM_CLAUSES": data_arr[7]
                 }
             }
         }

@@ -67,10 +67,26 @@ var time_elapsed = new Vue({
     }
 });
 
-var fitness = new Vue({
+var best_individual = new Vue({
     el: "#fitness",
     data: {
-      fitness: 0
+      fitness: 0,
+      individual: null
+    }
+});
+
+var current_child = new Vue({
+    data: {
+      fitness: 0,
+      individual: null
+    }
+});
+
+var formula_info = new Vue({
+    el: "#formula-info",
+    data: {
+        num_clauses: 0,
+        num_variables: 0
     }
 });
 
@@ -109,11 +125,18 @@ conn.on('data', function(data) {
       try {
         progressObject = JSON.parse(data);
         progressArray = progressObject["RESPONSE"]["PROGRESS"];
-        perc.percentage = progressArray["GENERATION"][0] / progressArray["GENERATION"][1];
+        console.log((progressArray["NUM_CLAUSES"][0]-progressArray["BEST_INDIVIDUAL_FITNESS"][0]).toString() + ' / ' + (progressArray["NUM_CLAUSES"][0]).toString());
+        perc.percentage = (progressArray["NUM_CLAUSES"][0]-progressArray["BEST_INDIVIDUAL_FITNESS"][0]) / progressArray["NUM_CLAUSES"][0];
         generations.generations = progressArray["GENERATION"][0];
         generations.max_generations = progressArray["GENERATION"][1];
-        fitness.fitness = progressArray["BEST_INDIVIDUAL"][0];
+        best_individual.fitness = progressArray["BEST_INDIVIDUAL_FITNESS"][0];
+        best_individual.individual = progressArray["BEST_INDIVIDUAL"][0];
+        current_child.fitness = progressArray["CURRENT_CHILD_FITNESS"][0];
+        current_child.individual = progressArray["CURRENT_CHILD"][0];
         time_elapsed.start = progressArray["TIME_STARTED"][0];
+
+        formula_info.num_clauses = progressArray["NUM_CLAUSES"][0];
+        formula_info.num_variables = progressArray["NUM_VARIABLES"][0];
 
 
         if ($('#progress').is(":hidden")) {
@@ -123,7 +146,7 @@ conn.on('data', function(data) {
 
         if (!chart.data.labels.includes(progressArray["GENERATION"][0])) {
           chart.data.labels.push(progressArray["GENERATION"][0]);
-          chart.data.datasets[0].data.push(progressArray["BEST_INDIVIDUAL"][0]);
+          chart.data.datasets[0].data.push(progressArray["BEST_INDIVIDUAL_FITNESS"][0]);
           chart.data.datasets[1].data.push(progressArray["CURRENT_CHILD_FITNESS"][0]);
           chart.update();
         }
@@ -140,7 +163,7 @@ conn.on('data', function(data) {
         perc.percentage = 1;
         generations.generations = finishedArray["GENERATION"][0];
         generations.max_generations = finishedArray["GENERATION"][1];
-        fitness.fitness = finishedArray["FITNESS"];
+        best_individual.fitness = finishedArray["FITNESS"];
         time_elapsed.start = finishedArray["TIME_STARTED"];
         time_elapsed.finish = finishedArray["TIME_FINISHED"];
         chart.update();
@@ -267,3 +290,23 @@ window.setInterval(function() {
         });
     }
 }, 5000);
+
+function reset() {
+    console.log("Here");
+    time_elapsed.start = 0;
+    time_elapsed.finish = 0;
+    generations.max_generations = 0;
+    generations.generations = 0;
+    best_individual.fitness = 0;
+    best_individual.individual = null;
+    current_child.fitness = 0;
+    current_child.individual = null;
+    formula_info.num_variables = 0;
+    formula_info.num_clauses = 0;
+    chart.data.datasets[0].data = [];
+    chart.data.datasets[1].data = [];
+    var canvas = document.querySelector('#fitness-chart');
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0, canvas.width, canvas.height); // resize to parent width
+    chart.reset();
+}
