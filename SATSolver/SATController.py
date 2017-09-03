@@ -42,6 +42,7 @@ class SATController(Observer, SingletonMixin):
         self.server_thread = None
         self.time_started = None
         self.time_finished = None
+        self.ga_thread = None
 
     def update(self, arg):
         from RequestHandler import encode

@@ -46,8 +46,8 @@ def decode(data, server, client_id):
                         "number_of_clauses"] = controller.parse_formula(raw_formula_array, False)
                     del json_data["SOLVE"]["raw_input"]
                     controller.create_ga(json_data["SOLVE"])
-                    thread = threading.Thread(target=controller.start_ga())
-                    thread.start()
+                    controller.ga_thread = threading.Thread(target=controller.start_ga())
+                    controller.ga_thread.start()
             else:
                 raise RequestHandlerError("Unexpected arguments found for SOLVE command: " + ', '.join(set(list(
                     json_data["SOLVE"].keys())) - set(required_parameters + optional_parameters)))
@@ -65,8 +65,15 @@ def decode(data, server, client_id):
         print("Poll called")
         pass
 
-    # Try and decode the JSON string. Return error message if the decoding failed.
+    def stop():
+        controller = SATController.instance()
+        if controller.GA is not None:
+            controller.ga_thread.terminate()
+            controller.GA = None
+        else:
+            raise RequestHandlerError("Server has nothing to stop.")
 
+    # Try and decode the JSON string. Return error message if the decoding failed.
     try:
         try:
             # print("Request handler got this juicy data " + str(data[:data.index('#')]))
@@ -78,7 +85,8 @@ def decode(data, server, client_id):
         if list(command.keys())[0] in ["SOLVE", "POLL"]:
             options = {
                 "SOLVE": solve,
-                "POLL": poll
+                "POLL": poll,
+                "STOP": stop
             }
             options[list(command.keys())[0]](command)
         else:

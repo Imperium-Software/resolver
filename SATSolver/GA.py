@@ -37,6 +37,8 @@ class GA:
         self.current_child_fitness = None
         self.current_child = None
 
+        self.stop = False
+
         # Initialize tabu, population and the sub_population to empty lists
         self.tabu = []
         self.population = []
