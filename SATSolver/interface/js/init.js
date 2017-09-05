@@ -72,14 +72,16 @@ var best_individual = new Vue({
     el: "#fitness",
     data: {
       fitness: 0,
-      individual: null
+      individual: null,
+      array : [[]]
     }
 });
 
 var current_child = new Vue({
     data: {
       fitness: 0,
-      individual: null
+      individual: null,
+      array : [[]]
     }
 });
 
@@ -142,6 +144,31 @@ conn.on('data', function(data) {
         if ($('#progress').is(":hidden")) {
             $('.setup').collapsible('close', 0);
             $('#progress').slideDown(2000);
+        }
+
+        if (progressArray["CURRENT_CHILD"] != "None") {
+            new_child = progressArray["CURRENT_CHILD"][0].split('').map((item) => {
+                return parseInt(item, 10);
+            });
+            new_best = progressArray["BEST_INDIVIDUAL"][0].split('').map((item) => {
+                return parseInt(item, 10);
+            });
+            current_child.array[0].push.apply(current_child.array[0], new_child);
+            best_individual.array[0].push.apply(best_individual.array[0], new_best);
+            $("#child-chart").html('');
+            $("#best-chart").html('');
+
+            // Data culling 
+
+            if (current_child.array[0].length > 10*new_child.length) {
+                current_child.array[0] = current_child.array[0].slice(-10*new_child.length);
+            }
+
+            if (best_individual.array[0].length > 10*new_child.length) {
+                best_individual.array[0] = best_individual.array[0].slice(-10*new_child.length);
+            }
+
+            circularHeat(current_child.array, best_individual.array, new_child.length);
         }
 
         if (!chart.data.labels.includes(progressArray["GENERATION"][0])) {
@@ -208,7 +235,6 @@ conn.on('data', function(data) {
   };
 
   options[message_type](data);
-
   progress_bar.animate(perc.percentage);
 });
 
@@ -326,4 +352,11 @@ function reset() {
     var ctx = canvas.getContext('2d');
     ctx.clearRect(0,0, canvas.width, canvas.height); // resize to parent width
     chart.reset();
+}
+
+function circularHeat(child_data, best_data, numSegments) {
+    var chart = circularHeatChart(numSegments).range(["white", 
+    getComputedStyle(document.body).getPropertyValue('--theme-four')]);
+    d3.select('#child-chart').selectAll('svg').data(child_data).enter().append('svg').call(chart);
+    d3.select('#best-chart').selectAll('svg').data(best_data).enter().append('svg').call(chart);
 }

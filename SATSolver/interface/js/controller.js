@@ -108,6 +108,7 @@ function make_request(type) {
     } catch (e) {
         console.log(e);
     }
+    circularHeatChart([[1,0,1,0,1,1,0,1,0]], 10);
 }
 
 //select drowpdowns
@@ -229,7 +230,9 @@ function navigate(filename) {
         var current_child = new Vue({
             data: {
               fitness: 0,
-              individual: null
+              individual: null,
+              array : current_child.array
+
             }
         });
 
@@ -357,14 +360,3 @@ fitness_chart.addEventListener('contextmenu', function (e) {
     e.preventDefault();
     menu.popup(remote.getCurrentWindow());
 }, false);
-
-var data = [];
-for(var i=0; i<1; i++) {
-	data[i] = [];
-	for(var j=0; j< 500; j++) {
-	    data[i][j] = Math.round(Math.random());
-	}
-}
-var chart = circularHeatChart(100).range(["white", 
-getComputedStyle(document.body).getPropertyValue('--theme-three')]);
-d3.select('#child-chart').selectAll('svg').data(data).enter().append('svg').call(chart);

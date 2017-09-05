@@ -1,10 +1,9 @@
 
 
 function circularHeatChart(numSegments) {
-    console.log("printing d3! " + d3)
     var margin = {top: 20, right: 20, bottom: 20, left: 20},
     innerRadius = 50,
-    segmentHeight = 10,
+    segmentHeight = 6,
     domain = null,
     range = ["white", "red"],
     accessor = function(d) {return d;},
@@ -15,6 +14,7 @@ function circularHeatChart(numSegments) {
             var svg = d3.select(this);
             svg.classed("circular-heat-svg", true);
 
+            // innerRadius = 50 -  3.14 * (Math.round(data.length / numSegments))
             var offset = innerRadius + Math.ceil(data.length / numSegments) * segmentHeight;
             g = svg.append("g")
                 .classed("circular-heat", true)
