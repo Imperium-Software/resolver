@@ -1,5 +1,6 @@
 const net = require('net');
 var ProgressBar = require('progressbar.js');
+var d3 = require('d3');
 const remote =  require('electron').remote;
 const canvasBuffer = require('electron-canvas-to-buffer');
 

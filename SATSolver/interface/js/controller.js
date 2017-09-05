@@ -357,3 +357,14 @@ fitness_chart.addEventListener('contextmenu', function (e) {
     e.preventDefault();
     menu.popup(remote.getCurrentWindow());
 }, false);
+
+var data = [];
+for(var i=0; i<1; i++) {
+	data[i] = [];
+	for(var j=0; j< 500; j++) {
+	    data[i][j] = Math.round(Math.random());
+	}
+}
+var chart = circularHeatChart(100).range(["white", 
+getComputedStyle(document.body).getPropertyValue('--theme-three')]);
+d3.select('#child-chart').selectAll('svg').data(data).enter().append('svg').call(chart);

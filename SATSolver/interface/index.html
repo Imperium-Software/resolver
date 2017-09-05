@@ -90,10 +90,13 @@
               <button class="btn" onclick="make_request('STOP')">Stop</button>
             </div>
           </div>
+
+
         </div>
         <br>
       </div>
       <div class="card" id="main-card">
+          
         <br>
         <div class="container">
           <ul class="collapsible setup z-depth-0" data-collapsible="accordion">
@@ -198,16 +201,16 @@
                                 <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
                               </div>
                             </div>
-                            
+
                             <div class="row container">
-                            <div class="input-field col s12 tooltip gray">
-                              <select id="method">
+                              <div class="input-field col s12 tooltip gray">
+                                <select id="method">
                                 <option value="" disabled selected>Method</option>
                                 <option value="bitvector">BitVector</option>
                                 <option value="bitarray">bitarray</option>
                               </select>
-                              <span class="tooltiptext">Underlying implementation method.</span>
-                            </div>
+                                <span class="tooltiptext">Underlying implementation method.</span>
+                              </div>
                             </div>
 
                             <div class="input-field col s12e">
@@ -231,7 +234,7 @@
                           </div>
 
                           <div class="modal-footer">
-                              <a href="#!" class="modal-action modal-close waves-effect btn btn-flat">Close</a>
+                            <a href="#!" class="modal-action modal-close waves-effect btn btn-flat">Close</a>
                           </div>
 
                         </div>
@@ -266,9 +269,7 @@
         </div>
         <br>
       </div>
-
-
-
+      <div id="child-chart"></div>
     </div>
     <script src="node_modules/hammerjs/hammer.js"></script>
     <script src='js/materialize.min.js' type="text/javascript"></script>
@@ -276,8 +277,8 @@
     <script type="text/javascript" src="./node_modules/vue/dist/vue.js"></script>
     <script src="js/Chart.min.js" type="text/javascript"></script>
     <script src='js/init.js' type="text/javascript"></script>
+    <script src="js/circularHeatChart.js" type="text/javascript"></script>
     <script src='js/controller.js' type="text/javascript"></script>
-    <script type="text/javascript" src="js/render_maths.js"></script>
     <script src='js/moment.min.js' type="text/javascript"></script>
 </body>
 

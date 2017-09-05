@@ -222,3 +222,7 @@ h5>small {
 #answer {
     word-break: break-all;
 }
+
+.circular-heat-svg {
+    height : 220px;
+}
