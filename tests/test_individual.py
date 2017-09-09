@@ -5,6 +5,7 @@ sys.path.insert(0, myPath + '/../SATSolver')
 
 from unittest import TestCase
 from individual import Individual
+# TODO: Try from SATSolver.individual import Individual
 from BitVector import BitVector
 from bitarray import bitarray
 
@@ -80,25 +81,3 @@ class TestIndividual(TestCase):
         self.assertEqual(ind.get(8), 1)
         ind.flip(4)
         self.assertEqual(ind.get(4), 1)
-
-    def test_set_defined(self):
-        ind = Individual(9, Individual.BIT_VECTOR)
-        for x in range(1, 10):
-            self.assertEqual(ind.get_defined(x), False)
-        for x in range(1, 10):
-            ind.set_defined(x)
-            self.assertEqual(ind.get_defined(x), True)
-
-    def test_get_defined(self):
-        ind = Individual(9, Individual.BIT_VECTOR)
-        for x in range(1, 10):
-            self.assertEqual(ind.get_defined(x), False)
-        for x in range(1, 10):
-            ind.set_defined(x)
-            self.assertEqual(ind.get_defined(x), True)
-
-    def test_allocate(self):
-        ind = Individual(9, Individual.BIT_VECTOR)
-        ind.allocate(ind, ind)
-        for x in range(1, 10):
-            self.assertEqual(ind.get_defined(x), True)

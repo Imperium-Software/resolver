@@ -50,13 +50,13 @@ class TestGA(TestCase):
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
         self.assertEqual(GA.sat(ind, [-6, -4]), False)
 
-    def test_sat_crossover(self):
-        ind = Individual(9)
-        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
-        ind.defined = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
-        self.assertEqual(GA.sat_crossover(ind, [9, -5]), False)
-        ind.set_defined(9)
-        self.assertEqual(GA.sat_crossover(ind, [9, -5]), True)
+    # def test_sat_crossover(self):
+    #     ind = Individual(9)
+    #     ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+    #     ind.defined = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
+    #     self.assertEqual(GA.sat_crossover(ind, [9, -5]), False)
+    #     ind.set_defined(9)
+    #     self.assertEqual(GA.sat_crossover(ind, [9, -5]), True)
 
     def test_evaluate(self):
         reader = self.FormulaReader("../examples/trivial.cnf")

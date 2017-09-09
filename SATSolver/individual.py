@@ -15,10 +15,14 @@ class Individual:
     BIT_VECTOR = 0
     BIT_ARRAY = 1
 
-    def __init__(self, length=0, method=None, defined=False, value=None):
+    def __init__(self, length=0, method=None, parents=None, value=None):
 
         """ Creates a bit string of a certain length, using a certain underlying
-        implementation.  """
+        implementation.
+
+        :param parents: A 2-tuple of the parents to initialise this child from
+
+        """
 
         self.length = length
         self.fitness = 0
@@ -30,29 +34,39 @@ class Individual:
             self.method = method
 
         if self.method == Individual.BIT_VECTOR:
-            self.data = BitVector(size=length)
-            self.data = self.data.gen_random_bits(length)
-            self.defined = BitVector(size=length)
-            
-            if defined:
-                self.defined = None
-            else:
-                self.defined.reset(0)
 
             if value is not None:
                 self.data = BitVector(bitlist=value)
+            elif parents is not None:
+                self.data = BitVector(size=length)
+                x, y = parents
+                for i in range(1, x.length + 1):
+                    # If the parents have the same value the bit stays the same, otherwise it is random
+                    val = x.get(i)
+                    if val == y.get(i):
+                        self.set(i, val)
+                    else:
+                        self.set(i, 0 if random.random() < 0.5 else 1)
+            else:
+                self.data = BitVector(size=length)
+                self.data = self.data.gen_random_bits(length)
 
         elif self.method == Individual.BIT_ARRAY:
-            self.defined = bitarray(length)
-            self.data = bitarray(length)
-
-            if defined:
-                self.defined = None
-            else:
-                self.defined.setall(False)
 
             if value is not None:
-                self.data = [bool(X) for X in value]
+                self.data = bitarray([bool(_) for _ in value])
+            elif parents is not None:
+                self.data = bitarray(length)
+                x, y = parents
+                for i in range(1, x.length + 1):
+                    # If the parents have the same value the bit stays the same, otherwise it is random
+                    val = x.get(i)
+                    if val == y.get(i):
+                        self.set(i, val)
+                    else:
+                        self.set(i, 0 if random.random() < 0.5 else 1)
+            else:
+                self.data = bitarray(length)
 
         for i in range(1, length+1):
             if bool(random.getrandbits(1)):
@@ -112,54 +126,13 @@ class Individual:
         elif self.method == Individual.BIT_ARRAY:
             self.data[b] = not self.data[b]
 
-    def set_defined(self, b):
-
-        """ Sets a certain bit b as defined. """
-
-        b -= 1
-        if b >= self.length or b < 0:
-            return
-
-        if self.method == Individual.BIT_VECTOR:
-            self.defined[b] = 1
-        elif self.method == Individual.BIT_ARRAY:
-            self.defined[b] = not self.data[b]
-
-    def get_defined(self, b):
-
-        """ Gets whether a certain bit is defined or not (boolean) """
-
-        b -= 1
-        if b >= self.length or b < 0:
-            return
-
-        if self.method == Individual.BIT_VECTOR:
-            return True if self.defined[b] == 1 else False
-        else:
-            return self.defined[b]
-
-    def allocate(self, first, second):
-
-        """ Allocates uniformly from either first or second parent. """
-
-        for i in range(self.length):
-            # i is inconsistently indexed in comparison to other places get_defined and set are called thus 1
-            # must be added
-            index = i + 1
-            if not self.get_defined(index):
-                if bool(random.getrandbits(1)):
-                    self.set(index, first.get(index))
-                else:
-                    self.set(index, second.get(index))
-                self.set_defined(index)
-
 
 class Factory:
     """ A factory class for creating individuals in bulk. """
 
     @staticmethod
-    def create(length, method, amount):
+    def create(length, amount, method=None):
         """ Creates an array of individuals. """
 
-        array = [Individual(length, method, True) for _ in range(amount)]
+        array = [Individual(length, method) for _ in range(amount)]
         return array

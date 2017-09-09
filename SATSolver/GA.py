@@ -6,7 +6,7 @@
 import copy
 import random
 from decimal import Decimal
-from SATSolver.individual import Individual
+from SATSolver.individual import Individual, Factory
 
 
 class GAStop(Exception):
@@ -38,6 +38,7 @@ class GA:
         self._generation_counter = None
         self.best_individual_fitness = None
         self.best_individual = Individual(3)
+        # TODO: Why is this initialised to an individual
         self.current_child_fitness = None
         self.current_child = None
 
@@ -70,53 +71,43 @@ class GA:
 
         # Iterate over atoms in the clause
         for atom in clause:
-            # IF the atom is not negated
-            if atom > 0:
-                if individual.get(atom):
-                    # The clause is satisfiable on seeing the first true atom
-                    return True
-            # IF the atom is negated
-            else:
-                if individual.get(abs(atom)) == 0:
-                    # The clause is satisfiable on seeing the first false atom due to it being a negation
-                    return True
-        # Clause is unsatisfiable - no true atoms
+            if (atom > 0 and individual.get(atom)) or (atom <= 0 and individual.get(abs(atom)) == 0):
+                return True
         return False
 
-    @staticmethod
-    def sat_crossover(individual, clause):
-        """
-        sat (X,c) - by literature
-        Indicates whether the clause c is true or false for the individual X i.e. satisfied or not by the assignment
-        corresponding to X - Particular to crossovers as it takes into account whether there are undefined variables
-        used in the clause - if so, the clause is not satisfied.
-        :param individual: Individual class (Implemented by Regan) representing a particular assignment of truth values
-        to variables.
-        :param clause: Python tuple of integers - should be the same tuple as in the DIMACS format.
-        :return: returns a boolean value indicating whether the assignment represented by the individual satisfies the
-        clause.
-        """
-
-        # Iterate over atoms in the clause
-        for atom in clause:
-            # IF the atom is not negated
-            if atom > 0:
-                # The Clause is unsatisfiable on seeing an undefined variable.
-                if individual.get_defined(atom) is False:
-                    return False
-                if individual.get(atom):
-                    # The clause is satisfiable on seeing the first true atom
-                    return True
-            # IF the atom is negated
-            else:
-                # The Clause is unsatisfiable on seeing an undefined variable.
-                if individual.get_defined(abs(atom)) is False:
-                    return False
-                if individual.get(abs(atom)) == 0:
-                    # The clause is satisfiable on seeing the first false atom due to it being a negation
-                    return True
-        # Clause is unsatisfiable - no true atoms
-        return False
+    # @staticmethod
+    # def sat_crossover(individual, clause):
+    #     """
+    #     sat (X,c) - by literature
+    #     Indicates whether the clause c is true or false for the individual X i.e. satisfied or not by the assignment
+    #     corresponding to X - Particular to crossovers as it takes into account whether there are undefined variables
+    #     used in the clause - if so, the clause is not satisfied.
+    #     to variables.
+    #     :param clause: Python tuple of integers - should be the same tuple as in the DIMACS format.
+    #     :return: returns a boolean value indicating whether the assignment represented by the individual satisfies the
+    #     clause.
+    #     """
+    #
+    #     # Iterate over atoms in the clause
+    #     for atom in clause:
+    #         # IF the atom is not negated
+    #         if atom > 0:
+    #             # The Clause is unsatisfiable on seeing an undefined variable.
+    #             if individual.get_defined(atom) is False:
+    #                 return False
+    #             if individual.get(atom):
+    #                 # The clause is satisfiable on seeing the first true atom
+    #                 return True
+    #         # IF the atom is negated
+    #         else:
+    #             # The Clause is unsatisfiable on seeing an undefined variable.
+    #             if individual.get_defined(abs(atom)) is False:
+    #                 return False
+    #             if individual.get(abs(atom)) == 0:
+    #                 # The clause is satisfiable on seeing the first false atom due to it being a negation
+    #                 return True
+    #     # Clause is unsatisfiable - no true atoms
+    #     return False
 
     def evaluate(self, individual):
         """
@@ -160,6 +151,7 @@ class GA:
         # index is not boundary tested - assuming this is done before a call to this function.
 
         # Determine fitness of individual before alterations
+        # TODO: We should be able to save an evaluate call here and just use the stored value
         original_individual_fitness = self.evaluate(individual)
 
         new_individual = copy.deepcopy(individual)
@@ -178,11 +170,11 @@ class GA:
         :return: The generated individual z
         """
 
-        z = Individual(self.numberOfVariables, self.method, False)
+        z = Individual(self.numberOfVariables, self.method, parents=(x, y))
         for clause in self.formula:
             best_pos = 0
             best_improvement = 0
-            if not self.sat(x, clause) and not self.sat(y, clause) and not self.sat_crossover(z, clause):
+            if not self.sat(x, clause) and not self.sat(y, clause):
                 for i in range(len(clause)):
                     # Find best index to flip in current clause. Absolute value of index must be used
                     current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
@@ -191,10 +183,7 @@ class GA:
                         best_pos = abs(clause[i])
                 if best_improvement != 0:
                     z.set(best_pos, x.get(best_pos))
-                    # z.set_defined(best_pos, x.get(best_pos))          removing this due to too many arguments
-                    z.set_defined(best_pos)
                     z.flip(best_pos)
-        z.allocate(x, y)
         return z
 
     def corrective_clause_with_truth_maintenance(self, x, y):
@@ -206,11 +195,11 @@ class GA:
         :return: The generated individual z
         """
 
-        z = Individual(self.numberOfVariables, self.method, False)
+        z = Individual(self.numberOfVariables, self.method, parents=(x, y))
         for clause in self.formula:
             best_pos = 0
             maximum_improvement = 0
-            if not self.sat(x, clause) and not self.sat(y, clause) and not self.sat_crossover(z, clause):
+            if not self.sat(x, clause) and not self.sat(y, clause):
                 for i in range(len(clause)):
                     current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
                     if current_improvement >= maximum_improvement:
@@ -218,27 +207,23 @@ class GA:
                         best_pos = abs(clause[i])
                 if maximum_improvement != 0:
                     z.set(best_pos, x.get(best_pos))
-                    z.set_defined(best_pos)
                     z.flip(best_pos)
 
         # Truth maintenance - See section 4.2 of the paper
         for clause in self.formula:
             best_pos = -1
             minimum_improvement = self.numberOfClauses + 1
-            if self.sat(x, clause) and self.sat(y, clause) and not self.sat_crossover(z, clause):
+            if self.sat(x, clause) and self.sat(y, clause) and not self.sat(z, clause):
                 for i in range(len(clause)):
                     if x.get(abs(clause[i])) == 1 or y.get(abs(clause[i])) == 1:
                         current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
                         z_new = copy.deepcopy(z)
                         z_new.set(abs(clause[i]), 1)
-                        z_new.set_defined(abs(clause[i]))
-                        if current_improvement < minimum_improvement and self.sat_crossover(z_new, clause):
+                        if current_improvement < minimum_improvement and self.sat(z_new, clause):
                             minimum_improvement = current_improvement
                             best_pos = abs(clause[i])
                 if not best_pos == -1:
                     z.set(best_pos, 1)
-                    z.set_defined(best_pos)
-        z.allocate(x, y)
         return z
 
     def fluerent_and_ferland(self, x, y):
@@ -250,17 +235,14 @@ class GA:
         :return: The generated individual z.
         """
 
-        z = Individual(self.numberOfVariables, self.method, False)
+        z = Individual(self.numberOfVariables, self.method, parents=(x, y))
         for clause in self.formula:
             if self.sat(x, clause) and not self.sat(y, clause):
                 for i in range(len(clause)):
                     z.set(abs(clause[i]), x(abs(clause[i])))
-                    z.set_defined(abs(clause[i]))
             elif not self.sat(x, clause) and self.sat(y, clause):
                 for i in range(len(clause)):
                     z.set(abs(clause[i]), y(abs(clause[i])))
-                    z.set_defined(abs(clause[i]))
-        z.allocate(x, y)
         return z
 
     def standard_tabu_choose(self, assignment):
@@ -478,13 +460,10 @@ class GA:
         Selects two parents from a sub-population.
         :return: Two individuals child_x and child_y
         """
-
+        # TODO: Get rid of this sort
         self.population.sort(key=self.evaluate)
         self.sub_population = self.population[0:self.sub_population_size]
-        child_x = random.choice(self.sub_population)
-        child_y = random.choice(self.sub_population)
-        while child_x == child_y:
-            child_x = random.choice(self.sub_population)
+        child_x, child_y = random.sample(self.sub_population, 2)
         return child_x, child_y
 
     def create_population(self):
@@ -494,11 +473,10 @@ class GA:
         :return: void (no return value)
         """
 
-        individual_counter = 0
-        while individual_counter < self.population_size:
-            self.population.append(Individual(self.numberOfVariables, self.method, False))
-            individual_counter = individual_counter + 1
-
+        self.population = Factory.create(self.numberOfVariables, self.population_size)
+        # Initial sort of the population. After this, we only ever have to do an insertion sort
+        # This also calls evaluate and therefore every individual has a stored fitness value
+        self.population.sort(key=self.evaluate)
         return
 
     def is_satisfied(self):
@@ -506,6 +484,7 @@ class GA:
         Determines whether or not there is a satisfying assignment.
         :return: An individual (assignment) or None.
         """
+        # TODO: Change this check only the first individual in the population
         for individual in self.population:
             if self.evaluate(individual) == 0:
                 return individual
@@ -517,7 +496,7 @@ class GA:
         child. If the child is worse than the weakest individual, then no replacement is done.
         :return: void (NONE)
         """
-
+        # Change this to get rid of the sort - Do an insertion sort
         self.population.sort(key=self.evaluate)
         self.best_individual_fitness = self.population[0].fitness
         self.best_individual = self.population[0]
@@ -535,18 +514,15 @@ class GA:
 
         # The GASAT Algorithm
         # -------------------------------------------------------------------------------------------------------------
-        # A population of individuals is initialised
+        # A population of individuals is initialised. The population is ordered by fitness
         self.create_population()
 
         # Counts the current number of iterations completed
         self.generation_counter = 0
 
-        # An individual that satisfies the formula or None
-        satisfied_individual = None
-
         # While no individual in the population satisfies the formula and while we have not reached the maximum
         # generation threshold
-        while satisfied_individual is None and self._generation_counter < self.max_generations:
+        while self._generation_counter < self.max_generations and not self.is_satisfied():
             # A sub-population of possible parents is selected and two individuals are randomly selected as parents
             parents = self.select()
 
@@ -568,20 +544,11 @@ class GA:
             self.current_child_fitness = self.evaluate(child)
             self.current_child = child
             self.replace(child)
-            # Determine whether any individual that satisfies the formula appeared in the current generation
-            satisfied_individual = self.is_satisfied()
-            # Increase the generation
-            self.generation_counter = self.generation_counter + 1
 
-        # Return a satisfying assignment if there exists one
-        if satisfied_individual is not None:
-            return satisfied_individual
-        else:
-            # Sort the population by fitness value
-            self.population.sort(key=self.evaluate)
-            # The first individual in the sorted population has the lowest number of unsatisfied clauses - best
-            # assignment found
-            return self.population[0]
+            # Increase the generation
+            self.generation_counter += 1
+
+        return self.population[0]
 
     def attach(self, observer):
         observer._subject = self
