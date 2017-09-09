@@ -1,13 +1,12 @@
 import sys
 import os
+myPath = os.path.dirname(os.path.abspath(__file__))
+print(myPath)
+sys.path.insert(0, myPath + '/../SATSolver')
 from GA import GA
 from unittest import TestCase
 from BitVector import BitVector
 from individual import Individual
-myPath = os.path.dirname(os.path.abspath(__file__))
-print(myPath)
-sys.path.insert(0, myPath + '/../SATSolver')
-
 
 class TestGA(TestCase):
 
