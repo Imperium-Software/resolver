@@ -258,7 +258,7 @@ class GA:
                     z.set_defined(abs(clause[i]))
             elif not self.sat(x, clause) and self.sat(y, clause):
                 for i in range(len(clause)):
-                    z.set(abs(clause[i], y(abs(clause[i]))))
+                    z.set(abs(clause[i]), y(abs(clause[i])))
                     z.set_defined(abs(clause[i]))
         z.allocate(x, y)
         return z
