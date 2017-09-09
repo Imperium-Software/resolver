@@ -111,7 +111,26 @@ class TestGA(TestCase):
         self.assertEqual(child.get(9), 0)
 
     def test_corrective_clause_with_truth_maintenance(self):
-        self.assertEqual(1, 1)
+        # Read the trivial example and create a GA instance
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        ga = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
+        # Create two individuals for which we know what the outcome should be
+        first_parent = Individual(9)
+        first_parent.data = BitVector(bitlist=[0, 0, 0, 1, 1, 1, 0, 0, 0])
+        second_parent = Individual(9)
+        second_parent.data = BitVector(bitlist=[0, 0, 1, 1, 1, 0, 0, 0, 0])
+        # Perform crossover to get the child
+        child = ga.corrective_clause_with_truth_maintenance(first_parent, second_parent)
+        # Force the truth maintenance code to run by setting bits 3 and 6 to zero
+        # Assert that crossover was correctly performed
+        self.assertEqual(child.get(1), 0)
+        self.assertEqual(child.get(2), 0)
+        # self.assertEqual(child.get(3), 1) # 3 should be set to 1
+        self.assertEqual(child.get(4), 1)
+        self.assertEqual(child.get(5), 0)
+        self.assertEqual(child.get(7), 0)
+        self.assertEqual(child.get(8), 0)
+        self.assertEqual(child.get(9), 0)
 
     def test_fluerent_and_ferland(self):
         # Read the trivial example and create a GA instance
