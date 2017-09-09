@@ -1,13 +1,12 @@
 import sys
 import os
-myPath = os.path.dirname(os.path.abspath(__file__))
-print(myPath)
-sys.path.insert(0, myPath + '/../SATSolver')
-
 from GA import GA
 from unittest import TestCase
 from BitVector import BitVector
 from individual import Individual
+myPath = os.path.dirname(os.path.abspath(__file__))
+print(myPath)
+sys.path.insert(0, myPath + '/../SATSolver')
 
 
 class TestGA(TestCase):
@@ -92,46 +91,47 @@ class TestGA(TestCase):
         self.assertEqual(ga.improvement(ind, 6), -1)
 
     def test_corrective_clause(self):
+        # Read the trivial example and create a GA instance
         file_reader = self.FormulaReader("../examples/trivial.cnf")
         ga = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
-        # Creates two parent bitvectors manually.
-        parent1 = Individual(9)
-        parent2 = Individual(9)
-        # for x in range(0, 10):
-            # Seed parent bitvectors.
-            # parent1.data = BitVector(bitlist=[random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1)])
-            # parent2.data = BitVector(bitlist=[random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1)])
-            # Evaluate parents
-            # par1_eval = ga.evaluate(parent1)
-            # par2_eval = ga.evaluate(parent2)
-
-            # Run corrective clause using set parents.
-            # child = ga.corrective_clause(parent1, parent2)
-            # child_eval = ga.evaluate(child)
-            # Compare child with parents.
-            # self.assertLessEqual(child_eval, par1_eval, "child sucks")
-            # self.assertLessEqual(child_eval, par2_eval, "child sucks")
-
-        #
-        for x in range(0, 10):
-            # Seed parent bitvectors.
-            parent1.data = BitVector(bitlist=[0, 1, 1, 0, 0, 1, 0, 0, 1])
-            parent2.data = BitVector(bitlist=[0, 1, 1, 1, 0, 1, 1, 1, 1])
-            # Evaluate parents
-            par1_eval = ga.evaluate(parent1)
-            par2_eval = ga.evaluate(parent2)
-
-            # Run corrective clause using set parents.
-            child = ga.corrective_clause(parent1, parent2)
-            child_eval = ga.evaluate(child)
-            # Compare child with parents. These will fail on occasion as child will be worse sometimes.
-            # self.assertLessEqual(child_eval, par1_eval, "child less satisfactory")
-            # self.assertLessEqual(child_eval, par2_eval, "child less satisfactory")
-
-        self.assertEqual(1, 1)
+        # Create two individuals for which we know what the outcome should be
+        first_parent = Individual(9)
+        first_parent.data = BitVector(bitlist=[0, 0, 0, 1, 1, 1, 0, 0, 0])
+        second_parent = Individual(9)
+        second_parent.data = BitVector(bitlist=[0, 0, 1, 1, 1, 0, 0, 0, 0])
+        # Perform crossover to get the child
+        child = ga.corrective_clause(first_parent, second_parent)
+        # Assert that crossover was correctly performed
+        self.assertEqual(child.get(1), 0)
+        self.assertEqual(child.get(2), 0)
+        self.assertEqual(child.get(4), 1)
+        self.assertEqual(child.get(5), 0)
+        self.assertEqual(child.get(7), 0)
+        self.assertEqual(child.get(8), 0)
+        self.assertEqual(child.get(9), 0)
 
     def test_corrective_clause_with_truth_maintenance(self):
         self.assertEqual(1, 1)
+
+    def test_fluerent_and_ferland(self):
+        # Read the trivial example and create a GA instance
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        ga = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
+        # Create two individuals for which we know what the outcome should be
+        first_parent = Individual(9)
+        first_parent.data = BitVector(bitlist=[0, 0, 1, 1, 0, 1, 0, 1, 1])
+        second_parent = Individual(9)
+        second_parent.data = BitVector(bitlist=[0, 0, 1, 1, 1, 0, 1, 1, 1])
+        # Perform crossover to get the child
+        child = ga.fluerent_and_ferland(first_parent, second_parent)
+        # Assert that crossover was correctly performed
+        self.assertEqual(child.get(1), 0)
+        self.assertEqual(child.get(2), 0)
+        self.assertEqual(child.get(3), 1)
+        self.assertEqual(child.get(4), 1)
+        self.assertEqual(child.get(6), 0)
+        self.assertEqual(child.get(8), 1)
+        self.assertEqual(child.get(9), 1)
 
     def test_standard_tabu_choose(self):
         # TEST 1 - All positions are tabu and best is the same as the individual........................................
@@ -270,26 +270,6 @@ class TestGA(TestCase):
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
         ga_implementation.check_flip(ind, ga_implementation.formula[4], forbidden_flips)
         self.assertEqual(ind.data, BitVector(bitlist=[1, 1, 1, 1, 1, 0, 1, 1, 1]))
-
-    def test_fluerent_and_ferland(self):
-        # Read the trivial example and create a GA instance
-        file_reader = self.FormulaReader("../examples/trivial.cnf")
-        ga = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
-        # Create two individuals for which we know what the outcome should be
-        first_parent = Individual(9)
-        first_parent.data = BitVector(bitlist=[0, 0, 1, 1, 0, 1, 0, 1, 1])
-        second_parent = Individual(9)
-        second_parent.data = BitVector(bitlist=[0, 0, 1, 1, 1, 0, 1, 1, 1])
-        # Perform crossover to get the child
-        child = ga.fluerent_and_ferland(first_parent, second_parent)
-        # Assert that crossover was correctly performed
-        self.assertEqual(child.get(1), 0)
-        self.assertEqual(child.get(2), 0)
-        self.assertEqual(child.get(3), 1)
-        self.assertEqual(child.get(4), 1)
-        self.assertEqual(child.get(6), 0)
-        self.assertEqual(child.get(8), 1)
-        self.assertEqual(child.get(9), 1)
 
     def test_select(self):
         self.assertEqual(1, 1)
