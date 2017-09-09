@@ -1,4 +1,5 @@
-import sys, os
+import sys
+import os
 myPath = os.path.dirname(os.path.abspath(__file__))
 print(myPath)
 sys.path.insert(0, myPath + '/../SATSolver')
@@ -220,6 +221,7 @@ class TestGA(TestCase):
         # else:
         #     self.assertEqual(1, 0)
         # .............................................................................................................
+
     def test_choose_rvcf(self):
         # An instance of the GA class which will be used to test the standard_tabu_choose function
         file_reader = self.FormulaReader("../examples/trivial.cnf")
@@ -270,7 +272,24 @@ class TestGA(TestCase):
         self.assertEqual(ind.data, BitVector(bitlist=[1, 1, 1, 1, 1, 0, 1, 1, 1]))
 
     def test_fluerent_and_ferland(self):
-        self.assertEqual(1, 1)
+        # Read the trivial example and create a GA instance
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        ga = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
+        # Create two individuals for which we know what the outcome should be
+        first_parent = Individual(9)
+        first_parent.data = BitVector(bitlist=[0, 0, 1, 1, 0, 1, 0, 1, 1])
+        second_parent = Individual(9)
+        second_parent.data = BitVector(bitlist=[0, 0, 1, 1, 1, 0, 1, 1, 1])
+        # Perform crossover to get the child
+        child = ga.fluerent_and_ferland(first_parent, second_parent)
+        # Assert that crossover was correctly performed
+        self.assertEqual(child.get(1), 0)
+        self.assertEqual(child.get(2), 0)
+        self.assertEqual(child.get(3), 1)
+        self.assertEqual(child.get(4), 1)
+        self.assertEqual(child.get(6), 0)
+        self.assertEqual(child.get(8), 1)
+        self.assertEqual(child.get(9), 1)
 
     def test_select(self):
         self.assertEqual(1, 1)
@@ -283,8 +302,8 @@ class TestGA(TestCase):
         ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
         ind = Individual(9)
         ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
-        ind.isCacheValid = False;
-        ga.population = [ind for x in range(100)]
+        ind.isCacheValid = False
+        ga.population = [ind for _ in range(100)]
 
         # There should not be a satisfiable assignment.
         self.assertIsNone(ga.is_satisfied())
