@@ -5,6 +5,7 @@
 
 import copy
 import random
+import operator
 from decimal import Decimal
 from SATSolver.individual import Individual, Factory
 
@@ -23,9 +24,20 @@ class GA:
         self.numberOfVariables = int(number_of_variables)
         # Creating member variables for each of the parameters
         self.max_generations = int(max_generations)
+        # TODO: Test for minimum possible size. It is at least 2
         self.population_size = int(population_size)
+        # TODO: Set sub-population size default to some percentage - May NOT be smaller than 2 because of crossover
         self.sub_population_size = int(sub_population_size)
-        self.crossover_operator = int(crossover_operator)
+
+        # Alias one of the crossover operators as a method called crossover_operator
+        if crossover_operator == 0:
+            self.crossover_operator = self.corrective_clause
+        elif crossover_operator == 1:
+            self.crossover_operator = self.corrective_clause_with_truth_maintenance
+        else:
+            self.crossover_operator = self.fluerent_and_ferland
+
+        # TODO: Check that length is not greater than the population length
         self.tabu_list_length = int(tabu_list_length)
         self.max_flip = int(max_flip)
         self.is_rvcf = bool(is_rvcf)
@@ -36,9 +48,9 @@ class GA:
         self.method = method
         self._observers = set()
         self._generation_counter = None
+        # TODO: Remove these 2 attributes. Best individual is always population[0]
         self.best_individual_fitness = None
-        self.best_individual = Individual(3)
-        # TODO: Why is this initialised to an individual
+        self.best_individual = None
         self.current_child_fitness = None
         self.current_child = None
 
@@ -52,9 +64,7 @@ class GA:
         # Used in tabu search to determine best configuration/move
         self.best = None
 
-        self.false_counts = [0 for _ in range(len(self.formula))]
-        
-        # This function should be called outside this class after instantiating an object of this class: self.gasat()
+        self.false_counts = [0 for _ in self.formula]
 
     @staticmethod
     def sat(individual, clause):
@@ -144,22 +154,17 @@ class GA:
         variable of the individual.
         :param individual: Individual class (Implemented by Regan) representing a particular assignment of truth values
         to variables.
-        :param index: index of a bit (starts at 1 - as per clause numbering in DIMACS format).
+        :param index: index of a bit (starts at 1 - as per clause numbering in DIMACS format). Boundary checking is
+        not performed
         :return: computed improvement value.
         """
 
-        # index is not boundary tested - assuming this is done before a call to this function.
-
-        # Determine fitness of individual before alterations
-        # TODO: We should be able to save an evaluate call here and just use the stored value
-        original_individual_fitness = self.evaluate(individual)
-
         new_individual = copy.deepcopy(individual)
-        # Flips the bit at the specified index
+        # Flip the bit at the specified index
         new_individual.flip(abs(index))
 
-        # Calculates improvement in fitness
-        return original_individual_fitness - self.evaluate(new_individual)
+        # Calculate improvement in fitness
+        return individual.fitness - self.evaluate(new_individual)
 
     def corrective_clause(self, x, y):
         """
@@ -171,20 +176,37 @@ class GA:
         """
 
         z = Individual(self.numberOfVariables, self.method, parents=(x, y))
-        for clause in self.formula:
+        clauses = [i for i in range(self.numberOfClauses) if
+                   not self.sat(x, self.formula[i]) and not self.sat(y, self.formula[i])]
+        for index in clauses:
+            clause = self.formula[index]
             best_pos = 0
             best_improvement = 0
-            if not self.sat(x, clause) and not self.sat(y, clause):
-                for i in range(len(clause)):
-                    # Find best index to flip in current clause. Absolute value of index must be used
-                    current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
-                    if current_improvement >= best_improvement:
-                        best_improvement = current_improvement
-                        best_pos = abs(clause[i])
-                if best_improvement != 0:
-                    z.set(best_pos, x.get(best_pos))
-                    z.flip(best_pos)
+            for i in range(len(clause)):
+                # Find best index to flip in current clause. Absolute value of index must be used
+                current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
+                if current_improvement >= best_improvement:
+                    best_improvement = current_improvement
+                    best_pos = abs(clause[i])
+            if best_pos != 0:
+                # TODO: Check if we could perhaps use 1 - x.get(best_pos) to avoid the flip
+                z.set(best_pos, x.get(best_pos))
+                z.flip(best_pos)
         return z
+        # for clause in self.formula:
+        #     best_pos = 0
+        #     best_improvement = 0
+        #     if not self.sat(x, clause) and not self.sat(y, clause):
+        #         for i in range(len(clause)):
+        #             # Find best index to flip in current clause. Absolute value of index must be used
+        #             current_improvement = self.improvement(x, abs(clause[i])) + self.improvement(y, abs(clause[i]))
+        #             if current_improvement >= best_improvement:
+        #                 best_improvement = current_improvement
+        #                 best_pos = abs(clause[i])
+        #         if best_improvement != 0:
+        #             z.set(best_pos, x.get(best_pos))
+        #             z.flip(best_pos)
+        # return z
 
     def corrective_clause_with_truth_maintenance(self, x, y):
         """
@@ -228,7 +250,7 @@ class GA:
 
     def fluerent_and_ferland(self, x, y):
         """
-        Performs the Fluerent & Ferland cross-over operator.
+        Performs the Fluerent & Ferland crossover operator.
 
         :param x: The first parent parameter.
         :param y: The second parent parameter.
@@ -253,7 +275,7 @@ class GA:
         :return: A position (index) in the assignment due to which maximum gain is obtained and the array of positions
         from which it was randomly chosen.
         """
-
+        # TODO: We can use one temp and just do flips on that - Might be faster than all these deep copies
         # A list to maintain the position(s) where the gain (by flip) is the best. 
         positions = []
         # The current overall best gain observed. Initially, it is set to a large negative value.
@@ -286,7 +308,7 @@ class GA:
         # i.e. out of those elements in the positions list.
         # Also return the positions list for the purposes of testing
         return random.choice(positions), positions
-    
+
     def standard_tabu(self, individual_in, choose_function):
         """
         Performs the standard Tabu algorithm.
@@ -299,7 +321,7 @@ class GA:
         self.tabu = self.tabu[:self.tabu_list_length]
         self.best = individual_in
         num_flips = 0
-        while not (self.evaluate(self.best) == 0) and (self.max_flip > num_flips):
+        while (self.evaluate(self.best) != 0) and (self.max_flip > num_flips):
             # index = self.choose(individual_in)
             index = choose_function(individual_in)
             individual_temp = copy.deepcopy(individual_in)
@@ -460,8 +482,6 @@ class GA:
         Selects two parents from a sub-population.
         :return: Two individuals child_x and child_y
         """
-        # TODO: Get rid of this sort
-        self.population.sort(key=self.evaluate)
         self.sub_population = self.population[0:self.sub_population_size]
         child_x, child_y = random.sample(self.sub_population, 2)
         return child_x, child_y
@@ -474,8 +494,8 @@ class GA:
         """
 
         self.population = Factory.create(self.numberOfVariables, self.population_size)
-        # Initial sort of the population. After this, we only ever have to do an insertion sort
-        # This also calls evaluate and therefore every individual has a stored fitness value
+        # Initial sort of the population. This also calls evaluate and therefore every individual has a stored
+        # fitness value
         self.population.sort(key=self.evaluate)
         return
 
@@ -485,10 +505,14 @@ class GA:
         :return: An individual (assignment) or None.
         """
         # TODO: Change this check only the first individual in the population
-        for individual in self.population:
-            if self.evaluate(individual) == 0:
-                return individual
-        return None
+        # for individual in self.population:
+        #     if self.evaluate(individual) == 0:
+        #         return individual
+        # return None
+        if self.population[0].fitness == 0:
+            return True
+        else:
+            return False
 
     def replace(self, child):
         """
@@ -497,14 +521,24 @@ class GA:
         :return: void (NONE)
         """
         # Change this to get rid of the sort - Do an insertion sort
-        self.population.sort(key=self.evaluate)
+        self.population.sort(key=operator.attrgetter("fitness"))
         self.best_individual_fitness = self.population[0].fitness
         self.best_individual = self.population[0]
         if self.population[0].fitness > child.fitness:
-            self.population.remove(self.population[len(self.population)-1])
-            self.population.append(child)
+            # self.population.remove(self.population[len(self.population)-1])
+            # self.population.append(child)
+            self.population[-1] = child
 
-        return
+        # if self.sub_population[-1].fitness > child.fitness:
+        #     return
+        # self.population[-1] = child
+        # # Python's timsort makes this efficient as the population is almost already sorted. Use the saved fitness of
+        # # each individual instead of calling evaluate. For more on timsort, see:
+        # # http://svn.python.org/projects/python/trunk/Objects/listsort.txt
+        # self.population.sort(key=operator.attrgetter("fitness"))
+        # self.best_individual_fitness = self.population[0].fitness
+        # self.best_individual = self.population[0]
+        # return
 
     def gasat(self):
         """
@@ -528,20 +562,19 @@ class GA:
 
             # A child is produced through reproduction - the method of reproduction is determined by the operator
             # parameter
-            child = None
-            if self.crossover_operator == 0:
-                child = self.corrective_clause(parents[0], parents[1])
-            elif self.crossover_operator == 1:
-                child = self.corrective_clause_with_truth_maintenance(parents[0], parents[1])
-            elif self.crossover_operator == 2:
-                child = self.fluerent_and_ferland(parents[0], parents[1])
+            child = self.crossover_operator(parents[0], parents[1])
+            # elif self.crossover_operator == 1:
+            #     child = self.corrective_clause_with_truth_maintenance(parents[0], parents[1])
+            # elif self.crossover_operator == 2:
+            #     child = self.fluerent_and_ferland(parents[0], parents[1])
 
             if not self.is_rvcf:
                 child = self.standard_tabu(child, self.standard_tabu_choose)
             else:
                 child = self.standard_tabu(child, self.choose_rvcf)
 
-            self.current_child_fitness = self.evaluate(child)
+            # TODO: Current_child_fitness is redundant as we can just use current_child.fitness instead
+            self.current_child_fitness = child.fitness
             self.current_child = child
             self.replace(child)
 
@@ -561,7 +594,7 @@ class GA:
     def _notify(self):
         for observer in self._observers:
             observer.update(self._generation_counter)
-            
+
     @property
     def generation_counter(self):
         return self._generation_counter
