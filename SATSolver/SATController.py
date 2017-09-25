@@ -4,7 +4,6 @@ import time
 from SATSolver.GA import GA
 from SATSolver.GA import GAStop
 from SATSolver.server import BColors
-from datetime import datetime
 
 
 class SingletonMixin(object):
@@ -141,8 +140,6 @@ class SATController(Observer, SingletonMixin):
 
                 self.GA = None
 
-
-
     def parse_formula(self, raw_formula, local=True):
         """
         Takes a list of lines read from the input file and
@@ -150,9 +147,9 @@ class SATController(Observer, SingletonMixin):
         # Read all the lines from the file that aren't comments
         if local:
             lines = [line.replace("\n", "") for line in raw_formula if line[0] != "c" and line.strip() != ""]
-            numberOfVariables, numberOfClauses = int(lines[0].split()[2]), int(lines[0].split()[3])
+            number_of_variables, number_of_clauses = int(lines[0].split()[2]), int(lines[0].split()[3])
         else:
-            numberOfVariables, numberOfClauses = int(raw_formula[0].split()[2]), int(raw_formula[0].split()[3])
+            number_of_variables, number_of_clauses = int(raw_formula[0].split()[2]), int(raw_formula[0].split()[3])
             lines = raw_formula
         formula = []
 
@@ -166,7 +163,8 @@ class SATController(Observer, SingletonMixin):
                 end_of_clause = False
                 while line < len(lines) and not end_of_clause:
                     # Split the line and append a list of all integers, excluding 0, to clause
-                    clause.append([int(variable.strip()) for variable in lines[line].split() if int(variable.strip()) != 0])
+                    clause.append([int(variable.strip()) for variable in lines[line].split()
+                                   if int(variable.strip()) != 0])
                     # If this line ended with a 0, we reached the end of the clause
                     if int(lines[line].split()[-1].strip()) == 0:
                         end_of_clause = True
@@ -178,6 +176,4 @@ class SATController(Observer, SingletonMixin):
                 formula.append(tuple([item for sublist in clause for item in sublist]))
         except Exception as e:
             raise Exception(str(line) + ' ' + str(e))
-        return formula, numberOfVariables, numberOfClauses
-
-
+        return formula, number_of_variables, number_of_clauses

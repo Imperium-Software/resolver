@@ -62,8 +62,9 @@ def decode(data, server, client_id):
         :return: Will return either `None` if no errors occurred and the command was successfully executed or a string
         explaining the error that occurred.
         """
-        print("Poll called")
-        pass
+
+        controller = SATController.instance()
+        controller.update(controller._generation_count)
 
     def stop(json_data):
         controller = SATController.instance()
@@ -96,6 +97,7 @@ def decode(data, server, client_id):
     except Exception as e:
         error_response = encode("ERROR", ["A fatal error occurred: " + str(e)])
         server.push_to_one(client_id, error_response)
+
 
 def encode(message_type, data):
 
