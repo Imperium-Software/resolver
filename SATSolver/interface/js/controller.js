@@ -6,23 +6,23 @@ const {
 function construct_request(type) {
     if (type === 'SOLVE') {
 
-        var request_string;
-        var dimacs;
+        let request_string;
+        let dimacs;
 
-        if ($('#cnf-input-method')[0].value == 'file') {
+        if ($('#cnf-input-method')[0].value === 'file') {
             let filename = $('#selected-file').prop('files')[0].path;
             dimacs = fs.readFileSync(filename).toString().trim()
         } else {
             dimacs = $('#manual-cnf')[0].value;
         }
 
-        var max_generations_input = $('#max_generations')[0].value;
-        var population_size_input = $('#population_size')[0].value;
-        var sub_population_size_input = $('#sub_population_size')[0].value;
-        var max_flip_input = $('#max_flip')[0].value;
-        var crossover_operator_input = $('#crossover_operator')[0].value;
-        var method_input = $('#method')[0].value;
-        var tabu_settings_input = $('#tabu-settings').val();
+        let max_generations_input = $('#max_generations')[0].value;
+        let population_size_input = $('#population_size')[0].value;
+        let sub_population_size_input = $('#sub_population_size')[0].value;
+        let max_flip_input = $('#max_flip')[0].value;
+        let crossover_operator_input = $('#crossover_operator')[0].value;
+        let method_input = $('#method')[0].value;
+        let tabu_settings_input = $('#tabu-settings').val();
 
         var request = {
             "SOLVE": {
@@ -39,40 +39,40 @@ function construct_request(type) {
         request.SOLVE.rec = $("#rec")[0].value;
         request.SOLVE.k = $("#k")[0].value;
 
-        if (population_size_input != undefined && population_size_input != '') {
+        if (population_size_input !== undefined && population_size_input !== '') {
             request.SOLVE["population_size"] = population_size_input;
         }
 
-        if (sub_population_size_input != undefined && sub_population_size_input != '') {
+        if (sub_population_size_input !== undefined && sub_population_size_input !== '') {
             request.SOLVE["sub_population_size"] = parseInt(sub_population_size_input);
         }
 
-        if (crossover_operator_input != undefined && crossover_operator_input != '') {
+        if (crossover_operator_input !== undefined && crossover_operator_input !== '') {
             request.SOLVE["crossover_operator"] = parseInt(crossover_operator_input);
         }
 
-        if (max_flip_input != undefined && max_flip_input != '') {
+        if (max_flip_input !== undefined && max_flip_input !== '') {
             request.SOLVE["max_flip"] = parseInt(max_flip_input);
         }
 
-        if (max_generations_input != undefined && max_generations_input != '') {
+        if (max_generations_input !== undefined && max_generations_input !== '') {
             request.SOLVE["max_generations"] = parseInt(max_generations_input);
         }
 
-        if (method_input != undefined && method_input != '') {
+        if (method_input !== undefined && method_input !== '') {
             request.SOLVE["method"] = parseInt(method_input);
         }
 
-        if (tabu_settings_input.indexOf('rvcf') != -1) {
+        if (tabu_settings_input.indexOf('rvcf') !== -1) {
             request.SOLVE["is_rvcf"] = true;
         }
 
-        if (tabu_settings_input.indexOf('diversification') != -1) {
+        if (tabu_settings_input.indexOf('diversification') !== -1) {
             request.SOLVE["is_diversification"] = true;
         }
 
         request.SOLVE.raw_input = dimacs.split('\n');
-        for (var i=request.SOLVE.raw_input.length-1; i>=0; i--) {
+        for (let i = request.SOLVE.raw_input.length-1; i>=0; i--) {
             if (request.SOLVE.raw_input[i][0] === 'c') {
                 request.SOLVE.raw_input.splice(i, 1);
             }
@@ -92,7 +92,7 @@ function construct_request(type) {
 
 function make_request(type) {
     try {
-        var request;
+        let request;
         if (type === 'SOLVE') {
             reset();
             request = construct_request('SOLVE');
@@ -153,7 +153,7 @@ function navigate(filename) {
 
         // Progress circle
 
-        var new_progress_bar = new ProgressBar.Circle('#progress-circle', {
+        let new_progress_bar = new ProgressBar.Circle('#progress-circle', {
             color: '#FFF',
             strokeWidth: 15,
             trailWidth: 4,
@@ -173,7 +173,7 @@ function navigate(filename) {
             step: function (state, circle) {
                 circle.path.setAttribute('stroke', state.color);
                 circle.path.setAttribute('stroke-width', state.width);
-                var value = Math.round(circle.value() * 1000) / 10;
+                let value = Math.round(circle.value() * 1000) / 10;
 
                 if (value === 0) {
                     circle.setText('0');
@@ -304,7 +304,7 @@ function theme_change() {
 
 function input_method_change() {
     let select_box = document.getElementById('cnf-input-method');
-    if (select_box.value == "file") {
+    if (select_box.value === "file") {
         $('#input-cnf-file').attr('hidden', false);
         $('#input-cnf-text').attr('hidden', true);
     } else {
@@ -319,7 +319,7 @@ menu.append(new MenuItem({
     label: 'Save Graph To JPG',
     click: function (e) {
         dialog.showSaveDialog(function (fileName) {
-            if (fileName != undefined) {
+            if (fileName !== undefined) {
                 destinationCanvas = document.createElement("canvas");
                 destinationCanvas.width = fitness_chart.width;
                 destinationCanvas.height = fitness_chart.height;
@@ -344,7 +344,7 @@ menu.append(new MenuItem({
     label: 'Save Graph To CSV',
     click: function (e) {
         dialog.showSaveDialog(function (fileName) {
-            if (fileName != undefined) {
+            if (fileName !== undefined) {
                 fs.writeFile(fileName + ".best.csv", chart.data["datasets"][0].data, function (err) {
                     console.log(err);
                 });

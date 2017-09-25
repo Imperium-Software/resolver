@@ -1,7 +1,7 @@
+const d3 = require('d3');
 const net = require('net');
-var ProgressBar = require('progressbar.js');
-var d3 = require('d3');
 const remote =  require('electron').remote;
+const ProgressBar = require('progressbar.js');
 const canvasBuffer = require('electron-canvas-to-buffer');
 
 const {
@@ -23,7 +23,7 @@ var progress_bar = new ProgressBar.Circle('#progress-circle', {
   step: function(state, circle) {
     circle.path.setAttribute('stroke', state.color);
     circle.path.setAttribute('stroke-width', state.width);
-    var value = Math.round(circle.value() * 1000) / 10;
+    let value = Math.round(circle.value() * 1000) / 10;
 
     if (value === 0) {
       circle.setText('0');
@@ -120,7 +120,7 @@ conn.on('data', function(data) {
 
   var response = JSON.parse(data);
   var message_type;
-  for (var key in response["RESPONSE"]) {
+  for (let key in response["RESPONSE"]) {
       message_type = key;
   }
 
@@ -146,7 +146,7 @@ conn.on('data', function(data) {
             $('#progress').slideDown(2000);
         }
 
-        if (progressArray["CURRENT_CHILD"] != "None") {
+        if (progressArray["CURRENT_CHILD"] !== "None") {
             new_child = progressArray["CURRENT_CHILD"][0].split('').map((item) => {
                 return parseInt(item, 10);
             });
@@ -185,8 +185,8 @@ conn.on('data', function(data) {
 
   function finished() {
       try {
-        var progressObject = JSON.parse(data);
-        var finishedArray = progressObject["RESPONSE"]["FINISHED"];
+        let progressObject = JSON.parse(data);
+        let finishedArray = progressObject["RESPONSE"]["FINISHED"];
         perc.percentage = (progressArray["NUM_CLAUSES"][0]-finishedArray["FITNESS"][0]) / progressArray["NUM_CLAUSES"][0];
         generations.generations = finishedArray["GENERATION"][0];
         generations.max_generations = finishedArray["GENERATION"][1];
@@ -195,7 +195,7 @@ conn.on('data', function(data) {
         time_elapsed.finish = finishedArray["TIME_FINISHED"];
         chart.update();
 
-        var status_title = $('#status-title');
+        let status_title = $('#status-title');
         if (finishedArray["SUCCESSFUL"] === true) {
             status_title.addClass('success');
             status_title.html('Successfully found a solution.');
@@ -206,7 +206,7 @@ conn.on('data', function(data) {
 
         $('#status').removeClass('hide');
 
-        var answer = $('#answer');
+        let answer = $('#answer');
         answer.removeClass('hide');
         answer.html(finishedArray["INDIVIDUAL"]);
 
@@ -219,7 +219,7 @@ conn.on('data', function(data) {
 
   function error() {
       try {
-          var errorObject = JSON.parse(data);
+          let errorObject = JSON.parse(data);
           error_log.text += "\n" + errorObject["RESPONSE"]["ERROR"];
           alert("Server says: " + errorObject["RESPONSE"]["ERROR"]);
       } catch(e) {
@@ -247,8 +247,8 @@ conn.on('close', function() {
 var chart;
 $(document).ready(function () {
     $('#progress').hide();
-    var accent_colour = $('button').css('backgroundColor');
-    var ctx = document.getElementById('fitness-chart').getContext('2d');
+    let accent_colour = $('button').css('backgroundColor');
+    let ctx = document.getElementById('fitness-chart').getContext('2d');
     chart = new Chart(ctx, {
         // The type of chart we want to create
         type: 'line',
@@ -348,14 +348,14 @@ function reset() {
     formula_info.num_clauses = 0;
     chart.data.datasets[0].data = [];
     chart.data.datasets[1].data = [];
-    var canvas = document.querySelector('#fitness-chart');
-    var ctx = canvas.getContext('2d');
+    let canvas = document.querySelector('#fitness-chart');
+    let ctx = canvas.getContext('2d');
     ctx.clearRect(0,0, canvas.width, canvas.height); // resize to parent width
     chart.reset();
 }
 
 function circularHeat(child_data, best_data, numSegments) {
-    var chart = circularHeatChart(numSegments).range(["white", 
+    let chart = circularHeatChart(numSegments).range(["white",
     getComputedStyle(document.body).getPropertyValue('--theme-four')]);
     d3.select('#child-chart').selectAll('svg').data(child_data).enter().append('svg').call(chart);
     d3.select('#best-chart').selectAll('svg').data(best_data).enter().append('svg').call(chart);
