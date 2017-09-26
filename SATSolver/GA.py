@@ -427,11 +427,11 @@ class GA:
             if literal > 0:
                 if individual.get(literal) == 1:
                     # list_of_literals.append(literal)
-                    ++degree
+                    degree += 1
             else:
                 if individual.get(abs(literal)) == 0:
                     # list_of_literals.append(literal)
-                    ++degree
+                    degree += 1
 
         # return len(list_of_literals)
         return degree
