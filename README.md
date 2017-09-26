@@ -1,5 +1,9 @@
 ![Build Status](https://travis-ci.org/Imperium-Software/resolver.svg?branch=master)
 [![Stories in Ready](https://badge.waffle.io/Imperium-Software/resolver.png?label=ready&title=Ready)](https://waffle.io/ErnstEksteen/COS301_GA-SATSolver?utm_source=badge)
+[![Code Health](https://landscape.io/github/Imperium-Software/resolver/master/landscape.svg?style=flat)](https://landscape.io/github/Imperium-Software/resolver/master)
+[![Python Versions](https://img.shields.io/badge/python-3.4%2C3.5%2C3.6-blue.svg)]()
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)]()
+
 # COS301 GA-SATSolver
 
 <div style="text-align:center;" align="center">
