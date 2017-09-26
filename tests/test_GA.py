@@ -265,6 +265,8 @@ class TestGA(TestCase):
         self.assertEqual(ga_implementation.weight(ind, 4), 1.5)
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
         self.assertEqual(ga_implementation.weight(ind, 4), 1)
+        ind.data = BitVector(bitlist=[1, 0, 1, 0, 1, 0, 1, 0, 1])
+        self.assertEqual(ga_implementation.weight(ind, 4), 1)
 
     def test_degree(self):
         ind = Individual(9)
