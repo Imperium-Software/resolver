@@ -149,7 +149,32 @@ function navigate(filename) {
             accordion: true
         });
         $("#advanced").modal();
-        $("#connected-indicator")[0].style.fill = connected ? "lime" : "red";
+        $("#connected-indicator")[0].style.fill = conn.connected ? "lime" : "red";
+
+        // timetable
+        let timetable_ctx = DragTimetable.create($("#timetable")[0], {
+            timeHeaderSize: '150px', // width of the time header column 
+            taskAreaSize: '100px', // width of the task column 
+            quarterHourAreaSize: '15px', // height of a 15 minute segment 
+            hourStart: 8, // starting time of timetable, 0 to 23 
+            hourEnd: 16, // ending time of timetable, 0 to 23 
+            clickThreshold: 200
+        });
+
+        timetable_ctx.addTask({
+            id: 1, // unique id for task 
+            start: 9, // starting time for task 
+            end: 11, // ending time for task 
+            text: 'Important Meeting'
+        }, true);
+
+        timetable_ctx.addTask({
+            id: 2, // unique id for task 
+            start: 11, // starting time for task 
+            end: 12, // ending time for task 
+            text: 'Lecture'
+        }, true);
+
 
         // Progress circle
 
@@ -188,6 +213,7 @@ function navigate(filename) {
         new_progress_bar.animate(perc.percentage);
         progress_bar = new_progress_bar;
 
+            
 
         // Re-render percentage
 
@@ -360,3 +386,4 @@ fitness_chart.addEventListener('contextmenu', function (e) {
     e.preventDefault();
     menu.popup(remote.getCurrentWindow());
 }, false);
+

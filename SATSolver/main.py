@@ -47,7 +47,6 @@ def main(argv):
         parser.add_option("--max-flip", dest="max_flip", type="int", help="", metavar="<max flip>")
         parser.add_option("--rvcf", dest="is_rvcf", type="string", help="")
         parser.add_option("--diversification", dest="is_diversification", type="string", help="")
-        parser.add_option("--method", dest="method", type="string", help="", metavar="<method>")
 
         (options, args) = parser.parse_args()
         options = vars(options)

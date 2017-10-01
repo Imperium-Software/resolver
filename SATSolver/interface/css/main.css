@@ -226,3 +226,13 @@ h5>small {
 .circular-heat-svg {
     height : 250px;
 }
+
+.dragtimetable-spacer>div {
+    background-color: var(--theme-four);
+    border-radius: 10%;
+    color : white;
+}
+
+.dragtimetable-table {
+    width: 80%;
+}

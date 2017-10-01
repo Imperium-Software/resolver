@@ -16,7 +16,7 @@ class GAStop(Exception):
 class GA:
     def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length, max_false, rec, k,
                  max_generations=1000, population_size=100, sub_population_size=15, crossover_operator=0,
-                 max_flip=10000, is_rvcf=False, is_diversification=False, method=None):
+                 max_flip=10000, is_rvcf=False, is_diversification=False):
 
         self.formula = formula
         self.numberOfClauses = int(number_of_clauses)
@@ -33,7 +33,6 @@ class GA:
         self.max_false = int(max_false)
         self.rec = int(rec)
         self.k = int(k)
-        self.method = method
         self._observers = set()
         self._generation_counter = None
         self.best_individual_fitness = None
@@ -178,7 +177,7 @@ class GA:
         :return: The generated individual z
         """
 
-        z = Individual(self.numberOfVariables, self.method, False)
+        z = Individual(self.numberOfVariables, False)
         for clause in self.formula:
             best_pos = 0
             best_improvement = 0
@@ -206,7 +205,7 @@ class GA:
         :return: The generated individual z
         """
 
-        z = Individual(self.numberOfVariables, self.method, False)
+        z = Individual(self.numberOfVariables, False)
         for clause in self.formula:
             best_pos = 0
             maximum_improvement = 0
@@ -250,7 +249,7 @@ class GA:
         :return: The generated individual z.
         """
 
-        z = Individual(self.numberOfVariables, self.method, False)
+        z = Individual(self.numberOfVariables, False)
         for clause in self.formula:
             if self.sat(x, clause) and not self.sat(y, clause):
                 for i in range(len(clause)):
@@ -496,7 +495,7 @@ class GA:
 
         individual_counter = 0
         while individual_counter < self.population_size:
-            self.population.append(Individual(self.numberOfVariables, self.method, False))
+            self.population.append(Individual(self.numberOfVariables, False))
             individual_counter = individual_counter + 1
 
         return
