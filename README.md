@@ -37,7 +37,7 @@ The graphical user interface can then be used to connect to this server instance
 ```sh
 cd SATSolver/interface
 npm install
-electron i.
+electron .
 ```
 
 See the [User Guide](https://github.com/Imperium-Software/resolver/wiki/User-Guide) for more details.
