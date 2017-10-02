@@ -1,28 +1,28 @@
-let fs = require('fs');
+var fs = require('fs');
 const {
     dialog
 } = require('electron').remote;
 
 function construct_request(type) {
+    var request_string = '';
     if (type === 'SOLVE') {
 
-        let request_string;
-        let dimacs;
+        var dimacs;
 
         if ($('#cnf-input-method')[0].value === 'file') {
-            let filename = $('#selected-file').prop('files')[0].path;
+            var filename = $('#selected-file').prop('files')[0].path;
             dimacs = fs.readFileSync(filename).toString().trim()
         } else {
             dimacs = $('#manual-cnf')[0].value;
         }
 
-        let max_generations_input = $('#max_generations')[0].value;
-        let population_size_input = $('#population_size')[0].value;
-        let sub_population_size_input = $('#sub_population_size')[0].value;
-        let max_flip_input = $('#max_flip')[0].value;
-        let crossover_operator_input = $('#crossover_operator')[0].value;
-        let method_input = $('#method')[0].value;
-        let tabu_settings_input = $('#tabu-settings').val();
+        var max_generations_input = $('#max_generations')[0].value;
+        var population_size_input = $('#population_size')[0].value;
+        var sub_population_size_input = $('#sub_population_size')[0].value;
+        var max_flip_input = $('#max_flip')[0].value;
+        var crossover_operator_input = $('#crossover_operator')[0].value;
+        var method_input = $('#method')[0].value;
+        var tabu_settings_input = $('#tabu-settings').val();
 
         var request = {
             "SOLVE": {
@@ -72,7 +72,7 @@ function construct_request(type) {
         }
 
         request.SOLVE.raw_input = dimacs.split('\n');
-        for (let i = request.SOLVE.raw_input.length-1; i>=0; i--) {
+        for (var i = request.SOLVE.raw_input.length-1; i>=0; i--) {
             if (request.SOLVE.raw_input[i][0] === 'c') {
                 request.SOLVE.raw_input.splice(i, 1);
             }
@@ -92,7 +92,7 @@ function construct_request(type) {
 
 function make_request(type) {
     try {
-        let request;
+        var request;
         if (type === 'SOLVE') {
             reset();
             request = construct_request('SOLVE');
@@ -153,7 +153,7 @@ function navigate(filename) {
 
         // Progress circle
 
-        let new_progress_bar = new ProgressBar.Circle('#progress-circle', {
+        var new_progress_bar = new ProgressBar.Circle('#progress-circle', {
             color: '#FFF',
             strokeWidth: 15,
             trailWidth: 4,
@@ -173,7 +173,7 @@ function navigate(filename) {
             step: function (state, circle) {
                 circle.path.setAttribute('stroke', state.color);
                 circle.path.setAttribute('stroke-width', state.width);
-                let value = Math.round(circle.value() * 1000) / 10;
+                var value = Math.round(circle.value() * 1000) / 10;
 
                 if (value === 0) {
                     circle.setText('0');
@@ -258,7 +258,7 @@ function navigate(filename) {
 }
 
 function theme_change() {
-    let theme_select = document.getElementById('theme-select');
+    var theme_select = document.getElementById('theme-select');
     switch (theme_select.value) {
         case "tea":
             document.body.style.setProperty("--theme-one", "#364958");
@@ -303,7 +303,7 @@ function theme_change() {
 }
 
 function input_method_change() {
-    let select_box = document.getElementById('cnf-input-method');
+    var select_box = document.getElementById('cnf-input-method');
     if (select_box.value === "file") {
         $('#input-cnf-file').attr('hidden', false);
         $('#input-cnf-text').attr('hidden', true);
@@ -313,7 +313,7 @@ function input_method_change() {
     }
 }
 
-let fitness_chart = $("#fitness-chart")[0];
+var fitness_chart = $("#fitness-chart")[0];
 var menu = new Menu();
 menu.append(new MenuItem({
     label: 'Save Graph To JPG',

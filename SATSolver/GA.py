@@ -147,6 +147,20 @@ class GA:
         individual.fitness = num_unsatisfied_clauses
         return num_unsatisfied_clauses
 
+    def true_clauses(self, individual):
+        """
+        The function returns a string of zeros and ones indicating which clauses are true and false.
+
+        :return: string of zeros and ones.
+        """
+        return_string = ''
+        for clause in self.formula:
+            if self.sat(individual, clause):
+                return_string += str(1)
+            else:
+                return_string += str(0)
+        return return_string
+
     def improvement(self, individual, index):
         """
         The function computes the improvement (difference in unsatisfiable clauses) obtained by the flip of the ith
@@ -602,4 +616,5 @@ class GA:
     @generation_counter.setter
     def generation_counter(self, arg):
         self._generation_counter = arg
-        self._notify()
+        if arg > 0:
+            self._notify()

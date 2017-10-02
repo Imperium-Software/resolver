@@ -115,7 +115,9 @@ def encode(message_type, data):
                     "CURRENT_CHILD_FITNESS": data_arr[4],
                     "CURRENT_CHILD": data_arr[5],
                     "NUM_VARIABLES": data_arr[6],
-                    "NUM_CLAUSES": data_arr[7]
+                    "NUM_CLAUSES": data_arr[7],
+                    "TRUE_CLAUSES_BEST_INDIVIDUAL": data_arr[8],
+                    "TRUE_CLAUSES_CURRENT_CHILD": data_arr[9]
                 }
             }
         }

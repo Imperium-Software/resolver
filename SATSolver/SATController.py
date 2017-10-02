@@ -54,7 +54,9 @@ class SATController(Observer, SingletonMixin):
                                               [self.GA.current_child_fitness],
                                               [str(self.GA.current_child)],
                                               [self.GA.numberOfVariables],
-                                              [self.GA.numberOfClauses]]
+                                              [self.GA.numberOfClauses],
+                                              [self.GA.true_clauses(self.GA.best_individual)],
+                                              [self.GA.true_clauses(self.GA.current_child)]]
                                  )
         if self.server_thread is not None:
             self.server_thread.push_to_all(encoded_message)
