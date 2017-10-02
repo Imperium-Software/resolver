@@ -22,7 +22,6 @@ This software allows solving of complex problems in classical planning, automati
 ## Dependencies
 - Python 3.4+
 - [bitarray](https://pypi.python.org/pypi/bitarray/) 0.8.1
-- [BitVector](https://pypi.python.org/pypi/BitVector) 3.4.7
 - Node.js v6.11.3+
 - npm v3.10.10+
 
@@ -36,9 +35,9 @@ python SATSolver/main.py
 
 The graphical user interface can then be used to connect to this server instance. It can be started using these commands:
 ```sh
-cd SATSolver/interface/index.js
+cd SATSolver/interface
 npm install
-electron index.js
+electron .
 ```
 
 See the [User Guide](https://github.com/Imperium-Software/resolver/wiki/User-Guide) for more details.
