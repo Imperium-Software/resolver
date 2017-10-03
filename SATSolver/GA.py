@@ -309,15 +309,15 @@ class GA:
         num_flips = 0
         while not (self.evaluate(self.best) == 0) and (self.max_flip > num_flips):
             # index = self.choose(individual_in)
-            # Access fault debugging for more then 50 flips
-            if num_flips > 57:
-                numberBlank = 1
             index = choose_function(individual_in)
-            individual_temp = copy.deepcopy(individual_in)
+            # as long as this flip is not in the tabu we set individual_temp to indavidual_in anyway. So I have removed
+            # the deep coppy on the next line to improve performance and altered all lines up to the second if statement
+            # testing for diversification to individual_in
+            # individual_temp = copy.deepcopy(individual_in)
             if not index[0] in self.tabu:
-                individual_temp.flip(index[0])
-                if self.evaluate(individual_temp) < self.evaluate(self.best):
-                    self.best = individual_temp
+                individual_in.flip(index[0])
+                if self.evaluate(individual_in) < self.evaluate(self.best):
+                    self.best = individual_in
                 num_flips += 1
 
                 # This is for diversifiaction
@@ -325,34 +325,39 @@ class GA:
                     # Increment all bits that have been flipped to make a Max_false clause positive
                     temp_flips = copy.deepcopy(forbidden_flips);
                     for index2 in temp_flips.items():
+                        # index2 is a returned tuple from the forbidden_flips, which records the index and the amount of
+                        # times it has been flipped. The index thus of forbidden_filips is thus the index 0 of the
+                        # returned tuple. That is why there is a dereference inside a dereference.
                         forbidden_flips[index2[0]] += 1
                         # Check if pos has been flipped k times since last flip and remove it if it has
                         # this frees that variable up to be flipped next time it is maximal in a max_false clause
                         if forbidden_flips[index2[0]] == self.k:
                             del forbidden_flips[index2[0]]
 
-                individual_in = individual_temp
+                # individual_in = individual_temp
                 if self.is_diversification:
                     temp_individual_in = copy.deepcopy(individual_in)
-                    for i in range(len(self.formula)):
-                        if not self.sat(temp_individual_in, self.formula[i]):
+                    i = 0
+                    for divers_clause in self.formula:
+                        if not self.sat(temp_individual_in, divers_clause):
                             self.false_counts[i] += 1
 
                             # if this clause has reached or exceeded max_false counts, making it a stumble clause
                             if self.false_counts[i] >= self.max_false:
                                 try:
-                                    value = max(self.formula[i], key=lambda c: self.improvement(temp_individual_in, abs(c)))
+                                    value = max(divers_clause, key=lambda c: self.improvement(temp_individual_in, abs(c)))
                                 except ValueError as e:
                                     raise e
                                 pos = abs(value)
 
+                                # for checking which of the clauses are turned false after diversification flip
                                 individual_temp = copy.deepcopy(temp_individual_in)
                                 # Check if pos has been flipped before
                                 # flips this one stubborn bit and refuse to flip it back before k flips.
                                 if pos not in forbidden_flips.keys():
                                     # set to 0 and not 1 because it means that if k is 5 only on flip 6 can
                                     # pos be flipped
-                                    individual_temp.flip(pos)
+                                    temp_individual_in.flip(pos)
                                     temp_flips = copy.deepcopy(forbidden_flips);
                                     for index4 in temp_flips.items():
                                         forbidden_flips[index4[0]] += 1
@@ -367,39 +372,46 @@ class GA:
                                     self.false_counts[i] = 0
 
                                 for _ in range(self.rec):
-                                    now_false_clauses = [self.formula[x] for x in range(len(self.formula))
-                                                         if
-                                                         not self.sat(individual_temp, self.formula[x]) and self.sat(temp_individual_in, self.formula[x])]
+
+                                    now_false_clauses = [f_clause for f_clause in self.formula
+                                                         if not self.sat(temp_individual_in, f_clause)
+                                                         and self.sat(individual_temp, f_clause)]
                                     for nested_clause in now_false_clauses:
                                         temp_clause = [c for c in nested_clause if c not in forbidden_flips.keys()]
 
                                         if len(temp_clause) > 0:
                                             try:
 
-                                                value = max(temp_clause, key=lambda c: self.improvement(individual_temp,c))
+                                                value = max(temp_clause, key=lambda c: self.improvement(temp_individual_in,c))
                                             except ValueError as e:
                                                 raise e
                                             pos = abs(value)
-                                            if pos not in forbidden_flips.keys():
-                                                # set to 0 and not 1 because it means that if k is 5 only on flip 6 can
-                                                # pos be flipped
-                                                individual_temp.flip(pos)
-                                                # increment all remaining forbidden flips as a flip has taken place
-                                                temp_flips = copy.deepcopy(forbidden_flips);
-                                                for index3 in temp_flips.items():
-                                                    forbidden_flips[index3[0]] += 1
-                                                    # Check if pos has been flipped k times since last flip and remove it if it has
-                                                    # this frees that variable up to be flipped next time it is maximal in a max_false clause
-                                                    if forbidden_flips[index3[0]] == self.k:
-                                                        del forbidden_flips[index3[0]]
+                                            # removing this structure as it is checket int the setting of temp_clause
+                                            # if pos not in forbidden_flips.keys():
 
-                                                forbidden_flips[pos] = 0
+                                            # set to 0 and not 1 because it means that if k is 5 only on flip 6 can
+                                            # pos be flipped
+                                            temp_individual_in.flip(pos)
+                                            # increment all remaining forbidden flips as a flip has taken place
+                                            temp_flips = copy.deepcopy(forbidden_flips);
+                                            for index3 in temp_flips.items():
+                                                forbidden_flips[index3[0]] += 1
+                                                # Check if pos has been flipped k times since last flip and remove it if it has
+                                                # this frees that variable up to be flipped next time it is maximal in a max_false clause
+                                                if forbidden_flips[index3[0]] == self.k:
+                                                    del forbidden_flips[index3[0]]
+                                            forbidden_flips[pos] = 0
                                             # not sure if a secondary maximal should be taken for the false clause.
-
-                                temp_individual_in = individual_temp
 
                                 if self.evaluate(temp_individual_in) < self.evaluate(self.best):
                                     self.best = temp_individual_in
+                        i = i + 1
+                    # NB! NB! NB! This is somewhat confusing and isnt clear in the paper. After all the processing has
+                    # been done on the individual for diversification Im assuming that the individual_in has to be set
+                    # to the resulting individual even if it a worse individual. My reason for this is because it would
+                    # mean tracking multiple states of forbidden flips per formula. if it must only be updated after an
+                    # improvement then an if statement must happen here.
+                    individual_in = temp_individual_in
         return self.best
 
     def choose_rvcf(self, individual_in):

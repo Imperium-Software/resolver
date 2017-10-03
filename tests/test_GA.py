@@ -169,8 +169,6 @@ class TestGA(TestCase):
         # .............................................................................................................
 
     def test_standard_tabu(self):
-
-
         # # # Test 1 - Satisfying assignment Passed - Nothing to intensify..................................................
         # # # An instance of the GA class which will be used to test the standard_tabu function
         # #
