@@ -266,6 +266,8 @@ class GA:
         # Iterate through each of the positions (atoms) of the individual.
         for position in range(1, len(assignment.data) + 1):
             # A copy of the original individual is made and the particular position of the copy is flipped.
+            if position > 102:
+                falseValue = False
             temp = copy.deepcopy(assignment)
             temp.flip(position)
             # If the move is not in the tabu list and the number of unsatisfied clauses in the copy is
@@ -308,8 +310,8 @@ class GA:
         while not (self.evaluate(self.best) == 0) and (self.max_flip > num_flips):
             # index = self.choose(individual_in)
             # Access fault debugging for more then 50 flips
-            if num_flips > 50:
-                break
+            if num_flips > 57:
+                numberBlank = 1
             index = choose_function(individual_in)
             individual_temp = copy.deepcopy(individual_in)
             if not index[0] in self.tabu:
