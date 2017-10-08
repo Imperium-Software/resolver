@@ -144,9 +144,9 @@
 
 	                  <!-- Text CNF Input -->
 	                  <div id='input-cnf-text' class="row" hidden>
-	                    <div class="row">
-	                      <div class="input-field col s12">
-	                        <textarea style='font-family:monospace' id="manual-cnf" class="materialize-textarea"></textarea>
+	                    <div class="row" style="margin-bottom: 0em; margin-top: 0em;">
+	                      <div class="input-field col s11 offset-s2" style="margin-top: 0em; margin-left: 1em;">
+	                        <textarea style='font-family:monospace; margin-bottom: 0em;' id="manual-cnf" class="materialize-textarea"></textarea>
 	                        <label for="textarea1">Manual DIMACS Entry:</label>
 	                      </div>
 	                    </div>
@@ -173,7 +173,7 @@
 	                        </div>
 
 
-	                        <div class="row">
+	                        <div class="row" style="margin-bottom: 0em;">
 	                          <div class="input-field col s6 tooltip">
 	                            <input id="rec" type="number" value=5>
 	                            <label for="rec">Recursion Count (<i>Rec</i>)</label>
@@ -190,10 +190,12 @@
 	                        <!-- Advanced options -->
 
 	                        <div class="modal modal-fixed-footer" id="advanced">
-	                          <div class="modal-content container">
-
+	                          <div class="modal-content">
+	                          	<div class="container">
+	                          		
+	                          	
 	                            <h5>Advanced Settings</h5>
-	                            <div class="row container">
+	                            <div class="row" style="margin-bottom: 0em; margin-top: 0em;">
 	                              <div class="input-field col s6 tooltip">
 	                                <input id="max_generations" type="number">
 	                                <label for="max_generations">Max Generations</label>
@@ -206,7 +208,7 @@
 	                              </div>
 	                            </div>
 
-	                            <div class="row container">
+	                            <div class="row" style="margin-bottom: 0em; margin-top: 0em;">
 	                              <div class="input-field col s6 tooltip">
 	                                <input id="population_size" type="number">
 	                                <label for="population_size">Population Size</label>
@@ -219,19 +221,23 @@
 	                              </div>
 	                            </div>
 
-	                            <div class="row container">
-	                              <div class="input-field col s12 tooltip gray">
+	                            <div class="row" style="margin-bottom: 0em; margin-top: 0em;">
+	                            <div class="col s12">
+	                            	<!-- nice to have tool tips but its causing readability issues -->
+	                              <!-- <div class="input-field tooltip gray SAT-dark-blue"> -->
+	                              <div class="input-field SAT-dark-blue">
 	                                <select id="method">
-	                                <option value="" disabled selected>Method</option>
+	                                <option value="" disabled selected>Implementation method</option>
 	                                <option value="bitvector">BitVector</option>
 	                                <option value="bitarray">bitarray</option>
 	                              </select>
-	                                <span class="tooltiptext">Underlying implementation method.</span>
+	                                <!-- <span class="tooltiptext">Underlying implementation method.</span> -->
 	                              </div>
 	                            </div>
-
-	                            <div class="input-field col s12e">
-	                              <select id="crossover_operator">
+	                            
+	                            <div class="col s12">
+	                            	<div class="input-field  SAT-dark-blue">
+	                              <select id="crossover_operator" style="padding-bottom: 0em; margin-bottom: 0em; border-bottom: 0em;">
 	                                <option value="" disabled selected>Crossover Operator</option>
 	                                <option value="corrective-clause">Corrective Clause</option>
 	                                <option value="cctm">CCTM</option>
@@ -239,17 +245,20 @@
 	                                <option value="uniform">Uniform Crossover</option>
 	                              </select>
 	                            </div>
-	                            <div>
-	                              <div class="input-field col s12">
-	                                <select multiple id='tabu-settings'>
+	                            </div>
+	                            
+	                            <div class="col s12">
+	                              <div class="input-field SAT-dark-blue" >
+	                                <select multiple id='tabu-settings' style="padding-bottom: 0em; margin-bottom: 0em; border-bottom: 0em;">
 	                                  <option value="" disabled selected>Tabu Search Settings</option>
 	                                  <option value="rvcf">> RVCF</option>
 	                                  <option value="diversification">> Diversification</option> <!-- these are not final -->
 	                                </select>
 	                              </div>
 	                            </div>
+	                            </div>
 	                          </div>
-
+	                          </div>
 	                          <div class="modal-footer">
 	                            <a href="#!" class="modal-action modal-close waves-effect btn btn-flat">Close</a>
 	                          </div>

@@ -83,13 +83,27 @@
   	padding: 0rem 1rem;
   }*/
 
-/*  .select-wrapper input.select-dropdown {
+  .select-wrapper input.select-dropdown {
   	border-bottom: none !important;
-  }*/
+  }
+
+  .select-wrapper {
+    padding-left: 1.3em;
+
+  }
+
+  .input-field{
+    padding-left: 1.3em;
+  }
+
+  .select-wrapper span.caret{
+    right: 1.3em;
+  }
 
   .SAT-darkest-blue,
   .dropdown-content {
   	background-color: #1c1e23 !important;
+    padding-bottom: 0em !important; margin-bottom: 0em !important; border-bottom: 0em !important;
   	/*color: white !important;*/
   }
 
