@@ -2,3 +2,4 @@
 node_modules/
 __pycache__/
 .cache/
+docs/_build
