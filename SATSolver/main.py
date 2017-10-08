@@ -1,7 +1,7 @@
 import sys
-from SATSolver.SATController import SATController
+from SATController import SATController
 from optparse import OptionParser
-from SATSolver.server import SATServer
+from server import SATServer
 
 
 default_port = 55555

@@ -1,9 +1,9 @@
 import threading
 import abc
 import time
-from SATSolver.GA import GA
-from SATSolver.GA import GAStop
-from SATSolver.server import BColors
+from GA import GA
+from GA import GAStop
+from server import BColors
 
 
 class SingletonMixin(object):

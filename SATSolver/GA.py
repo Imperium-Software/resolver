@@ -6,7 +6,7 @@
 import copy
 import random
 from decimal import Decimal
-from SATSolver.individual import Individual
+from individual import Individual
 
 
 class GAStop(Exception):
