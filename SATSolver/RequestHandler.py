@@ -4,8 +4,8 @@
 """
 import json
 from threading import Thread
-from SATSolver.SATController import SingletonMixin
-from SATSolver.main import SATController
+from SATController import SingletonMixin
+from main import SATController
 
 
 class RequestHandlerError(Exception):
