@@ -1,13 +1,12 @@
-import sys, os
+import sys
+import os
 myPath = os.path.dirname(os.path.abspath(__file__))
 print(myPath)
 sys.path.insert(0, myPath + '/../SATSolver')
-
-from GA import GA
+from SATSolver.GA import GA
 from unittest import TestCase
-from BitVector import BitVector
-from individual import Individual
-
+from bitarray import bitarray
+from SATSolver.individual import Individual
 
 class TestGA(TestCase):
 
@@ -45,85 +44,104 @@ class TestGA(TestCase):
 
     def test_sat(self):
         ind = Individual(9)
-        ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
+        ind.data = bitarray("000100000")
         self.assertEqual(GA.sat(ind, [9, -5]), True)
         self.assertEqual(GA.sat(ind, [1, 3, 6]), False)
-        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+        ind.data = bitarray("111111111")
         self.assertEqual(GA.sat(ind, [-6, -4]), False)
-
-    def test_sat_crossover(self):
-        ind = Individual(9)
-        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
-        ind.defined = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
-        self.assertEqual(GA.sat_crossover(ind, [9, -5]), False)
-        ind.set_defined(9)
-        self.assertEqual(GA.sat_crossover(ind, [9, -5]), True)
 
     def test_evaluate(self):
         reader = self.FormulaReader("../examples/trivial.cnf")
         ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
         ind = Individual(9)
-        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
-        ind.isCacheValid = False;
+        ind.data = bitarray("111111111")
+        ind.isCacheValid = False
         self.assertEqual(ga.evaluate(ind), 1)
-        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 0])
-        ind.isCacheValid = False;
+        ind.data = bitarray("111111110")
+        ind.isCacheValid = False
         self.assertEqual(ga.evaluate(ind), 2)
-        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 0])
-        ind.isCacheValid = False;
+        ind.data = bitarray("111111110")
+        ind.isCacheValid = False
         self.assertEqual(ga.evaluate(ind), 2)
+
+    def test_evaluate_unsolvable(self):
+        reader = self.FormulaReader("../examples/trivial3.cnf")
+        ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
+        ind = Individual(9)
+        ind.isCacheValid = False
+        self.assertTrue(ga.evaluate(ind) != 0, "Evaluate says unsolvable formula is solved.")
 
     def test_improvement(self):
         reader = self.FormulaReader("../examples/trivial.cnf")
         ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
         ind = Individual(9)
-        ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
+        ind.data = bitarray("000100000")
         self.assertEqual(ga.improvement(ind, 1), 1)
         self.assertEqual(ga.improvement(ind, 6), 1)
         ind.flip(6)
         self.assertEqual(ga.improvement(ind, 6), -1)
 
     def test_corrective_clause(self):
+        # Read the trivial example and create a GA instance
         file_reader = self.FormulaReader("../examples/trivial.cnf")
         ga = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
-        # Creates two parent bitvectors manually.
-        parent1 = Individual(9)
-        parent2 = Individual(9)
-        # for x in range(0, 10):
-            # Seed parent bitvectors.
-            # parent1.data = BitVector(bitlist=[random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1)])
-            # parent2.data = BitVector(bitlist=[random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1), random.randint(0, 1)])
-            # Evaluate parents
-            # par1_eval = ga.evaluate(parent1)
-            # par2_eval = ga.evaluate(parent2)
-
-            # Run corrective clause using set parents.
-            # child = ga.corrective_clause(parent1, parent2)
-            # child_eval = ga.evaluate(child)
-            # Compare child with parents.
-            # self.assertLessEqual(child_eval, par1_eval, "child sucks")
-            # self.assertLessEqual(child_eval, par2_eval, "child sucks")
-
-        #
-        for x in range(0, 10):
-            # Seed parent bitvectors.
-            parent1.data = BitVector(bitlist=[0, 1, 1, 0, 0, 1, 0, 0, 1])
-            parent2.data = BitVector(bitlist=[0, 1, 1, 1, 0, 1, 1, 1, 1])
-            # Evaluate parents
-            par1_eval = ga.evaluate(parent1)
-            par2_eval = ga.evaluate(parent2)
-
-            # Run corrective clause using set parents.
-            child = ga.corrective_clause(parent1, parent2)
-            child_eval = ga.evaluate(child)
-            # Compare child with parents. These will fail on occasion as child will be worse sometimes.
-            # self.assertLessEqual(child_eval, par1_eval, "child less satisfactory")
-            # self.assertLessEqual(child_eval, par2_eval, "child less satisfactory")
-
-        self.assertEqual(1, 1)
+        # Create two individuals for which we know what the outcome should be
+        first_parent = Individual(9)
+        first_parent.data = bitarray("000111000")
+        second_parent = Individual(9)
+        second_parent.data = bitarray("001110000")
+        # Perform crossover to get the child
+        child = ga.corrective_clause(first_parent, second_parent)
+        # Assert that crossover was correctly performed
+        self.assertEqual(child.get(1), 0)
+        self.assertEqual(child.get(2), 0)
+        self.assertEqual(child.get(4), 1)
+        self.assertEqual(child.get(5), 1)
+        self.assertEqual(child.get(7), 0)
+        self.assertEqual(child.get(8), 0)
+        self.assertEqual(child.get(9), 0)
 
     def test_corrective_clause_with_truth_maintenance(self):
-        self.assertEqual(1, 1)
+        # Read the trivial example and create a GA instance
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        ga = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
+        # Create two individuals for which we know what the outcome should be
+        first_parent = Individual(9)
+        first_parent.data = bitarray("000111000")
+        second_parent = Individual(9)
+        second_parent.data = bitarray("001110000")
+        # Perform crossover to get the child
+        child = ga.corrective_clause_with_truth_maintenance(first_parent, second_parent)
+        # Force the truth maintenance code to run by setting bits 3 and 6 to zero
+        # Assert that crossover was correctly performed
+        self.assertEqual(child.get(1), 0)
+        self.assertEqual(child.get(2), 0)
+        # self.assertEqual(child.get(3), 1) # 3 should be set to 1
+        self.assertEqual(child.get(4), 1)
+        self.assertEqual(child.get(5), 1)
+        self.assertEqual(child.get(7), 0)
+        self.assertEqual(child.get(8), 0)
+        self.assertEqual(child.get(9), 0)
+
+    def test_fluerent_and_ferland(self):
+        # Read the trivial example and create a GA instance
+        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        ga = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
+        # Create two individuals for which we know what the outcome should be
+        first_parent = Individual(9)
+        first_parent.data = bitarray("001101011")
+        second_parent = Individual(9)
+        second_parent.data = bitarray("001110111")
+        # Perform crossover to get the child
+        child = ga.fluerent_and_ferland(first_parent, second_parent)
+        # Assert that crossover was correctly performed
+        self.assertEqual(child.get(1), 0)
+        self.assertEqual(child.get(2), 0)
+        self.assertEqual(child.get(3), 1)
+        self.assertEqual(child.get(4), 1)
+        self.assertEqual(child.get(6), 0)
+        self.assertEqual(child.get(8), 1)
+        self.assertEqual(child.get(9), 1)
 
     def test_standard_tabu_choose(self):
         # TEST 1 - All positions are tabu and best is the same as the individual........................................
@@ -139,13 +157,13 @@ class TestGA(TestCase):
         # Creating an individual that will represent the best individual during a tabu search procedure
         ind = Individual(9)
         # Individual is assigned values for variables to overwrite the random initialisation
-        ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
+        ind.data = bitarray("000100000")
         ga_implementation.best = ind
 
         # Creating an individual that will represent another individual for which we want to find best flip for
         ind = Individual(9)
         # Individual is assigned values for variables to overwrite the random initialisation
-        ind.data = BitVector(bitlist=[0, 0, 0, 1, 0, 0, 0, 0, 0])
+        ind.data = bitarray("000100000")
         # A test
         self.assertEqual(ga_implementation.standard_tabu_choose(ind)[1], [1, 2, 4, 6])
         # .............................................................................................................
@@ -160,11 +178,11 @@ class TestGA(TestCase):
             ga_implementation.tabu.append(index)
 
         ind = Individual(3)
-        ind.data = BitVector(bitlist=[1, 1, 1])
+        ind.data = bitarray("111")
         ga_implementation.best = ind
 
         ind = Individual(3)
-        ind.data = BitVector(bitlist=[0, 0, 0])
+        ind.data = bitarray("000")
         self.assertEqual(ga_implementation.standard_tabu_choose(ind)[1], [1, 2, 3])
         # .............................................................................................................
 
@@ -177,27 +195,27 @@ class TestGA(TestCase):
         # Creating an individual that will represent the individual we want to intensify using tabu search
         ind = Individual(9)
         # Individual is assigned values for variables to overwrite the random initialisation
-        ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 1, 1, 1, 1])
+        ind.data = bitarray("000001111")
         # Test whether if a satisfying assignment is passed, then that assignment should be returned as best
         ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
-        self.assertEqual(list(ind.data), list(BitVector(bitlist=[0, 0, 0, 0, 0, 1, 1, 1, 1])))
+        self.assertEqual(list(ind.data), list(bitarray("000001111")))
         # .............................................................................................................
         # Test 2 - Max Number of Flips is Zero..........................................................................
         file_reader = self.FormulaReader("../examples/trivial.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, max_flip=0)
         ind = Individual(9)
-        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+        ind.data = bitarray("111111111")
         ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
-        self.assertEqual(list(ind.data), list(BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])))
+        self.assertEqual(list(ind.data), list(bitarray("111111111")))
         # .............................................................................................................
         # Test 3 - No diversification..................................................................................
         file_reader = self.FormulaReader("../examples/trivial.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, is_diversification=False)
         ind = Individual(9)
-        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+        ind.data = bitarray("111111111")
         ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
-        if (list(ind.data) == list(BitVector(bitlist=[1, 1, 1, 0, 1, 1, 1, 1, 1])) or
-                list(ind.data) == list(BitVector(bitlist=[1, 1, 1, 1, 1, 0, 1, 1, 1]))):
+        if (list(ind.data) == list(bitarray("111011111")) or
+                list(ind.data) == list(bitarray("111110111"))):
             self.assertEqual(1, 1)
         else:
             self.assertEqual(1, 0)
@@ -205,14 +223,15 @@ class TestGA(TestCase):
         # Test 4 - Diversification.....................................................................................
         # ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, is_diversification=True)
         # ind = Individual(9)
-        # ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+        # ind.data = bitarray(1, 1, 1, 1, 1, 1, 1, 1, 1])
         # ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
-        # if (list(ind.data) == list(BitVector(bitlist=[1, 1, 1, 0, 1, 1, 1, 1, 1])) or
-        #         list(ind.data) == list(BitVector(bitlist=[1, 1, 1, 1, 1, 0, 1, 1, 1]))):
+        # if (list(ind.data) == list(bitarray(1, 1, 1, 0, 1, 1, 1, 1, 1])) or
+        #         list(ind.data) == list(bitarray(1, 1, 1, 1, 1, 0, 1, 1, 1]))):
         #     self.assertEqual(1, 1)
         # else:
         #     self.assertEqual(1, 0)
         # .............................................................................................................
+
     def test_choose_rvcf(self):
         # An instance of the GA class which will be used to test the standard_tabu_choose function
         file_reader = self.FormulaReader("../examples/trivial.cnf")
@@ -220,13 +239,13 @@ class TestGA(TestCase):
         # Creating an individual that will represent the best individual during a tabu search procedure
         ind = Individual(9)
         # Individual is assigned values for variables to overwrite the random initialisation
-        ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
+        ind.data = bitarray("000000000")
         # A test
         self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [6])
 
         file_reader = self.FormulaReader("../examples/trivial2.cnf")
         ga_implementation = GA(file_reader.formula, 1, 3, 5, 5, 5, 5)
-        ind.data = BitVector(bitlist=[0, 0, 0])
+        ind.data = bitarray("000")
         self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [1, 2, 3])
 
     def test_weight(self):
@@ -234,17 +253,19 @@ class TestGA(TestCase):
         file_reader = self.FormulaReader("../examples/trivial.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         ind = Individual(9)
-        ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
+        ind.data = bitarray("000000000")
         self.assertEqual(ga_implementation.weight(ind, 4), 1.5)
-        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+        ind.data = bitarray("111111111")
         self.assertEqual(ga_implementation.weight(ind, 4), 1)
+        ind.data = bitarray("111010101")
+        self.assertEqual(ga_implementation.weight(ind, 4), 2)
 
     def test_degree(self):
         ind = Individual(9)
-        ind.data = BitVector(bitlist=[1, 0, 0, 1, 0, 0, 0, 0, 0])
+        ind.data = bitarray("100100000")
         self.assertEqual(GA.degree(ind, [9, -5]), 1)
         self.assertEqual(GA.degree(ind, [1, 3, 6]), 1)
-        ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 1, 1, 0])
+        ind.data = bitarray("000000110")
         self.assertEqual(GA.degree(ind, [7, 8, -3]), 3)
 
     def test_tabu_with_diversification(self):
@@ -258,12 +279,9 @@ class TestGA(TestCase):
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         forbidden_flips = {}
         ind = Individual(9)
-        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+        ind.data = bitarray("111111111")
         ga_implementation.check_flip(ind, ga_implementation.formula[4], forbidden_flips)
-        self.assertEqual(ind.data, BitVector(bitlist=[1, 1, 1, 1, 1, 0, 1, 1, 1]))
-
-    def test_fluerent_and_ferland(self):
-        self.assertEqual(1, 1)
+        self.assertEqual(ind.data, bitarray("111110111"))
 
     def test_select(self):
         self.assertEqual(1, 1)
@@ -275,15 +293,15 @@ class TestGA(TestCase):
         reader = self.FormulaReader("../examples/trivial.cnf")
         ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
         ind = Individual(9)
-        ind.data = BitVector(bitlist=[0, 0, 0, 0, 0, 0, 0, 0, 0])
-        ind.isCacheValid = False;
-        ga.population = [ind for x in range(100)]
+        ind.data = bitarray("000000000")
+        ind.isCacheValid = False
+        ga.population = [ind for _ in range(100)]
 
         # There should not be a satisfiable assignment.
         self.assertIsNone(ga.is_satisfied())
 
-        ga.population[0].data = BitVector(bitlist=[1, 1, 1, 0, 1, 1, 1, 1, 1])
-        ga.population[0].isCacheValid = False;
+        ga.population[0].data = bitarray("111011111")
+        ga.population[0].isCacheValid = False
 
         # Population now has one satisfying assignment.
         self.assertIsNotNone(ga.is_satisfied())

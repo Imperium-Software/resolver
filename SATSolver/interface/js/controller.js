@@ -1,93 +1,114 @@
-let fs = require('fs');
+var fs = require('fs');
 const {
     dialog
 } = require('electron').remote;
 
 function construct_request(type) {
-    var request_string = '{ "command" :';
     var request_string = '';
-    if (type == 'SOLVE') {
+    if (type === 'SOLVE') {
 
-        var request_string = '{ "SOLVE" : {';
+        var dimacs;
 
-        if ($('#cnf-input-method')[0].value == 'file') {
-            let filename = $('#selected-file').prop('files')[0].path;
+        if ($('#cnf-input-method')[0].value === 'file') {
+            var filename = $('#selected-file').prop('files')[0].path;
             dimacs = fs.readFileSync(filename).toString().trim()
         } else {
             dimacs = $('#manual-cnf')[0].value;
         }
 
-        // Mandatory parameters
+        var max_generations_input = $('#max_generations')[0].value;
+        var population_size_input = $('#population_size')[0].value;
+        var sub_population_size_input = $('#sub_population_size')[0].value;
+        var max_flip_input = $('#max_flip')[0].value;
+        var crossover_operator_input = $('#crossover_operator')[0].value;
+        var method_input = $('#method')[0].value;
+        var tabu_settings_input = $('#tabu-settings').val();
 
-        request_string += '"tabu_list_length" : ' + $("#tabu_list_length")[0].value;
-        request_string += ',"max_false" : ' + $("#max_false")[0].value;
-        request_string += ',"rec" : ' + $("#rec")[0].value;
-        request_string += ',"k" : ' + $("#k")[0].value;
+        var request = {
+            "SOLVE": {
+                "raw_input": null,
+                "tabu_list_length": null,
+                "max_false": null,
+                "rec": null,
+                "k": null
+            }
+        };
 
-        // Optional parameters
+        request.SOLVE.tabu_list_length = $("#tabu_list_length")[0].value;
+        request.SOLVE.max_false = $("#max_false")[0].value;
+        request.SOLVE.rec = $("#rec")[0].value;
+        request.SOLVE.k = $("#k")[0].value;
 
-        // Get optional inputs
-
-        let max_generations_input = $('#max_generations')[0].value;
-        let population_size_input = $('#population_size')[0].value;
-        let sub_population_size_input = $('#sub_population_size')[0].value;
-        let max_flip_input = $('#max_flip')[0].method;
-        let crossover_operator_input = $('#crossover_operator')[0].value;
-        let method_input = $('#method')[0].value;
-        let tabu_settings_input = $('#tabu-settings').val();
-
-        if (population_size_input != undefined && population_size_input != '') {
-            request_string += ',"population_size" : ' + population_size_input;
+        if (population_size_input !== undefined && population_size_input !== '') {
+            request.SOLVE["population_size"] = population_size_input;
         }
 
-        if (sub_population_size_input != undefined && sub_population_size_input != '') {
-            request_string += ',"sub_population_size" : ' + sub_population_size_input;
+        if (sub_population_size_input !== undefined && sub_population_size_input !== '') {
+            request.SOLVE["sub_population_size"] = parseInt(sub_population_size_input);
         }
 
-        if (crossover_operator_input != undefined && crossover_operator_input != '') {
-            request_string += ',"crossover_operator" : ' + crossover_operator_input;
+        if (crossover_operator_input !== undefined && crossover_operator_input !== '') {
+            request.SOLVE["crossover_operator"] = parseInt(crossover_operator_input);
         }
 
-        if (max_flip_input != undefined && max_flip_input != '') {
-            request_string += ',"max_flip" : ' + max_flip_input;
+        if (max_flip_input !== undefined && max_flip_input !== '') {
+            request.SOLVE["max_flip"] = parseInt(max_flip_input);
         }
 
-        if (max_generations_input != undefined && max_generations_input != '') {
-            request_string += ',"max_generations" : ' + max_generations_input;
+        if (max_generations_input !== undefined && max_generations_input !== '') {
+            request.SOLVE["max_generations"] = parseInt(max_generations_input);
         }
 
-        if (method_input != undefined && method_input != '') {
-            request_string += ',"method" : "' + method_input + '"';
+        if (method_input !== undefined && method_input !== '') {
+            request.SOLVE["method"] = parseInt(method_input);
         }
 
-        if (tabu_settings_input.indexOf('rvcf') != -1) {
-            request_string += ',"is_rvcf" : true';
-        }
-        
-        if (tabu_settings_input.indexOf('diversification') != -1) {
-            request_string += ',"is_diversification" : true';
+        if (tabu_settings_input.indexOf('rvcf') !== -1) {
+            request.SOLVE["is_rvcf"] = true;
         }
 
-        request_string += ',"raw_input" : [ "' + dimacs.split('\n').join('","') + '"]';
-        request_string = request_string.replace(/(\r\n|\n|\r)/gm,"");
-    } else if (type == 'POLL') {
+        if (tabu_settings_input.indexOf('diversification') !== -1) {
+            request.SOLVE["is_diversification"] = true;
+        }
+
+        request.SOLVE.raw_input = dimacs.split('\n');
+        for (var i = request.SOLVE.raw_input.length-1; i>=0; i--) {
+            if (request.SOLVE.raw_input[i][0] === 'c') {
+                request.SOLVE.raw_input.splice(i, 1);
+            }
+        }
+        request_string = JSON.stringify(request);
+    } else if (type === 'POLL') {
         request_string += "'POLL'";
+    } else if (type === 'STOP') {
+        request = {
+            "STOP": {}
+        };
+        request_string = JSON.stringify(request);
     }
     // Add terminating character.
-    return request_string + '}}#' ;
-    // return '{ "SOLVE" : {"tabu_list_length" : 10,"max_false" : 5,"rec" : 5,"k" : 5,"raw_input" : [ "c FILE: trivial.cnf","c","c DESCRIPTION: Small expression used for testing purposes.","c","c NOTE: Satisfiable by design","c","p cnf 9 5","9 -5 0","1 3 6 0","2 -4 6 0","7 8 -3 0","-6 -4 0"]}}#'
+    return request_string + '#';
 }
 
-function make_request(type, filename) {
+function make_request(type) {
     try {
-        var request = construct_request('SOLVE');
-        console.log(request);
-        conn.write(request);
-        terminal.text = "";
-        error_log.text = "";
+        var request;
+        if (type === 'SOLVE') {
+            reset();
+            request = construct_request('SOLVE');
+            console.log(request);
+            conn.write(request);
+            terminal.text = "";
+            error_log.text = "";
+        } else if (type === 'STOP') {
+            request = construct_request('STOP');
+            console.log(request);
+            conn.write(request);
+        }
     } catch (e) {
         console.log(e);
     }
+    circularHeatChart([[1,0,1,0,1,1,0,1,0]], 10);
 }
 
 //select drowpdowns
@@ -121,15 +142,40 @@ $('#circle').circleProgress({
 function navigate(filename) {
     fs.readFile(filename, 'utf8', (err, data) => {
         document.getElementById('base').innerHTML = data;
-        document.body.classList.add('loaded')
+        document.body.classList.add('loaded');
         $(".button-collapse").sideNav();
         $('select').material_select();
         $('.collapsible').collapsible({
             accordion: true
         });
         $("#advanced").modal();
-        $("#connected-indicator")[0].style.fill = connected ? "lime" : "red";
-        
+        $("#connected-indicator")[0].style.fill = conn.connected ? "lime" : "red";
+
+        // timetable
+        let timetable_ctx = DragTimetable.create($("#timetable")[0], {
+            timeHeaderSize: '150px', // width of the time header column 
+            taskAreaSize: '100px', // width of the task column 
+            quarterHourAreaSize: '15px', // height of a 15 minute segment 
+            hourStart: 8, // starting time of timetable, 0 to 23 
+            hourEnd: 16, // ending time of timetable, 0 to 23 
+            clickThreshold: 200
+        });
+
+        timetable_ctx.addTask({
+            id: 1, // unique id for task 
+            start: 9, // starting time for task 
+            end: 11, // ending time for task 
+            text: 'Important Meeting'
+        }, true);
+
+        timetable_ctx.addTask({
+            id: 2, // unique id for task 
+            start: 11, // starting time for task 
+            end: 12, // ending time for task 
+            text: 'Lecture'
+        }, true);
+
+
         // Progress circle
 
         var new_progress_bar = new ProgressBar.Circle('#progress-circle', {
@@ -139,28 +185,35 @@ function navigate(filename) {
             easing: 'easeInOut',
             duration: 1400,
             text: {
-              autoStyleContainer: true
+                autoStyleContainer: true
             },
-            from: { color: '#0EBFE9', width: 4 },
-            to: { color: '#0EBFE9', width: 4 },
-            step: function(state, circle) {
-              circle.path.setAttribute('stroke', state.color);
-              circle.path.setAttribute('stroke-width', state.width);
-              var value = Math.round(circle.value() * 1000) / 10;
-          
-              if (value === 0) {
-                circle.setText('0');
-              } else {
-                circle.setText(value);
-              }
-          
+            from: {
+                color: '#0EBFE9',
+                width: 4
+            },
+            to: {
+                color: '#0EBFE9',
+                width: 4
+            },
+            step: function (state, circle) {
+                circle.path.setAttribute('stroke', state.color);
+                circle.path.setAttribute('stroke-width', state.width);
+                var value = Math.round(circle.value() * 1000) / 10;
+
+                if (value === 0) {
+                    circle.setText('0');
+                } else {
+                    circle.setText(value);
+                }
+
             }
-          });
-          
+        });
+
         //new_progress_bar.animate(progress_bar)
         new_progress_bar.animate(perc.percentage);
         progress_bar = new_progress_bar;
 
+            
 
         // Re-render percentage
 
@@ -186,32 +239,52 @@ function navigate(filename) {
         });
 
         time_elapsed = new Vue({
-           el: "#time",
+            el: "#time",
             data: {
-             elapsed: time_elapsed.elapsed
+                elapsed: time_elapsed.elapsed
             }
         });
 
-        var fitness = new Vue({
+        var best_individual = new Vue({
             el: "#fitness",
             data: {
-              fitness: 0
+              fitness: 0,
+              individual: null
+            }
+        });
+
+        var current_child = new Vue({
+            data: {
+              fitness: 0,
+              individual: null,
+              array : current_child.array
+
+            }
+        });
+
+        var formula_info = new Vue({
+            el: "#formula-info",
+            data: {
+                num_clauses: 0,
+                num_variables: 0
             }
         });
 
         var generations = new Vue({
             el: "#generations",
             data: {
-              generations: 0,
-              max_generations: 1000
+                generations: 0,
+                max_generations: 1000
             }
         });
+
+        var g
 
     })
 }
 
 function theme_change() {
-    let theme_select = document.getElementById('theme-select');
+    var theme_select = document.getElementById('theme-select');
     switch (theme_select.value) {
         case "tea":
             document.body.style.setProperty("--theme-one", "#364958");
@@ -256,8 +329,8 @@ function theme_change() {
 }
 
 function input_method_change() {
-    let select_box = document.getElementById('cnf-input-method');
-    if (select_box.value == "file") {
+    var select_box = document.getElementById('cnf-input-method');
+    if (select_box.value === "file") {
         $('#input-cnf-file').attr('hidden', false);
         $('#input-cnf-text').attr('hidden', true);
     } else {
@@ -265,3 +338,52 @@ function input_method_change() {
         $('#input-cnf-text').attr('hidden', false);
     }
 }
+
+var fitness_chart = $("#fitness-chart")[0];
+var menu = new Menu();
+menu.append(new MenuItem({
+    label: 'Save Graph To JPG',
+    click: function (e) {
+        dialog.showSaveDialog(function (fileName) {
+            if (fileName !== undefined) {
+                destinationCanvas = document.createElement("canvas");
+                destinationCanvas.width = fitness_chart.width;
+                destinationCanvas.height = fitness_chart.height;
+                destCtx = destinationCanvas.getContext('2d');
+                //create a rectangle with the desired color
+                destCtx.fillStyle = "#FFFFFF";
+                destCtx.fillRect(0,0,fitness_chart.width,fitness_chart.height);
+                //draw the original canvas onto the destination canvas
+                destCtx.drawImage(fitness_chart, 0, 0);
+                var buffer = canvasBuffer(destinationCanvas, 'image/jpg')
+                fs.writeFile(fileName, buffer, function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                })
+            }
+        });
+    }
+}));
+
+menu.append(new MenuItem({
+    label: 'Save Graph To CSV',
+    click: function (e) {
+        dialog.showSaveDialog(function (fileName) {
+            if (fileName !== undefined) {
+                fs.writeFile(fileName + ".best.csv", chart.data["datasets"][0].data, function (err) {
+                    console.log(err);
+                });
+                fs.writeFile(fileName + ".child.csv", chart.data["datasets"][1].data, function (err) {
+                    console.log(err);
+                });
+            }
+        });
+    }
+}));
+
+fitness_chart.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+    menu.popup(remote.getCurrentWindow());
+}, false);
+
