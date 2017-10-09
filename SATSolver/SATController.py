@@ -45,7 +45,7 @@ class SATController(Observer, SingletonMixin):
         self.ga_thread = None
 
     def update(self, arg):
-        from RequestHandler import encode
+        from SATSolver.RequestHandler import encode
         self._generation_count = arg
         encoded_message = encode("PROGRESS", [[self._generation_count, self.GA.max_generations],
                                               [self.time_started],
@@ -99,7 +99,7 @@ class SATController(Observer, SingletonMixin):
                 print(BColors.FAIL + "Could not find a solution in the given amount of generations." + BColors.ENDC)
                 print('The best solution found is: ' + str(result))
             if self.server_thread is not None:
-                from RequestHandler import encode
+                from SATSolver.RequestHandler import encode
                 encoded_message = encode("FINISHED", [
                     result.fitness == 0,
                     result.fitness,
@@ -129,7 +129,7 @@ class SATController(Observer, SingletonMixin):
                 print(BColors.FAIL + "Could not find a solution, solving stopped by client." + BColors.ENDC)
                 print('The best solution found is: ' + str(result))
             if self.server_thread is not None:
-                from RequestHandler import encode
+                from SATSolver.RequestHandler import encode
                 encoded_message = encode("FINISHED", [
                     result.fitness == 0,
                     result.fitness,

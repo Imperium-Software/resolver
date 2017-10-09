@@ -1,4 +1,4 @@
-from server import SATServer
+from SATSolver.server import SATServer
 from threading import Thread
 from time import sleep
 import os

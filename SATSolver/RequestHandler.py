@@ -4,7 +4,7 @@
 """
 import json
 from threading import Thread
-from SATController import SingletonMixin
+from SATSolver.SATController import SingletonMixin
 from SATSolver.main import SATController
 
 
