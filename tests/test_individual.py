@@ -41,24 +41,3 @@ class TestIndividual(TestCase):
         ind.flip(4)
         self.assertEqual(ind.get(4), 1)
 
-    def test_set_defined(self):
-        ind = Individual(9)
-        for x in range(1, 10):
-            self.assertEqual(ind.get_defined(x), False)
-        for x in range(1, 10):
-            ind.set_defined(x)
-            self.assertEqual(ind.get_defined(x), True)
-
-    def test_get_defined(self):
-        ind = Individual(9)
-        for x in range(1, 10):
-            self.assertEqual(ind.get_defined(x), False)
-        for x in range(1, 10):
-            ind.set_defined(x)
-            self.assertEqual(ind.get_defined(x), True)
-
-    def test_allocate(self):
-        ind = Individual(9)
-        ind.allocate(ind, ind)
-        for x in range(1, 10):
-            self.assertEqual(ind.get_defined(x), True)
