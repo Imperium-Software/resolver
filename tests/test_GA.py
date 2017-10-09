@@ -50,14 +50,6 @@ class TestGA(TestCase):
         ind.data = bitarray("111111111")
         self.assertEqual(GA.sat(ind, [-6, -4]), False)
 
-    def test_sat_crossover(self):
-        ind = Individual(9)
-        ind.data = bitarray("111111111")
-        ind.defined = bitarray("000000000")
-        self.assertEqual(GA.sat_crossover(ind, [9, -5]), False)
-        ind.set_defined(9)
-        self.assertEqual(GA.sat_crossover(ind, [9, -5]), True)
-
     def test_evaluate(self):
         reader = self.FormulaReader("../examples/trivial.cnf")
         ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
@@ -83,7 +75,7 @@ class TestGA(TestCase):
         reader = self.FormulaReader("../examples/trivial.cnf")
         ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
         ind = Individual(9)
-        ind.data = bitarray("0001000000")
+        ind.data = bitarray("000100000")
         self.assertEqual(ga.improvement(ind, 1), 1)
         self.assertEqual(ga.improvement(ind, 6), 1)
         ind.flip(6)
@@ -104,7 +96,7 @@ class TestGA(TestCase):
         self.assertEqual(child.get(1), 0)
         self.assertEqual(child.get(2), 0)
         self.assertEqual(child.get(4), 1)
-        self.assertEqual(child.get(5), 0)
+        self.assertEqual(child.get(5), 1)
         self.assertEqual(child.get(7), 0)
         self.assertEqual(child.get(8), 0)
         self.assertEqual(child.get(9), 0)
@@ -126,7 +118,7 @@ class TestGA(TestCase):
         self.assertEqual(child.get(2), 0)
         # self.assertEqual(child.get(3), 1) # 3 should be set to 1
         self.assertEqual(child.get(4), 1)
-        self.assertEqual(child.get(5), 0)
+        self.assertEqual(child.get(5), 1)
         self.assertEqual(child.get(7), 0)
         self.assertEqual(child.get(8), 0)
         self.assertEqual(child.get(9), 0)
@@ -223,7 +215,7 @@ class TestGA(TestCase):
         ind.data = bitarray("111111111")
         ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
         if (list(ind.data) == list(bitarray("111011111")) or
-                list(ind.data) == list(bitarray("111011111"))):
+                list(ind.data) == list(bitarray("111110111"))):
             self.assertEqual(1, 1)
         else:
             self.assertEqual(1, 0)
@@ -289,7 +281,7 @@ class TestGA(TestCase):
         ind = Individual(9)
         ind.data = bitarray("111111111")
         ga_implementation.check_flip(ind, ga_implementation.formula[4], forbidden_flips)
-        self.assertEqual(ind.data, bitarray("111101111"))
+        self.assertEqual(ind.data, bitarray("111110111"))
 
     def test_select(self):
         self.assertEqual(1, 1)
