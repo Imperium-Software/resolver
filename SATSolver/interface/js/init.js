@@ -148,10 +148,10 @@ conn.on('data', function(data) {
         }
 
         if (progressArray["CURRENT_CHILD"] !== "None") {
-            new_child = progressArray["CURRENT_CHILD"][0].split('').map((item) => {
+            new_child = progressArray["TRUE_CLAUSES_CURRENT_CHILD"][0].split('').map((item) => {
                 return parseInt(item, 10);
             });
-            new_best = progressArray["BEST_INDIVIDUAL"][0].split('').map((item) => {
+            new_best = progressArray["TRUE_CLAUSES_BEST_INDIVIDUAL"][0].split('').map((item) => {
                 return parseInt(item, 10);
             });
             current_child.array[0].push.apply(current_child.array[0], new_child);
@@ -159,7 +159,7 @@ conn.on('data', function(data) {
             $("#child-chart").html('');
             $("#best-chart").html('');
 
-            // Data culling 
+            // Data culling
 
             if (current_child.array[0].length > 10*new_child.length) {
                 current_child.array[0] = current_child.array[0].slice(-10*new_child.length);
@@ -211,6 +211,8 @@ conn.on('data', function(data) {
         answer.removeClass('hide');
         answer.html(finishedArray["INDIVIDUAL"]);
 
+        console.log(current_child.array[0]);
+        console.log(best_individual.array[0]);
 
       } catch(e) {
         $("#connected-indicator")[0].style.fill = "yellow";
@@ -358,6 +360,8 @@ function reset() {
 function circularHeat(child_data, best_data, numSegments) {
     let chart = circularHeatChart(numSegments).range(["white",
     getComputedStyle(document.body).getPropertyValue('--theme-four')]);
+    console.log(child_data);
+    console.log(best_data);
     d3.select('#child-chart').selectAll('svg').data(child_data).enter().append('svg').call(chart);
     d3.select('#best-chart').selectAll('svg').data(best_data).enter().append('svg').call(chart);
 }

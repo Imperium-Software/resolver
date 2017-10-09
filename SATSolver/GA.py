@@ -146,6 +146,20 @@ class GA:
         individual.fitness = num_unsatisfied_clauses
         return num_unsatisfied_clauses
 
+    def true_clauses(self, individual):
+        """
+        The function returns a string of zeros and ones indicating which clauses are true and false.
+
+        :return: string of zeros and ones.
+        """
+        return_string = ''
+        for clause in self.formula:
+            if self.sat(individual, clause):
+                return_string += str(1)
+            else:
+                return_string += str(0)
+        return return_string
+
     def improvement(self, individual, index):
         """
         The function computes the improvement (difference in unsatisfiable clauses) obtained by the flip of the ith
@@ -370,24 +384,41 @@ class GA:
         :return: The weight value.
         """
 
-        c_ones = [clause for clause in self.formula if (index in clause or -index in clause) and
-                  (individual.get(index) == 1)]
-        c_zeros = [clause for clause in self.formula if (index in clause or -index in clause) and
-                   (individual.get(index) == 0)]
+        # Truth values aren't being considered only actual values. I.E. -index in clause must be == 0 to be added to the
+        # c_ones list of tuples as per the paper page 13: "val(X; a) is the truth value of the literal a for the
+        # assignment X", which is further supported up by the truth degree function depending on the number of true
+        # atoms in the clause as it doesnt make sense to evaluate the truth degree for clauses where a negated index
+        # equates to a false clause, it also means that as it stands the other list (c_zeros) will always be empty.
+
+        # c_ones = [clause for clause in self.formula if (index in clause or -index in clause) and
+        #           (individual.get(abs(index)) == 1)]
+        # c_zeros = [clause for clause in self.formula if (index in clause or -index in clause) and
+        #            (individual.get(abs(index)) == 0)]
+
+        c_ones = [clause for clause in self.formula
+                  if (index in clause and individual.get(abs(index)) == 1)
+                  or (-index in clause and individual.get(abs(index)) == 0)]
+        c_zeros = [clause for clause in self.formula
+                   if (index in clause and individual.get(abs(index)) == 0)
+                   or (-index in clause and individual.get(abs(index)) == 1)]
 
         length_c_ones = len(c_ones)
         length_c_zeros = len(c_zeros)
 
-        sum_ones = sum(self.degree(individual, c) for c in c_ones)
-        sum_zeros = sum(self.degree(individual, c) for c in c_zeros)
+        # moved this into if statements to reduce computation that might not be needed as I dont know if
+        # short circuiting applies
+        # sum_ones = sum(self.degree(individual, c) for c in c_ones)
+        # sum_zeros = sum(self.degree(individual, c) for c in c_zeros)
 
         # To cater for the case where the length is 0
         ratio_ones = 0
         ratio_zeros = 0
         if length_c_ones > 0:
+            sum_ones = sum(self.degree(individual, c) for c in c_ones)
             ratio_ones = sum_ones / length_c_ones
 
         if length_c_zeros > 0:
+            sum_zeros = sum(self.degree(individual, c) for c in c_zeros)
             ratio_zeros = sum_zeros / length_c_zeros
 
         return ratio_ones + ratio_zeros
@@ -402,16 +433,21 @@ class GA:
         :return: A numerical value representing the degree.
         """
 
-        list_of_literals = []
+        #can this not just use a simple int counter variable?
+        # list_of_literals = []
+        degree = 0
         for literal in clause:
             if literal > 0:
                 if individual.get(literal) == 1:
-                    list_of_literals.append(literal)
+                    # list_of_literals.append(literal)
+                    degree += 1
             else:
                 if individual.get(abs(literal)) == 0:
-                    list_of_literals.append(literal)
+                    # list_of_literals.append(literal)
+                    degree += 1
 
-        return len(list_of_literals)
+        # return len(list_of_literals)
+        return degree
 
     def tabu_with_diversification(self, individual):
         """
@@ -601,4 +637,5 @@ class GA:
     @generation_counter.setter
     def generation_counter(self, arg):
         self._generation_counter = arg
-        self._notify()
+        if arg > 0:
+            self._notify()

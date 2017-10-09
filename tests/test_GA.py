@@ -3,10 +3,10 @@ import os
 myPath = os.path.dirname(os.path.abspath(__file__))
 print(myPath)
 sys.path.insert(0, myPath + '/../SATSolver')
-from GA import GA
+from SATSolver.GA import GA
 from unittest import TestCase
 from BitVector import BitVector
-from individual import Individual
+from SATSolver.individual import Individual
 
 class TestGA(TestCase):
 
@@ -265,6 +265,8 @@ class TestGA(TestCase):
         self.assertEqual(ga_implementation.weight(ind, 4), 1.5)
         ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
         self.assertEqual(ga_implementation.weight(ind, 4), 1)
+        ind.data = BitVector(bitlist=[1, 1, 1, 0, 1, 0, 1, 0, 1])
+        self.assertEqual(ga_implementation.weight(ind, 4), 2)
 
     def test_degree(self):
         ind = Individual(9)
