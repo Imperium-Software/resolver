@@ -245,8 +245,17 @@ h5>small {
   width: 92%;
 }
 
-.top-bot-pad
-{
+.top-bot-pad {
   padding-top: 1em;
   padding-bottom: 1em;
+}
+
+.dragtimetable-spacer>div {
+    background-color: var(--theme-four);
+    border-radius: 10%;
+    color : white;
+}
+
+.dragtimetable-table {
+    width: 80%;
 }

@@ -3,6 +3,7 @@ const net = require('net');
 const remote =  require('electron').remote;
 const ProgressBar = require('progressbar.js');
 const canvasBuffer = require('electron-canvas-to-buffer');
+const DragTimetable = require('drag-timetable');
 
 const {
   Menu,
