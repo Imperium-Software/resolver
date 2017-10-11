@@ -9,5 +9,6 @@
   "test_SATServer.py::TestSATServer::test_push_to_all": true,
   "test_SATServer.py::TestSATServer::test_push_to_one": true,
   "test_factory.py": true,
-  "test_individual.py": true
+  "test_individual.py": true,
+  "test_integration.py::IntegrationTests::test_request_chain": true
 }
