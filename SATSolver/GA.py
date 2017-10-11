@@ -13,6 +13,14 @@ class GAStop(Exception):
     """This exception should be raised when GA should stop"""
 
 
+class InputError(Exception):
+    """This exception should be raised when invalid input parameters are provided
+    i.e. don't meet constraints for input."""
+
+    def __init__(self, arg):
+        self.args = arg
+
+
 class GA:
     def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length=None, max_false=5, rec=10,
                  k=None, max_generations=1000, population_size=100, sub_population_size=15, crossover_operator=0,
@@ -22,22 +30,46 @@ class GA:
         self.numberOfClauses = int(number_of_clauses)
         self.numberOfVariables = int(number_of_variables)
         # Creating member variables for each of the parameters
+        if not max_generations > 1:
+            raise InputError("Input Error: max_generations > 1. \nExiting Program ...")
         self.max_generations = int(max_generations)
+        if not population_size > 0:
+            raise InputError("Input Error: population_size > 0. \nExiting Program ...")
         self.population_size = int(population_size)
+        if not sub_population_size > 0 or not sub_population_size <= population_size:
+            raise InputError("Input Error: population_size >= sub_population_size > 0. \nExiting Program ...")
         self.sub_population_size = int(sub_population_size)
+        if crossover_operator not in [0, 1, 2]:
+            raise InputError("Input Error: crossover_operator element of {0,1,2}. \nExiting Program ...")
         self.crossover_operator = int(crossover_operator)
         if tabu_list_length is None:
             # If no value specified - default value of 10% of number of variables.
             tabu_list_length = int(10.0/100.0 * number_of_variables)
+        else:
+            if not tabu_list_length > 0:
+                raise InputError("Input Error: tabu_list_length > 0. \nExiting Program ...")
         self.tabu_list_length = int(tabu_list_length)
+        if not max_flip > 0:
+            raise InputError("Input Error: max_flips > 0. \nExiting Program ...")
         self.max_flip = int(max_flip)
+        if is_rvcf not in [0, 1]:
+            raise InputError("Input Error: is_rvcf element of {0,1}. \nExiting Program ...")
         self.is_rvcf = bool(is_rvcf)
+        if is_diversification not in [0, 1]:
+            raise InputError("Input Error: is_diversification element of {0,1}. \nExiting Program ...")
         self.is_diversification = bool(is_diversification)
+        if not max_false > 0:
+            raise InputError("Input Error: max_false > 0. \nExiting Program ...")
         self.max_false = int(max_false)
+        if not rec > 0:
+            raise InputError("Input Error: rec > 0. \nExiting Program ...")
         self.rec = int(rec)
         if k is None:
             # If no value specified - default value of 10% of number of variables.
             k = int(10.0/100.0 * number_of_variables)
+        else:
+            if not k > 0:
+                raise InputError("Input Error: k > 0. \nExiting Program ...")
         self.k = int(k)
         self._observers = set()
         self._generation_counter = None

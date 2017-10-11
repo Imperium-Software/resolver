@@ -2,6 +2,7 @@ import sys
 from SATController import SATController
 from optparse import OptionParser
 from server import SATServer
+from GA import InputError
 
 
 default_port = 55555
@@ -56,11 +57,13 @@ def main(argv):
         parser.add_option("--max-flip", dest="max_flip", type="int",
                           help="The maximum number of flips that can be performed during a tabu search procedure.",
                           metavar="<max flip>")
-        parser.add_option("--rvcf", dest="is_rvcf", type="string",
+        parser.add_option("--rvcf", dest="is_rvcf", type="int",
                           help="Refinement of variable choice to flip - "
-                               "using weight criterion to choose a better variable to flip.")
-        parser.add_option("--diversification", dest="is_diversification", type="string",
-                          help="A mechanism to help flip the last few stubborn false clauses.")
+                               "using weight criterion to choose a better variable to flip - "
+                               "0 for False; 1 for True.")
+        parser.add_option("--diversification", dest="is_diversification", type="int",
+                          help="A mechanism to help flip the last few stubborn false clauses -  "
+                               "0 for False; 1 for True.")
 
         (options, args) = parser.parse_args()
         options = vars(options)
@@ -70,12 +73,20 @@ def main(argv):
             controller.server_thread.start()
         f = open(options['file'], "r")
         formula, number_of_variables, number_of_clauses = controller.parse_formula(f.readlines())
+        port_number = options['port']
         del options['port']
         del options['file']
         options['formula'] = formula
         options['number_of_variables'] = number_of_variables
         options['number_of_clauses'] = number_of_clauses
-        controller.create_ga(options)
+        try:
+            controller.create_ga(options)
+        except InputError as ie:
+            print("".join(ie.args))
+            if port_number is not None:
+                # Close Server
+                pass
+            return
         controller.start_ga()
 
 
