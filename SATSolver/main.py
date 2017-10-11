@@ -17,7 +17,7 @@ def main(argv):
         And finally returns the exit code
     """
     controller = SATController.instance()
-    from SATSolver.RequestHandler import decode
+    from RequestHandler import decode
 
     if len(argv) == 0:
         # Start the interface
