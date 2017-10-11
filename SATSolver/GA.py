@@ -46,7 +46,7 @@ class GA:
             # If no value specified - default value of 10% of number of variables.
             tabu_list_length = int(10.0/100.0 * number_of_variables)
         else:
-            if not tabu_list_length > 0:
+            if not int(tabu_list_length) > 0:
                 raise InputError("Input Error: tabu_list_length > 0. \nExiting Program ...")
         self.tabu_list_length = int(tabu_list_length)
         if not max_flip > 0:
@@ -58,17 +58,17 @@ class GA:
         if is_diversification not in [0, 1]:
             raise InputError("Input Error: is_diversification element of {0,1}. \nExiting Program ...")
         self.is_diversification = bool(is_diversification)
-        if not max_false > 0:
+        if not int(max_false) > 0:
             raise InputError("Input Error: max_false > 0. \nExiting Program ...")
         self.max_false = int(max_false)
-        if not rec > 0:
+        if not int(rec) > 0:
             raise InputError("Input Error: rec > 0. \nExiting Program ...")
         self.rec = int(rec)
         if k is None:
             # If no value specified - default value of 10% of number of variables.
             k = int(10.0/100.0 * number_of_variables)
         else:
-            if not k > 0:
+            if not int(k) > 0:
                 raise InputError("Input Error: k > 0. \nExiting Program ...")
         self.k = int(k)
         self._observers = set()
