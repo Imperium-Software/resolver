@@ -14,8 +14,8 @@ class GAStop(Exception):
 
 
 class GA:
-    def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length, max_false, rec, k,
-                 max_generations=1000, population_size=100, sub_population_size=15, crossover_operator=0,
+    def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length=None, max_false=5, rec=10,
+                 k=None, max_generations=1000, population_size=100, sub_population_size=15, crossover_operator=0,
                  max_flip=10000, is_rvcf=False, is_diversification=False):
 
         self.formula = formula
@@ -26,12 +26,18 @@ class GA:
         self.population_size = int(population_size)
         self.sub_population_size = int(sub_population_size)
         self.crossover_operator = int(crossover_operator)
+        if tabu_list_length is None:
+            # If no value specified - default value of 10% of number of variables.
+            tabu_list_length = int(10.0/100.0 * number_of_variables)
         self.tabu_list_length = int(tabu_list_length)
         self.max_flip = int(max_flip)
         self.is_rvcf = bool(is_rvcf)
         self.is_diversification = bool(is_diversification)
         self.max_false = int(max_false)
         self.rec = int(rec)
+        if k is None:
+            # If no value specified - default value of 10% of number of variables.
+            k = int(10.0/100.0 * number_of_variables)
         self.k = int(k)
         self._observers = set()
         self._generation_counter = None
