@@ -5,7 +5,6 @@ print(myPath)
 sys.path.insert(0, myPath + '/../SATSolver')
 from GA import GA
 from unittest import TestCase
-from BitVector import BitVector
 from individual import Individual
 
 class TestGA(TestCase):
@@ -306,7 +305,7 @@ class TestGA(TestCase):
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         ga_implementation.tabu = [0, 0, 0, 0, 5]
         ind = Individual(9)
-        ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+        ind.data = bitarray("111111111")
         ga_implementation.tabu_with_diversification(ind)
 
         self.assertEqual(1, 1)
