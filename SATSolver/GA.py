@@ -51,7 +51,6 @@ class GA:
         # TODO: Check that length is not greater than the population length
         if crossover_operator not in [0, 1, 2]:
             raise InputError("Input Error: crossover_operator element of {0,1,2}.")
-        self.crossover_operator = int(crossover_operator)
         if tabu_list_length is None:
             # If no value specified - default value of 10% of number of variables.
             tabu_list_length = int(10.0/100.0 * number_of_variables)
