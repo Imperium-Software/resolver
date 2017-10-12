@@ -6,6 +6,8 @@ sys.path.insert(0, myPath + '/../SATSolver')
 from GA import GA
 from unittest import TestCase
 from individual import Individual
+from bitarray import bitarray
+
 
 class TestGA(TestCase):
 
