@@ -27,204 +27,286 @@
     </ul>
     <nav class="navbar-fixed">
       <div class="nav-wrapper nav-bar">
-        <div class='row'>
-          <button data-activates="slide-out" class="btn button-collapse"><b>SAT</b>Home</button>
-          <div class="right">
-            <svg height=20 width=20>
-              <circle cx=10 cy=10 class="right" id="connected-indicator" r=4 fill="red" />
-            </svg>
+        <div class='row valign-wrapper'>
+          <div class="col s3">
+          	<button data-activates="slide-out" class="btn button-collapse"><b>SAT</b>Home</button>
           </div>
-          <div class="container right" id="progress-circle"></div>
+          <div class="col s3 offset-s6">
+          	<div class="right">
+	            <svg height=20 width=20>
+	              <circle cx=10 cy=10 class="right" id="connected-indicator" r=4 fill="red" />
+	            </svg>
+          	</div>
+          	<div class="container right" id="progress-circle"></div>
+          </div>
         </div>
       </div>
     </nav>
     <br>
-    <div class="container">
-      <div class="card">
-        <br>
-        <div class="container">
-          <ul class="collapsible z-depth-0" data-collapsible="accordion">
-            <li class="page-item">
-              <div class="collapsible-header collapsible-header-odd">
-                <div class="container">Setup</div>
-              </div>
-              <div class="collapsible-body" align='center'>
-                <form class="col s12 body-container">
-                  <div class="input-field col s12 SAT-dark-blue">
-                    <select id='cnf-input-method' onchange="input_method_change()">
-                        <option value="" disabled selected>Source</option>
-                        <option value="file">File</option>
-                        <option value="text">Text</option>
-                      </select>
-                  </div>
+    <div class="row">
+    	<div class="container col s10 offset-s1">
+	      <div class="col s12 l6"">
+	      	<div class="card" id="progress">
+	        <br>
+	        <div class="container">
+	          <h4>Progress</h4>
+	          <hr>
+	          <div id="status" class="row hide">
+	            <div class="col s12">
+	              <h5 id="status-title" class="success"></h5>
+	            </div>
+	          </div>
+	          <div class="row">
+	            <div class="col s6">
+	              <label for="time">time elapsed</label>
+	              <h4 id="time">{{elapsed}}</h4>
+	            </div>
+	            <div class="col s6">
+	              <label for="generations">generations</label>
+	              <h5 id="generations">{{generations}}/{{max_generations}}</h5>
+	            </div>
+	          </div>
+	          <div class="row">
+	            <div class="col s6">
+	              <label for="formula-info">formula information</label>
+	              <div id="formula-info">
+	                <h5>{{num_clauses}}<small> clauses</small></h5>
+	                <h5>{{num_variables}}<small> variables</small></h5>
+	              </div>
+	            </div>
+	            <div class="col s6">
+	              <label for="fitness">fittest individual</label>
+	              <h5 id="fitness">{{fitness}}<small> unsolved clauses</small></h5>
+	            </div>
+	          </div>
+	          <div class="row">
+	          	<div class="col s12">
+	            <div id="chart-container">
+	              <canvas style="background-color: white" id="fitness-chart"></canvas>
+	            </div>
+	            </div>
+	          </div>
 
-                  <!-- File CNF Input -->
-                  <div id='input-cnf-file' class="file-field input-field" hidden>
-                    <div class="btn">
-                      <span>File</span>
-                      <input id='selected-file' type="file">
-                    </div>
-                    <div class="file-path-wrapper">
-                      <input class="file-path validate" type="text">
-                    </div>
-                  </div>
+	          <div class="row">
+	            <div class="col s6" id="child-chart"></div>
+	            <div class="col s6" id="best-chart"></div>
+	          </div>
 
-                  <!-- Text CNF Input -->
-                  <div id='input-cnf-text' class="row" hidden>
-                    <div class="row">
-                      <div class="input-field col s12">
-                        <textarea style='font-family:monospace' id="manual-cnf" class="materialize-textarea"></textarea>
-                        <label for="textarea1">Manual DIMACS Entry:</label>
-                      </div>
-                    </div>
-                  </div>
+	          <div class="input-field row">
+	            <h5>Solution:</h5>
+	            <p id="answer" class="hide left-align"></p>
+	          </div>
+	          <div class="row">
+	            <div class="col s4 offset-s8">
+	              <button class="btn" onclick="make_request('STOP')">Stop</button>
+	            </div>
+	          </div>
+	          <br/>
+	        </div>
+	       
+	      </div>
+	      </div>
+	       <br/>
+	    	<div class="col s12 l5 offset-l1">
+	      <div class="card" id="main-card">
+	         <!-- this is the moved form to attemtp to fix styling -->
+	         <form>
+	        <div class="container container-over top-bot-pad">
+	          <ul class="collapsible setup z-depth-0" style="margin: 0;" data-collapsible="accordion">
+	            <li class="page-item active">
+	              <div class="collapsible-header collapsible-header-odd active">
+	                <div class="container container-over">Setup</div>
+	              </div>
+	              <div class="collapsible-body" align='center' style="display: block">
+	                <!-- moved this - it is breaking the styling for some reason -->
+	                <!-- <form class="col s12 body-container" > -->
+	                <div class="input-field SAT-dark-blue">
+	                    <div>
+	                    <select id='cnf-input-method' onchange="input_method_change()">
+	                        <option value="" disabled selected>Source</option>
+	                        <option value="file">File</option>
+	                        <option value="text">Text</option>
+	                	</select>
+	                	</div>
+	                </div>
+	                  <!-- File CNF Input -->
+	                  <div id='input-cnf-file' class="file-field input-field" hidden>
+	                    <div class="btn">
+	                      <span>File</span>
+	                      <input id='selected-file' type="file">
+	                    </div>
+	                    <div class="file-path-wrapper">
+	                      <input class="file-path validate" type="text">
+	                    </div>
+	                  </div>
 
-                  <ul class="collapsible" data-collapsible="accordion">
-                    <li>
-                      <div class="collapsible-header">Hyper-parameters</div>
-                      <div class="collapsible-body">
-
-
-                        <div class="row">
-                          <div class="input-field col s6 tooltip">
-                            <input id="tabu_list_length" type="number" value=10>
-                            <label for="tabu_list_length">Tabu List Length</label>
-                            <span class="tooltiptext">The length of the algorithm's "memory".</span>
-                          </div>
-
-                          <div class="input-field col s6 tooltip">
-                            <input id="max_false" type="number" value=5>
-                            <label for="max_false">Max False</label>
-                            <span class="tooltiptext">How many times a clause must be false to be considered a "stumble-clause".</span>
-                          </div>
-                        </div>
-
-
-                        <div class="row">
-                          <div class="input-field col s6 tooltip">
-                            <input id="rec" type="number" value=5>
-                            <label for="rec">Recursion Count (<i>Rec</i>)</label>
-                            <span class="tooltiptext">The amount the algorithm is allowed to recurse.</span>
-                          </div>
-
-                          <div class="input-field col s6 tooltip">
-                            <input id="k" type="number" value=5>
-                            <label for="k">Flip Constraint (<i>K</i>)</label>
-                            <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
-                          </div>
-                        </div>
-
-                        <!-- Advanced options -->
-
-                        <div class="modal modal-fixed-footer" id="advanced">
-                          <div class="modal-content container">
-
-                            <h5>Advanced Settings</h5>
-                            <div class="row container">
-                              <div class="input-field col s6 tooltip">
-                                <input id="max_generations" type="number">
-                                <label for="max_generations">Max Generations</label>
-                                <span class="tooltiptext">The maximum number of times evolution will iterate.</span>
-                              </div>
-                              <div class="input-field col s6 tooltip">
-                                <input id="max_flip" type="number">
-                                <label for="max_flip">Max Flips</label>
-                                <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
-                              </div>
-                            </div>
-
-                            <div class="row container">
-                              <div class="input-field col s6 tooltip">
-                                <input id="population_size" type="number">
-                                <label for="population_size">Population Size</label>
-                                <span class="tooltiptext">The maximum number of individuals at any given time.</span>
-                              </div>
-                              <div class="input-field col s6 tooltip">
-                                <input id="sub_population_size" type="number">
-                                <label for="sub_population_size">Sub-population Size</label>
-                                <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
-                              </div>
-                            </div>
-                            
-                            <div class="row container">
-                            <div class="input-field col s12 tooltip gray">
-                              <select id="method">
-                                <option value="" disabled selected>Method</option>
-                                <option value="bitvector">BitVector</option>
-                                <option value="bitarray">bitarray</option>
-                              </select>
-                              <span class="tooltiptext">Underlying implementation method.</span>
-                            </div>
-                            </div>
-
-                            <div class="input-field col s12e">
-                              <select id="crossover_operator">
-                                <option value="" disabled selected>Crossover Operator</option>
-                                <option value="corrective-clause">Corrective Clause</option>
-                                <option value="cctm">CCTM</option>
-                                <option value="fleurent-and-ferland">Fleurent and Ferland</option>
-                                <option value="uniform">Uniform Crossover</option>
-                              </select>
-                            </div>
-                            <div>
-                              <div class="input-field col s12">
-                                <select multiple id='tabu-settings'>
-                                  <option value="" disabled selected>Tabu Search Settings</option>
-                                  <option value="rvcf">> RVCF</option>
-                                  <option value="diversification">> Diversification</option> <!-- these are not final -->
-                                </select>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="modal-footer">
-                              <a href="#!" class="modal-action modal-close waves-effect btn btn-flat">Close</a>
-                          </div>
-
-                        </div>
-
-                        <a class="btn modal-trigger" href="#advanced">Advanced Settings</a>
-                      </div>
-                    </li>
-                  </ul>
-                  <button onclick='make_request(); return false' class='btn'>Start</button>
-                </form>
-              </div>
-            </li>
-            <li class="page-item">
-              <div class="collapsible-header">
-                <div class="container">Command Line Readout</div>
-              </div>
-              <div class="collapsible-body">
-                <div class="body-container"><textarea id="term" class='terminal' readonly="true">{{text}}</textarea></div>
-              </div>
-            </li>
-            <li class="page-item">
-              <div class="collapsible-header collapsible-header-odd">
-                <div class="container">Error Log</div>
-              </div>
-              <div class="collapsible-body">
-                <div class="body-container">
-                  <textarea id='err' class='terminal' readonly="true">{{text}}</textarea>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <br>
-      </div>
+	                  <!-- Text CNF Input -->
+	                  <div id='input-cnf-text' class="row" hidden>
+	                    <div class="row" style="margin-bottom: 0em; margin-top: 0em;">
+	                      <div class="input-field col s11 offset-s2" style="margin-top: 0em; margin-left: 1em;">
+	                        <textarea style='font-family:monospace; margin-bottom: 0em;' id="manual-cnf" class="materialize-textarea"></textarea>
+	                        <label for="textarea1">Manual DIMACS Entry:</label>
+	                      </div>
+	                    </div>
+	                  </div>
+	                  <div>
+	                  <ul class="collapsible" data-collapsible="accordion">
+	                    <li>
+	                      <div class="collapsible-header">Hyper-parameters</div>
+	                      <div class="collapsible-body">
 
 
+	                        <div class="row">
+	                          <div class="input-field col s6 tooltip">
+	                            <input id="tabu_list_length" type="number" value=10>
+	                            <label for="tabu_list_length">Tabu List Length</label>
+	                            <span class="tooltiptext">The length of the algorithm's "memory".</span>
+	                          </div>
 
+	                          <div class="input-field col s6 tooltip">
+	                            <input id="max_false" type="number" value=5>
+	                            <label for="max_false">Max False</label>
+	                            <span class="tooltiptext">How many times a clause must be false to be considered a "stumble-clause".</span>
+	                          </div>
+	                        </div>
+
+
+	                        <div class="row" style="margin-bottom: 0em;">
+	                          <div class="input-field col s6 tooltip">
+	                            <input id="rec" type="number" value=5>
+	                            <label for="rec">Recursion Count (<i>Rec</i>)</label>
+	                            <span class="tooltiptext">The amount the algorithm is allowed to recurse.</span>
+	                          </div>
+
+	                          <div class="input-field col s6 tooltip">
+	                            <input id="k" type="number" value=5>
+	                            <label for="k">Flip Constraint (<i>K</i>)</label>
+	                            <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
+	                          </div>
+	                        </div>
+
+	                        <!-- Advanced options -->
+
+	                        <div class="modal modal-fixed-footer" id="advanced">
+	                          <div class="modal-content">
+	                          	<div class="container">
+	                          		
+	                          	
+	                            <h5>Advanced Settings</h5>
+	                            <div class="row" style="margin-bottom: 0em; margin-top: 0em;">
+	                              <div class="input-field col s6 tooltip">
+	                                <input id="max_generations" type="number">
+	                                <label for="max_generations">Max Generations</label>
+	                                <span class="tooltiptext">The maximum number of times evolution will iterate.</span>
+	                              </div>
+	                              <div class="input-field col s6 tooltip">
+	                                <input id="max_flip" type="number">
+	                                <label for="max_flip">Max Flips</label>
+	                                <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
+	                              </div>
+	                            </div>
+
+	                            <div class="row" style="margin-bottom: 0em; margin-top: 0em;">
+	                              <div class="input-field col s6 tooltip">
+	                                <input id="population_size" type="number">
+	                                <label for="population_size">Population Size</label>
+	                                <span class="tooltiptext">The maximum number of individuals at any given time.</span>
+	                              </div>
+	                              <div class="input-field col s6 tooltip">
+	                                <input id="sub_population_size" type="number">
+	                                <label for="sub_population_size">Sub-population Size</label>
+	                                <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
+	                              </div>
+	                            </div>
+
+	                            <div class="row" style="margin-bottom: 0em; margin-top: 0em;">
+	                            <div class="col s12">
+	                            	<!-- nice to have tool tips but its causing readability issues -->
+	                              <!-- <div class="input-field tooltip gray SAT-dark-blue"> -->
+	                              <div class="input-field SAT-dark-blue">
+	                                <select id="method">
+	                                <option value="" disabled selected>Implementation method</option>
+	                                <option value="bitvector">BitVector</option>
+	                                <option value="bitarray">bitarray</option>
+	                              </select>
+	                                <!-- <span class="tooltiptext">Underlying implementation method.</span> -->
+	                              </div>
+	                            </div>
+	                            
+	                            <div class="col s12">
+	                            	<div class="input-field  SAT-dark-blue">
+	                              <select id="crossover_operator" style="padding-bottom: 0em; margin-bottom: 0em; border-bottom: 0em;">
+	                                <option value="" disabled selected>Crossover Operator</option>
+	                                <option value="corrective-clause">Corrective Clause</option>
+	                                <option value="cctm">CCTM</option>
+	                                <option value="fleurent-and-ferland">Fleurent and Ferland</option>
+	                                <option value="uniform">Uniform Crossover</option>
+	                              </select>
+	                            </div>
+	                            </div>
+	                            
+	                            <div class="col s12">
+	                              <div class="input-field SAT-dark-blue" >
+	                                <select multiple id='tabu-settings' style="padding-bottom: 0em; margin-bottom: 0em; border-bottom: 0em;">
+	                                  <option value="" disabled selected>Tabu Search Settings</option>
+	                                  <option value="rvcf">> RVCF</option>
+	                                  <option value="diversification">> Diversification</option> <!-- these are not final -->
+	                                </select>
+	                              </div>
+	                            </div>
+	                            </div>
+	                          </div>
+	                          </div>
+	                          <div class="modal-footer">
+	                            <a href="#!" class="modal-action modal-close waves-effect btn btn-flat">Close</a>
+	                          </div>
+
+	                        </div>
+
+	                        <a class="btn modal-trigger" href="#advanced">Advanced Settings</a>
+	                      </div>
+	                    </li>
+	                  </ul>
+	              	  </div>
+	                  <button onclick='make_request("SOLVE"); return false' class='btn'>Start</button>
+	                <!-- </form> -->
+	              </div>
+	            </li>
+	            <li class="page-item">
+	              <div class="collapsible-header">
+	                <div class="container container-over">Command Line Readout</div>
+	              </div>
+	              <div class="collapsible-body" style="padding-top: 1.5em;">
+	                <div class="body-container" style="margin: 0em; padding: 0;"><textarea id="term" class='terminal' readonly="true">{{text}}</textarea></div>
+	              </div>
+	            </li>
+	            <li class="page-item">
+	              <div class="collapsible-header collapsible-header-odd">
+	                <div class="container container-over">Error Log</div>
+	              </div>
+	              <div class="collapsible-body" style="padding-top: 1.5em;">
+	                <div class="body-container" style="margin: 0em; padding: 0;">
+	                  <textarea id='err' class='terminal' readonly="true">{{text}}</textarea>
+	                </div>
+	              </div>
+	            </li>
+	          </ul>
+	        </div>
+	        <!-- this form is for moved for to try fix styling -->
+	      </form>
+	      </div>
+	      </div>
+	    </div>
     </div>
+    <script src="node_modules/hammerjs/hammer.js"></script>
+    <script src='js/materialize.min.js' type="text/javascript"></script>
+    <script src="node_modules/jquery-circle-progress/dist/circle-progress.js"></script>
+    <script type="text/javascript" src="./node_modules/vue/dist/vue.js"></script>
+    <script src="js/Chart.min.js" type="text/javascript"></script>
+    <script src='js/init.js' type="text/javascript"></script>
+    <script src="js/circularHeatChart.js" type="text/javascript"></script>
+    <script src='js/controller.js' type="text/javascript"></script>
+    <script src='js/moment.min.js' type="text/javascript"></script>
 </body>
-<script src="node_modules/hammerjs/hammer.js"></script>
-<script src='js/materialize.min.js' type="text/javascript"></script>
-<script src="node_modules/jquery-circle-progress/dist/circle-progress.js"></script>
-<script type="text/javascript" src="./node_modules/vue/dist/vue.js"></script>
-<script src='js/init.js' type="text/javascript"></script>
-<script src='js/controller.js' type="text/javascript"></script>
-<script type="text/javascript" src="js/render_maths.js"></script>
-<script type="text/javascript" src="./node_modules/mathjax-electron/resources/MathJax/MathJax.js?config=electron"></script>
 
 </html>

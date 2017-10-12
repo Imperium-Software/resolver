@@ -4,7 +4,6 @@
     an Individual for use in the genetic algorithm.
 """
 
-from BitVector import BitVector
 from bitarray import bitarray
 import random
 
@@ -12,10 +11,7 @@ import random
 class Individual:
     """ Encapsulates an Individual in the GA. """
 
-    BIT_VECTOR = 0
-    BIT_ARRAY = 1
-
-    def __init__(self, length=0, method=None, defined=False, value=None):
+    def __init__(self, length=0, defined=False, value=None):
 
         """ Creates a bit string of a certain length, using a certain underlying
         implementation.  """
@@ -23,51 +19,26 @@ class Individual:
         self.length = length
         self.fitness = 0
         self.isCacheValid = False
+        self.defined = bitarray(length)
+        self.data = bitarray(length)
 
-        if method not in [0, 1]:
-            self.method = Individual.BIT_VECTOR
+        if defined:
+            self.defined = None
         else:
-            self.method = method
+            self.defined.setall(False)
 
-        if self.method == Individual.BIT_VECTOR:
-            self.data = BitVector(size=length)
-            self.data = self.data.gen_random_bits(length)
-            self.defined = BitVector(size=length)
-            
-            if defined:
-                self.defined = None
-            else:
-                self.defined.reset(0)
-
-            if value is not None:
-                self.data = BitVector(bitlist=value)
-
-        elif self.method == Individual.BIT_ARRAY:
-            self.defined = bitarray(length)
-            self.data = bitarray(length)
-
-            if defined:
-                self.defined = None
-            else:
-                self.defined.setall(False)
-
-            if value is not None:
-                self.data = [bool(X) for X in value]
+        if value is not None:
+            self.data = [bool(X) for X in value]
 
         for i in range(1, length+1):
             if bool(random.getrandbits(1)):
                 self.flip(i)
-        print(self)
 
     def __str__(self):
 
         """ Creates a consistent string method across implementations. """
 
-        if self.method == Individual.BIT_VECTOR:
-            return str(self.data)
-        elif self.method == Individual.BIT_ARRAY:
-            return self.data.to01()
-        return ""
+        return self.data.to01()
 
     def __call__(self, b):
         return self.get(b)
@@ -79,11 +50,7 @@ class Individual:
         b -= 1
         if b >= self.length or b < 0:
             return
-
-        if self.method == Individual.BIT_VECTOR:
-            return self.data[b]
-        elif self.method == Individual.BIT_ARRAY:
-            return int(self.data[b])
+        return int(self.data[b])
 
     def set(self, b, v):
 
@@ -93,11 +60,7 @@ class Individual:
         b -= 1
         if b >= self.length or b < 0:
             return
-
-        if self.method == Individual.BIT_VECTOR:
-            self.data[b] = v
-        elif self.method == Individual.BIT_ARRAY:
-            self.data[b] = bool(v)
+        self.data[b] = bool(v)
 
     def flip(self, b):
 
@@ -107,11 +70,7 @@ class Individual:
         b -= 1
         if b >= self.length or b < 0:
             return
-
-        if self.method == Individual.BIT_VECTOR:
-            self.data[b] ^= 1
-        elif self.method == Individual.BIT_ARRAY:
-            self.data[b] = not self.data[b]
+        self.data[b] = not self.data[b]
 
     def set_defined(self, b):
 
@@ -120,11 +79,7 @@ class Individual:
         b -= 1
         if b >= self.length or b < 0:
             return
-
-        if self.method == Individual.BIT_VECTOR:
-            self.defined[b] = 1
-        elif self.method == Individual.BIT_ARRAY:
-            self.defined[b] = not self.data[b]
+        self.defined[b] = not self.data[b]
 
     def get_defined(self, b):
 
@@ -133,11 +88,7 @@ class Individual:
         b -= 1
         if b >= self.length or b < 0:
             return
-
-        if self.method == Individual.BIT_VECTOR:
-            return True if self.defined[b] == 1 else False
-        else:
-            return self.defined[b]
+        return self.defined[b]
 
     def allocate(self, first, second):
 
@@ -159,8 +110,8 @@ class Factory:
     """ A factory class for creating individuals in bulk. """
 
     @staticmethod
-    def create(length, method, amount):
+    def create(length, amount):
         """ Creates an array of individuals. """
 
-        array = [Individual(length, method, True) for _ in range(amount)]
+        array = [Individual(length, True) for _ in range(amount)]
         return array

@@ -1,6 +1,0 @@
-{
-  "tests/test_GA.py": true,
-  "tests/test_SATServer.py": true,
-  "tests/test_factory.py": true,
-  "tests/test_individual.py": true
-}

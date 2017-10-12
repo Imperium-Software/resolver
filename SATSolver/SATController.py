@@ -1,23 +1,22 @@
-import sys
+import threading
 import abc
-from SATSolver.GA import GA
-from RequestHandler import *
-from optparse import OptionParser
-from SATSolver.server import SATServer
-
-default_port = 55555
-default_host = "localhost"
+import time
+from GA import GA
+from GA import GAStop
+from server import BColors
 
 
-def singleton(class_):
-    instances = {}
+class SingletonMixin(object):
+    __singleton_lock = threading.Lock()
+    __singleton_instance = None
 
-    def get_instance(*args, **kwargs):
-        if class_ not in instances:
-            instances[class_] = class_(*args, **kwargs)
-        return instances[class_]
-
-    return get_instance
+    @classmethod
+    def instance(cls):
+        if cls.__singleton_instance is None:
+            with cls.__singleton_lock:
+                if cls.__singleton_instance is None:
+                    cls.__singleton_instance = cls()
+        return cls.__singleton_instance
 
 
 class Observer(metaclass=abc.ABCMeta):
@@ -35,19 +34,40 @@ class Observer(metaclass=abc.ABCMeta):
         pass
 
 
-@singleton
-class SATController(Observer):
+class SATController(Observer, SingletonMixin):
+
     def __init__(self):
         Observer.__init__(self)
         self.GA = None
         self.server_thread = None
+        self.time_started = None
+        self.time_finished = None
+        self.ga_thread = None
 
     def update(self, arg):
+        from SATSolver.RequestHandler import encode
         self._generation_count = arg
+        encoded_message = encode("PROGRESS", [[self._generation_count, self.GA.max_generations],
+                                              [self.time_started],
+                                              [self.GA.best_individual_fitness],
+                                              [str(self.GA.best_individual)],
+                                              [self.GA.current_child_fitness],
+                                              [str(self.GA.current_child)],
+                                              [self.GA.numberOfVariables],
+                                              [self.GA.numberOfClauses],
+                                              [self.GA.true_clauses(self.GA.best_individual)],
+                                              [self.GA.true_clauses(self.GA.current_child)]]
+                                 )
         if self.server_thread is not None:
-            self.send_update(RequestHandler.encode("PROGRESS", [[self._generation_count, self.GA.max_generations]]))
+            self.server_thread.push_to_all(encoded_message)
+        time_elapsed = int(time.time()*1000)-self.time_started
+        if time_elapsed >= 1000:
+            time_elapsed = str(time_elapsed/1000) + 's'
         else:
-            print(arg)
+            time_elapsed = str(time_elapsed) + 'ms'
+        print("Generations: " + str(self._generation_count) + "/" + str(self.GA.max_generations) + "\t|\tElapsed Time: "
+              + time_elapsed + "\t|\tBest Individual's Fitness: "
+              + str(self.GA.best_individual_fitness))
 
     def send_update(self, msg):
         self.server_thread.push_to_all(msg)
@@ -61,94 +81,101 @@ class SATController(Observer):
         self.GA = GA(**new_params)
         self.GA.attach(self)
 
-    def parse_formula(self, raw_formula):
+    def start_ga(self):
+        try:
+            self.time_started = int(time.time()*1000)
+            result = self.GA.gasat()
+            self.time_finished = int(time.time()*1000)
+            time_elapsed = self.time_finished - self.time_started
+            if time_elapsed >= 1000:
+                time_elapsed = str(time_elapsed / 1000) + 's'
+            else:
+                time_elapsed = str(time_elapsed) + 'ms'
+            if result.fitness == 0:
+                print(BColors.OKGREEN + "Successfully found a solution in " +
+                      time_elapsed + BColors.ENDC)
+                print('A solution is: ' + str(result))
+            else:
+                print(BColors.FAIL + "Could not find a solution in the given amount of generations." + BColors.ENDC)
+                print('The best solution found is: ' + str(result))
+            if self.server_thread is not None:
+                from SATSolver.RequestHandler import encode
+                encoded_message = encode("FINISHED", [
+                    result.fitness == 0,
+                    result.fitness,
+                    [self._generation_count, self.GA.max_generations],
+                    self.time_started,
+                    self.time_finished,
+                    str(result)
+                ])
+                time.sleep(0.1)
+                self.server_thread.push_to_all(encoded_message)
+
+                self.GA = None
+
+        except GAStop:
+            self.time_finished = int(time.time() * 1000)
+            time_elapsed = self.time_finished - self.time_started
+            if time_elapsed >= 1000:
+                time_elapsed = str(time_elapsed / 1000) + 's'
+            else:
+                time_elapsed = str(time_elapsed) + 'ms'
+            result = self.GA.best_individual
+            if result.fitness == 0:
+                print(BColors.OKGREEN + "Successfully found a solution in " +
+                      time_elapsed + BColors.ENDC)
+                print('A solution is: ' + str(result))
+            else:
+                print(BColors.FAIL + "Could not find a solution, solving stopped by client." + BColors.ENDC)
+                print('The best solution found is: ' + str(result))
+            if self.server_thread is not None:
+                from SATSolver.RequestHandler import encode
+                encoded_message = encode("FINISHED", [
+                    result.fitness == 0,
+                    result.fitness,
+                    [self._generation_count, self.GA.max_generations],
+                    self.time_started,
+                    self.time_finished,
+                    str(self.GA.best_individual)
+                ])
+                self.server_thread.push_to_all(encoded_message)
+
+                self.GA = None
+
+    def parse_formula(self, raw_formula, local=True):
         """
-        Takes a list of lines read from the input file and 
+        Takes a list of lines read from the input file and
         """
         # Read all the lines from the file that aren't comments
-        lines = [line.replace("\n", "") for line in raw_formula if line[0] != "c" and line.strip() != ""]
-        numberOfVariables, numberOfClauses = int(lines[0].split()[2]), int(lines[0].split()[3])
+        if local:
+            lines = [line.replace("\n", "") for line in raw_formula if line[0] != "c" and line.strip() != ""]
+            number_of_variables, number_of_clauses = int(lines[0].split()[2]), int(lines[0].split()[3])
+        else:
+            number_of_variables, number_of_clauses = int(raw_formula[0].split()[2]), int(raw_formula[0].split()[3])
+            lines = raw_formula
         formula = []
 
         # Go through the lines and create numberOfClauses clauses
         line = 1
         # for line in range(1, len(lines)):
-        while line < len(lines):
-            clause = []
-            # We need a while loop as a clause may be split over many lines, but eventually ends with a 0
-            end_of_clause = False
-            while line < len(lines) and not end_of_clause:
-                # Split the line and append a list of all integers, excluding 0, to clause
-                clause.append([int(variable.strip()) for variable in lines[line].split() if int(variable.strip()) != 0])
-                # If this line ended with a 0, we reached the end of the clause
-                if int(lines[line].split()[-1].strip()) == 0:
-                    end_of_clause = True
-                    line += 1
-                # Otherwise continue reading this clause from the next line
-                else:
-                    line += 1
-            # clause is now a list of lists, so we need to flatten it and convert it to a list
-            formula.append(tuple([item for sublist in clause for item in sublist]))
-        return formula, numberOfVariables, numberOfClauses
-
-
-def main(argv):
-    """
-        The main method of the program. It is responsible for:
-         - Managing the server and request handler
-         - Spawning the GA instance
-         - Starts the interface or parses command-line arguments
-        And finally returns the exit code
-    """
-
-    controller = singleton(SATController)()
-    message_decoder = RequestHandler()
-
-    if len(argv) == 0:
-        # Start the interface
-        controller.server_thread = SATServer(default_host, default_port, message_decoder.decode)
-        controller.server_thread.start()
-    else:
-        parser = OptionParser()
-        parser.add_option("-p", "--port", dest="port", type="int", help="Port number on which the server should run.",
-                          metavar="<port>")
-        parser.add_option("-f", "--file", dest="file", type="string", help="The CNF source.", metavar="<filename>")
-        parser.add_option("--tabu-list-length", dest="tabu_list_length", type="int", help="",
-                          metavar="<tabu list length>")
-        parser.add_option("--max-false", dest="max_false", type="int",
-                          help='How many times a clause must be false to be considered a "stumble-clause".',
-                          metavar="<max false>")
-        parser.add_option("--rec", dest="rec", type="int", help="", metavar="<rec>")
-        parser.add_option("-k", dest="k", type="int", help="How long an atom in a stumble-clause is prevented from "
-                                                           "flipping.", metavar="<k>")
-        parser.add_option("--max-generations", dest="max_generations", type="int", help="", metavar="<max generations>")
-        parser.add_option("--population-size", dest="population_size", type="int", help="", metavar="<population size>")
-        parser.add_option("--sub-population-size", dest="sub_population_size", type="int", help="",
-                          metavar="<sub population size>")
-        parser.add_option("--crossover-operator", dest="crossover_operator", type="string", help="",
-                          metavar="<crossover operator>")
-        parser.add_option("--max-flip", dest="max_flip", type="int", help="", metavar="<max flip>")
-        parser.add_option("--rvcf", dest="is_rvcf", type="string", help="")
-        parser.add_option("--diversification", dest="is_diversification", type="string", help="")
-        parser.add_option("--method", dest="method", type="string", help="", metavar="<method>")
-
-        (options, args) = parser.parse_args()
-        options = vars(options)
-        if options["port"] is not None:
-            # Port has been specified start server
-            controller.server_thread = SATServer(default_host, options["port"], RequestHandler.decode)
-            controller.server_thread.start()
-        f = open("../examples/hgen2-a.cnf", "r")  # TODO: Get filename passed in
-        formula, number_of_variables, number_of_clauses = controller.parse_formula(f.readlines())
-        del options['port']
-        del options['file']
-        options['formula'] = formula
-        options['number_of_variables'] = number_of_variables
-        options['number_of_clauses'] = number_of_clauses
-        controller.create_ga(options)
-        print("Going into the dark GA hole now from which there apparently is no return.")
-        print(controller.GA.gasat())
-
-
-if __name__ == '__main__':
-    sys.exit(main(sys.argv[1:]))
+        try:
+            while line < len(lines):
+                clause = []
+                # We need a while loop as a clause may be split over many lines, but eventually ends with a 0
+                end_of_clause = False
+                while line < len(lines) and not end_of_clause:
+                    # Split the line and append a list of all integers, excluding 0, to clause
+                    clause.append([int(variable.strip()) for variable in lines[line].split()
+                                   if int(variable.strip()) != 0])
+                    # If this line ended with a 0, we reached the end of the clause
+                    if int(lines[line].split()[-1].strip()) == 0:
+                        end_of_clause = True
+                        line += 1
+                    # Otherwise continue reading this clause from the next line
+                    else:
+                        line += 1
+                # clause is now a list of lists, so we need to flatten it and convert it to a list
+                formula.append(tuple([item for sublist in clause for item in sublist]))
+        except Exception as e:
+            raise Exception(str(line) + ' ' + str(e))
+        return formula, number_of_variables, number_of_clauses

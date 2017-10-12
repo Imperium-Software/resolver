@@ -27,6 +27,8 @@
   	border-style: none;
   	border-color: Transparent;
   	font-family: Arial, Helvetica, sans-serif;
+      max-width: 100%;
+      min-height: 160px;
   }
 
   #circle {}
@@ -77,17 +79,31 @@
   	color: #fff;
   }
 
-  .input-field {
+  /*.input-field {
   	padding: 0rem 1rem;
-  }
+  }*/
 
   .select-wrapper input.select-dropdown {
   	border-bottom: none !important;
   }
 
+  .select-wrapper {
+    padding-left: 1.3em;
+
+  }
+
+  .input-field{
+    padding-left: 1.3em;
+  }
+
+  .select-wrapper span.caret{
+    right: 1.3em;
+  }
+
   .SAT-darkest-blue,
   .dropdown-content {
   	background-color: #1c1e23 !important;
+    padding-bottom: 0em !important; margin-bottom: 0em !important; border-bottom: 0em !important;
   	/*color: white !important;*/
   }
 
@@ -186,4 +202,60 @@ body:not(.loaded) {
 #progress-circle {
   margin: 5px;
   width: 50px;
+}
+
+h5>small {
+    font-size: .8rem;
+    color: #9e9e9e;
+}
+
+#fitness-chart {
+    min-height: 250px;
+}
+
+#progress label {
+    color: var(--theme-four);
+}
+
+#progress h4,h5 {
+    margin-top: 0;
+}
+
+#status {
+    margin-bottom: 0;
+}
+
+#status-title.success{
+    color: #5A9889;
+}
+
+#status-title.failed {
+    color: #FF6159;
+}
+
+#answer {
+    word-break: break-all;
+}
+
+.circular-heat-svg {
+    height : 250px;
+}
+
+.container-over {
+  width: 92%;
+}
+
+.top-bot-pad {
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+.dragtimetable-spacer>div {
+    background-color: var(--theme-four);
+    border-radius: 10%;
+    color : white;
+}
+
+.dragtimetable-table {
+    width: 80%;
 }

@@ -6,32 +6,76 @@
 import copy
 import random
 from decimal import Decimal
-from SATSolver.individual import Individual
+from individual import Individual
+
+
+class GAStop(Exception):
+    """This exception should be raised when GA should stop"""
+
+
+class InputError(Exception):
+    """This exception should be raised when invalid input parameters are provided
+    i.e. don't meet constraints for input."""
 
 
 class GA:
-    def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length, max_false, rec, k,
-                 max_generations=1000, population_size=100, sub_population_size=15, crossover_operator=0,
-                 max_flip=10000, is_rvcf=False, is_diversification=False, method=None):
+    def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length=None, max_false=5, rec=10,
+                 k=None, max_generations=1000, population_size=100, sub_population_size=15, crossover_operator=0,
+                 max_flip=10000, is_rvcf=False, is_diversification=False):
 
         self.formula = formula
-        self.numberOfClauses = number_of_clauses
-        self.numberOfVariables = number_of_variables
+        self.numberOfClauses = int(number_of_clauses)
+        self.numberOfVariables = int(number_of_variables)
         # Creating member variables for each of the parameters
-        self.max_generations = max_generations
-        self.population_size = population_size
-        self.sub_population_size = sub_population_size
-        self.crossover_operator = crossover_operator
-        self.tabu_list_length = tabu_list_length
-        self.max_flip = max_flip
-        self.is_rvcf = is_rvcf
-        self.is_diversification = is_diversification
-        self.max_false = max_false
-        self.rec = rec
-        self.k = k
-        self.method = method
+        if not max_generations > 1:
+            raise InputError("Input Error: max_generations > 1.")
+        self.max_generations = int(max_generations)
+        if not population_size > 0:
+            raise InputError("Input Error: population_size > 0.")
+        self.population_size = int(population_size)
+        if not sub_population_size > 0 or not sub_population_size <= population_size:
+            raise InputError("Input Error: population_size >= sub_population_size > 0.")
+        self.sub_population_size = int(sub_population_size)
+        if crossover_operator not in [0, 1, 2]:
+            raise InputError("Input Error: crossover_operator element of {0,1,2}.")
+        self.crossover_operator = int(crossover_operator)
+        if tabu_list_length is None:
+            # If no value specified - default value of 10% of number of variables.
+            tabu_list_length = int(10.0/100.0 * number_of_variables)
+        else:
+            if not int(tabu_list_length) > 0:
+                raise InputError("Input Error: tabu_list_length > 0.")
+        self.tabu_list_length = int(tabu_list_length)
+        if not max_flip > 0:
+            raise InputError("Input Error: max_flips > 0.")
+        self.max_flip = int(max_flip)
+        if is_rvcf not in [0, 1]:
+            raise InputError("Input Error: is_rvcf element of {0,1}.")
+        self.is_rvcf = bool(is_rvcf)
+        if is_diversification not in [0, 1]:
+            raise InputError("Input Error: is_diversification element of {0,1}.")
+        self.is_diversification = bool(is_diversification)
+        if not int(max_false) > 0:
+            raise InputError("Input Error: max_false > 0.")
+        self.max_false = int(max_false)
+        if not int(rec) > 0:
+            raise InputError("Input Error: rec > 0.")
+        self.rec = int(rec)
+        if k is None:
+            # If no value specified - default value of 10% of number of variables.
+            k = int(10.0/100.0 * number_of_variables)
+        else:
+            if not int(k) > 0:
+                raise InputError("Input Error: k > 0.")
+        self.k = int(k)
         self._observers = set()
         self._generation_counter = None
+        self.best_individual_fitness = None
+        self.best_individual = Individual(3)
+        self.current_child_fitness = None
+        self.current_child = None
+
+        self.stop = False
 
         # Initialize tabu, population and the sub_population to empty lists
         self.tabu = []
@@ -51,7 +95,7 @@ class GA:
         sat (X,c) - by literature
         Indicates whether the clause c is true or false for the individual X i.e. satisfied or not by the assignment
         corresponding to X.
-        :param individual: Individual class (Implemented by Regan) representing a particular assignment of truth values
+        :param individual: Individual class representing a particular assignment of truth values
         to variables.
         :param clause: Python tuple of integers - should be the same tuple as in the DIMACS format.
         :return: returns a boolean value indicating whether the assignment represented by the individual satisfies the
@@ -116,6 +160,9 @@ class GA:
         :return: the number of clauses of F which are not satisfied by X.
         """
 
+        if self.stop:
+            raise GAStop("GA needs to be stopped.")
+
         if individual.isCacheValid:
             return individual.fitness
 
@@ -133,6 +180,20 @@ class GA:
 
         individual.fitness = num_unsatisfied_clauses
         return num_unsatisfied_clauses
+
+    def true_clauses(self, individual):
+        """
+        The function returns a string of zeros and ones indicating which clauses are true and false.
+
+        :return: string of zeros and ones.
+        """
+        return_string = ''
+        for clause in self.formula:
+            if self.sat(individual, clause):
+                return_string += str(1)
+            else:
+                return_string += str(0)
+        return return_string
 
     def improvement(self, individual, index):
         """
@@ -165,7 +226,7 @@ class GA:
         :return: The generated individual z
         """
 
-        z = Individual(self.numberOfVariables, self.method, False)
+        z = Individual(self.numberOfVariables, False)
         for clause in self.formula:
             best_pos = 0
             best_improvement = 0
@@ -193,7 +254,7 @@ class GA:
         :return: The generated individual z
         """
 
-        z = Individual(self.numberOfVariables, self.method, False)
+        z = Individual(self.numberOfVariables, False)
         for clause in self.formula:
             best_pos = 0
             maximum_improvement = 0
@@ -237,7 +298,7 @@ class GA:
         :return: The generated individual z.
         """
 
-        z = Individual(self.numberOfVariables, self.method, False)
+        z = Individual(self.numberOfVariables, False)
         for clause in self.formula:
             if self.sat(x, clause) and not self.sat(y, clause):
                 for i in range(len(clause)):
@@ -245,7 +306,7 @@ class GA:
                     z.set_defined(abs(clause[i]))
             elif not self.sat(x, clause) and self.sat(y, clause):
                 for i in range(len(clause)):
-                    z.set(abs(clause[i], y(abs(clause[i]))))
+                    z.set(abs(clause[i]), y(abs(clause[i])))
                     z.set_defined(abs(clause[i]))
         z.allocate(x, y)
         return z
@@ -454,24 +515,41 @@ class GA:
         :return: The weight value.
         """
 
-        c_ones = [clause for clause in self.formula if (index in clause or -index in clause) and
-                  (individual.get(index) == 1)]
-        c_zeros = [clause for clause in self.formula if (index in clause or -index in clause) and
-                   (individual.get(index) == 0)]
+        # Truth values aren't being considered only actual values. I.E. -index in clause must be == 0 to be added to the
+        # c_ones list of tuples as per the paper page 13: "val(X; a) is the truth value of the literal a for the
+        # assignment X", which is further supported up by the truth degree function depending on the number of true
+        # atoms in the clause as it doesnt make sense to evaluate the truth degree for clauses where a negated index
+        # equates to a false clause, it also means that as it stands the other list (c_zeros) will always be empty.
+
+        # c_ones = [clause for clause in self.formula if (index in clause or -index in clause) and
+        #           (individual.get(abs(index)) == 1)]
+        # c_zeros = [clause for clause in self.formula if (index in clause or -index in clause) and
+        #            (individual.get(abs(index)) == 0)]
+
+        c_ones = [clause for clause in self.formula
+                  if (index in clause and individual.get(abs(index)) == 1)
+                  or (-index in clause and individual.get(abs(index)) == 0)]
+        c_zeros = [clause for clause in self.formula
+                   if (index in clause and individual.get(abs(index)) == 0)
+                   or (-index in clause and individual.get(abs(index)) == 1)]
 
         length_c_ones = len(c_ones)
         length_c_zeros = len(c_zeros)
 
-        sum_ones = sum(self.degree(individual, c) for c in c_ones)
-        sum_zeros = sum(self.degree(individual, c) for c in c_zeros)
+        # moved this into if statements to reduce computation that might not be needed as I dont know if
+        # short circuiting applies
+        # sum_ones = sum(self.degree(individual, c) for c in c_ones)
+        # sum_zeros = sum(self.degree(individual, c) for c in c_zeros)
 
         # To cater for the case where the length is 0
         ratio_ones = 0
         ratio_zeros = 0
         if length_c_ones > 0:
+            sum_ones = sum(self.degree(individual, c) for c in c_ones)
             ratio_ones = sum_ones / length_c_ones
 
         if length_c_zeros > 0:
+            sum_zeros = sum(self.degree(individual, c) for c in c_zeros)
             ratio_zeros = sum_zeros / length_c_zeros
 
         return ratio_ones + ratio_zeros
@@ -486,16 +564,21 @@ class GA:
         :return: A numerical value representing the degree.
         """
 
-        list_of_literals = []
+        #can this not just use a simple int counter variable?
+        # list_of_literals = []
+        degree = 0
         for literal in clause:
             if literal > 0:
                 if individual.get(literal) == 1:
-                    list_of_literals.append(literal)
+                    # list_of_literals.append(literal)
+                    degree += 1
             else:
                 if individual.get(abs(literal)) == 0:
-                    list_of_literals.append(literal)
+                    # list_of_literals.append(literal)
+                    degree += 1
 
-        return len(list_of_literals)
+        # return len(list_of_literals)
+        return degree
 
     def tabu_with_diversification(self, individual):
         """
@@ -579,7 +662,7 @@ class GA:
 
         individual_counter = 0
         while individual_counter < self.population_size:
-            self.population.append(Individual(self.numberOfVariables, self.method, False))
+            self.population.append(Individual(self.numberOfVariables, False))
             individual_counter = individual_counter + 1
 
         return
@@ -601,9 +684,11 @@ class GA:
         :return: void (NONE)
         """
 
-        weakest_individual = max(self.sub_population, key=self.evaluate)
-        if not self.evaluate(weakest_individual) > self.evaluate(child):
-            self.population.remove(weakest_individual)
+        self.population.sort(key=self.evaluate)
+        self.best_individual_fitness = self.population[0].fitness
+        self.best_individual = self.population[0]
+        if self.population[0].fitness > child.fitness:
+            self.population.remove(self.population[len(self.population)-1])
             self.population.append(child)
 
         return
@@ -646,8 +731,9 @@ class GA:
             else:
                 child = self.standard_tabu(child, self.choose_rvcf)
 
+            self.current_child_fitness = self.evaluate(child)
+            self.current_child = child
             self.replace(child)
-
             # Determine whether any individual that satisfies the formula appeared in the current generation
             satisfied_individual = self.is_satisfied()
             # Increase the generation
@@ -682,4 +768,5 @@ class GA:
     @generation_counter.setter
     def generation_counter(self, arg):
         self._generation_counter = arg
-        self._notify()
+        if arg > 0:
+            self._notify()
