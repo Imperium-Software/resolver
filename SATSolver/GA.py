@@ -20,7 +20,7 @@ class InputError(Exception):
 
 
 class GA:
-    def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length=None, max_false=5, rec=10,
+        def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length=None, max_false=5, rec=10,
                  k=None, max_generations=1000, population_size=100, sub_population_size=15, crossover_operator=0,
                  max_flip=10000, is_rvcf=False, is_diversification=False):
 
@@ -32,31 +32,23 @@ class GA:
             raise InputError("Input Error: max_generations > 1.")
         self.max_generations = int(max_generations)
         # TODO: Test for minimum possible size. It is at least 2
-        if not population_size > 0:
-            raise InputError("Input Error: population_size > 0.")
+        if not int(population_size) >= 2:
+            raise InputError("Input Error: population_size >= 2.")
         self.population_size = int(population_size)
         # TODO: Set sub-population size default to some percentage - May NOT be smaller than 2 because of crossover
-        if not sub_population_size > 0 or not sub_population_size <= population_size:
-            raise InputError("Input Error: population_size >= sub_population_size > 0.")
+        if not sub_population_size >= 2 or not sub_population_size <= int(population_size):
+            raise InputError("Input Error: population_size >= sub_population_size >= 2.")
         self.sub_population_size = int(sub_population_size)
-
-        # Alias one of the crossover operators as a method called crossover_operator
-        if crossover_operator == 0:
-            self.crossover_operator = self.corrective_clause
-        elif crossover_operator == 1:
-            self.crossover_operator = self.corrective_clause_with_truth_maintenance
-        else:
-            self.crossover_operator = self.fluerent_and_ferland
-
-        # TODO: Check that length is not greater than the population length
         if crossover_operator not in [0, 1, 2]:
             raise InputError("Input Error: crossover_operator element of {0,1,2}.")
+        self.crossover_operator = int(crossover_operator)
+        # TODO: Check that length is not greater than the population length
         if tabu_list_length is None:
             # If no value specified - default value of 10% of number of variables.
             tabu_list_length = int(10.0/100.0 * number_of_variables)
         else:
-            if not int(tabu_list_length) > 0:
-                raise InputError("Input Error: tabu_list_length > 0.")
+            if not int(tabu_list_length) > 0 or not int(tabu_list_length) <= int(population_size):
+                raise InputError("Input Error: population_size >= tabu_list_length > 0.")
         self.tabu_list_length = int(tabu_list_length)
         if not max_flip > 0:
             raise InputError("Input Error: max_flips > 0.")
