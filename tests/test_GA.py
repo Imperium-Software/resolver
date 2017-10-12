@@ -200,13 +200,14 @@ class TestGA(TestCase):
         ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
         self.assertEqual(list(ind.data), list(bitarray("000001111")))
         # .............................................................................................................
-        # Test 2 - Max Number of Flips is Zero..........................................................................
-        file_reader = self.FormulaReader("../examples/trivial.cnf")
-        ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, max_flip=0)
-        ind = Individual(9)
-        ind.data = bitarray("111111111")
-        ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
-        self.assertEqual(list(ind.data), list(bitarray("111111111")))
+        # # Test 2 - Max Number of Flips is Zero........................................................................
+        # file_reader = self.FormulaReader("../examples/trivial.cnf")
+        # ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, max_flip=1)
+        # ind = Individual(9)
+        # ind.data = bitarray("111111111")
+        # ind = ga_implementation.standard_tabu(ind, ga_implementation.standard_tabu_choose)
+        # self.assertEqual(list(ind.data), list(bitarray("111111111")))
+        # THIS TEST HAD TO BE COMMENTED OUT AS MAX FLIPS HAS A CONSTRAINT > 0
         # .............................................................................................................
         # Test 3 - No diversification..................................................................................
         file_reader = self.FormulaReader("../examples/trivial.cnf")
