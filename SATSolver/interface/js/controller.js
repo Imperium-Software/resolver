@@ -1,16 +1,16 @@
-let fs = require('fs');
+var fs = require('fs');
 const {
     dialog
 } = require('electron').remote;
 
 function construct_request(type) {
+    var request_string = '';
     if (type === 'SOLVE') {
 
-        var request_string;
         var dimacs;
 
-        if ($('#cnf-input-method')[0].value == 'file') {
-            let filename = $('#selected-file').prop('files')[0].path;
+        if ($('#cnf-input-method')[0].value === 'file') {
+            var filename = $('#selected-file').prop('files')[0].path;
             dimacs = fs.readFileSync(filename).toString().trim()
         } else {
             dimacs = $('#manual-cnf')[0].value;
@@ -39,40 +39,40 @@ function construct_request(type) {
         request.SOLVE.rec = $("#rec")[0].value;
         request.SOLVE.k = $("#k")[0].value;
 
-        if (population_size_input != undefined && population_size_input != '') {
+        if (population_size_input !== undefined && population_size_input !== '') {
             request.SOLVE["population_size"] = population_size_input;
         }
 
-        if (sub_population_size_input != undefined && sub_population_size_input != '') {
+        if (sub_population_size_input !== undefined && sub_population_size_input !== '') {
             request.SOLVE["sub_population_size"] = parseInt(sub_population_size_input);
         }
 
-        if (crossover_operator_input != undefined && crossover_operator_input != '') {
+        if (crossover_operator_input !== undefined && crossover_operator_input !== '') {
             request.SOLVE["crossover_operator"] = parseInt(crossover_operator_input);
         }
 
-        if (max_flip_input != undefined && max_flip_input != '') {
+        if (max_flip_input !== undefined && max_flip_input !== '') {
             request.SOLVE["max_flip"] = parseInt(max_flip_input);
         }
 
-        if (max_generations_input != undefined && max_generations_input != '') {
+        if (max_generations_input !== undefined && max_generations_input !== '') {
             request.SOLVE["max_generations"] = parseInt(max_generations_input);
         }
 
-        if (method_input != undefined && method_input != '') {
+        if (method_input !== undefined && method_input !== '') {
             request.SOLVE["method"] = parseInt(method_input);
         }
 
-        if (tabu_settings_input.indexOf('rvcf') != -1) {
+        if (tabu_settings_input.indexOf('rvcf') !== -1) {
             request.SOLVE["is_rvcf"] = true;
         }
 
-        if (tabu_settings_input.indexOf('diversification') != -1) {
+        if (tabu_settings_input.indexOf('diversification') !== -1) {
             request.SOLVE["is_diversification"] = true;
         }
 
         request.SOLVE.raw_input = dimacs.split('\n');
-        for (var i=request.SOLVE.raw_input.length-1; i>=0; i--) {
+        for (var i = request.SOLVE.raw_input.length-1; i>=0; i--) {
             if (request.SOLVE.raw_input[i][0] === 'c') {
                 request.SOLVE.raw_input.splice(i, 1);
             }
@@ -149,7 +149,32 @@ function navigate(filename) {
             accordion: true
         });
         $("#advanced").modal();
-        $("#connected-indicator")[0].style.fill = connected ? "lime" : "red";
+        $("#connected-indicator")[0].style.fill = conn.connected ? "lime" : "red";
+
+        // timetable
+        let timetable_ctx = DragTimetable.create($("#timetable")[0], {
+            timeHeaderSize: '150px', // width of the time header column 
+            taskAreaSize: '100px', // width of the task column 
+            quarterHourAreaSize: '15px', // height of a 15 minute segment 
+            hourStart: 8, // starting time of timetable, 0 to 23 
+            hourEnd: 16, // ending time of timetable, 0 to 23 
+            clickThreshold: 200
+        });
+
+        timetable_ctx.addTask({
+            id: 1, // unique id for task 
+            start: 9, // starting time for task 
+            end: 11, // ending time for task 
+            text: 'Important Meeting'
+        }, true);
+
+        timetable_ctx.addTask({
+            id: 2, // unique id for task 
+            start: 11, // starting time for task 
+            end: 12, // ending time for task 
+            text: 'Lecture'
+        }, true);
+
 
         // Progress circle
 
@@ -188,6 +213,7 @@ function navigate(filename) {
         new_progress_bar.animate(perc.percentage);
         progress_bar = new_progress_bar;
 
+            
 
         // Re-render percentage
 
@@ -258,7 +284,7 @@ function navigate(filename) {
 }
 
 function theme_change() {
-    let theme_select = document.getElementById('theme-select');
+    var theme_select = document.getElementById('theme-select');
     switch (theme_select.value) {
         case "tea":
             document.body.style.setProperty("--theme-one", "#364958");
@@ -303,8 +329,8 @@ function theme_change() {
 }
 
 function input_method_change() {
-    let select_box = document.getElementById('cnf-input-method');
-    if (select_box.value == "file") {
+    var select_box = document.getElementById('cnf-input-method');
+    if (select_box.value === "file") {
         $('#input-cnf-file').attr('hidden', false);
         $('#input-cnf-text').attr('hidden', true);
     } else {
@@ -313,13 +339,13 @@ function input_method_change() {
     }
 }
 
-let fitness_chart = $("#fitness-chart")[0];
+var fitness_chart = $("#fitness-chart")[0];
 var menu = new Menu();
 menu.append(new MenuItem({
     label: 'Save Graph To JPG',
     click: function (e) {
         dialog.showSaveDialog(function (fileName) {
-            if (fileName != undefined) {
+            if (fileName !== undefined) {
                 destinationCanvas = document.createElement("canvas");
                 destinationCanvas.width = fitness_chart.width;
                 destinationCanvas.height = fitness_chart.height;
@@ -344,7 +370,7 @@ menu.append(new MenuItem({
     label: 'Save Graph To CSV',
     click: function (e) {
         dialog.showSaveDialog(function (fileName) {
-            if (fileName != undefined) {
+            if (fileName !== undefined) {
                 fs.writeFile(fileName + ".best.csv", chart.data["datasets"][0].data, function (err) {
                     console.log(err);
                 });
@@ -360,3 +386,4 @@ fitness_chart.addEventListener('contextmenu', function (e) {
     e.preventDefault();
     menu.popup(remote.getCurrentWindow());
 }, false);
+

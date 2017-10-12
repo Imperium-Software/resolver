@@ -4,7 +4,6 @@
     an Individual for use in the genetic algorithm.
 """
 
-from BitVector import BitVector
 from bitarray import bitarray
 import random
 
@@ -12,10 +11,7 @@ import random
 class Individual:
     """ Encapsulates an Individual in the GA. """
 
-    BIT_VECTOR = 0
-    BIT_ARRAY = 1
-
-    def __init__(self, length=0, method=None, parents=None, value=None):
+    def __init__(self, length=0, defined=False, value=None):
 
         """ Creates a bit string of a certain length, using a certain underlying
         implementation.
@@ -27,46 +23,16 @@ class Individual:
         self.length = length
         self.fitness = 0
         self.isCacheValid = False
+        self.defined = bitarray(length)
+        self.data = bitarray(length)
 
-        if method not in [0, 1]:
-            self.method = Individual.BIT_VECTOR
+        if defined:
+            self.defined = None
         else:
-            self.method = method
+            self.defined.setall(False)
 
-        if self.method == Individual.BIT_VECTOR:
-
-            if value is not None:
-                self.data = BitVector(bitlist=value)
-            elif parents is not None:
-                self.data = BitVector(size=length)
-                x, y = parents
-                for i in range(1, x.length + 1):
-                    # If the parents have the same value the bit stays the same, otherwise it is random
-                    val = x.get(i)
-                    if val == y.get(i):
-                        self.set(i, val)
-                    else:
-                        self.set(i, 0 if random.random() < 0.5 else 1)
-            else:
-                self.data = BitVector(size=length)
-                self.data = self.data.gen_random_bits(length)
-
-        elif self.method == Individual.BIT_ARRAY:
-
-            if value is not None:
-                self.data = bitarray([bool(_) for _ in value])
-            elif parents is not None:
-                self.data = bitarray(length)
-                x, y = parents
-                for i in range(1, x.length + 1):
-                    # If the parents have the same value the bit stays the same, otherwise it is random
-                    val = x.get(i)
-                    if val == y.get(i):
-                        self.set(i, val)
-                    else:
-                        self.set(i, 0 if random.random() < 0.5 else 1)
-            else:
-                self.data = bitarray(length)
+        if value is not None:
+            self.data = [bool(X) for X in value]
 
         for i in range(1, length+1):
             if bool(random.getrandbits(1)):
@@ -76,11 +42,7 @@ class Individual:
 
         """ Creates a consistent string method across implementations. """
 
-        if self.method == Individual.BIT_VECTOR:
-            return str(self.data)
-        elif self.method == Individual.BIT_ARRAY:
-            return self.data.to01()
-        return ""
+        return self.data.to01()
 
     def __call__(self, b):
         return self.get(b)
@@ -92,11 +54,7 @@ class Individual:
         b -= 1
         if b >= self.length or b < 0:
             return
-
-        if self.method == Individual.BIT_VECTOR:
-            return self.data[b]
-        elif self.method == Individual.BIT_ARRAY:
-            return int(self.data[b])
+        return int(self.data[b])
 
     def set(self, b, v):
 
@@ -106,11 +64,7 @@ class Individual:
         b -= 1
         if b >= self.length or b < 0:
             return
-
-        if self.method == Individual.BIT_VECTOR:
-            self.data[b] = v
-        elif self.method == Individual.BIT_ARRAY:
-            self.data[b] = bool(v)
+        self.data[b] = bool(v)
 
     def flip(self, b):
 
@@ -120,19 +74,48 @@ class Individual:
         b -= 1
         if b >= self.length or b < 0:
             return
+        self.data[b] = not self.data[b]
 
-        if self.method == Individual.BIT_VECTOR:
-            self.data[b] ^= 1
-        elif self.method == Individual.BIT_ARRAY:
-            self.data[b] = not self.data[b]
+    def set_defined(self, b):
+
+        """ Sets a certain bit b as defined. """
+
+        b -= 1
+        if b >= self.length or b < 0:
+            return
+        self.defined[b] = not self.data[b]
+
+    def get_defined(self, b):
+
+        """ Gets whether a certain bit is defined or not (boolean) """
+
+        b -= 1
+        if b >= self.length or b < 0:
+            return
+        return self.defined[b]
+
+    def allocate(self, first, second):
+
+        """ Allocates uniformly from either first or second parent. """
+
+        for i in range(self.length):
+            # i is inconsistently indexed in comparison to other places get_defined and set are called thus 1
+            # must be added
+            index = i + 1
+            if not self.get_defined(index):
+                if bool(random.getrandbits(1)):
+                    self.set(index, first.get(index))
+                else:
+                    self.set(index, second.get(index))
+                self.set_defined(index)
 
 
 class Factory:
     """ A factory class for creating individuals in bulk. """
 
     @staticmethod
-    def create(length, amount, method=None):
+    def create(length, amount):
         """ Creates an array of individuals. """
 
-        array = [Individual(length, method) for _ in range(amount)]
+        array = [Individual(length, True) for _ in range(amount)]
         return array

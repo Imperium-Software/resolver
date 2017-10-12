@@ -5,7 +5,7 @@
 import json
 from threading import Thread
 from SATController import SingletonMixin
-from SATSolver.main import SATController
+from main import SATController
 
 
 class RequestHandlerError(Exception):
@@ -42,8 +42,12 @@ def decode(data, server, client_id):
                 else:
                     raw_formula_array = json_data["SOLVE"]["raw_input"]
 
-                    json_data["SOLVE"]["formula"], json_data["SOLVE"]["number_of_variables"], json_data["SOLVE"][
-                        "number_of_clauses"] = controller.parse_formula(raw_formula_array, False)
+                    try:
+                        json_data["SOLVE"]["formula"], json_data["SOLVE"]["number_of_variables"], json_data["SOLVE"][
+                            "number_of_clauses"] = controller.parse_formula(raw_formula_array, False)
+                    except Exception:
+                        raise RequestHandlerError("Parsing of .cnf file failed. "
+                                                    "Please check the DIMACS format for errors.")
                     del json_data["SOLVE"]["raw_input"]
                     controller.create_ga(json_data["SOLVE"])
                     controller.ga_thread = Thread(target=controller.start_ga)
@@ -62,8 +66,9 @@ def decode(data, server, client_id):
         :return: Will return either `None` if no errors occurred and the command was successfully executed or a string
         explaining the error that occurred.
         """
-        print("Poll called")
-        pass
+
+        controller = SATController.instance()
+        controller.update(controller._generation_count)
 
     def stop(json_data):
         controller = SATController.instance()
@@ -97,6 +102,7 @@ def decode(data, server, client_id):
         error_response = encode("ERROR", ["A fatal error occurred: " + str(e)])
         server.push_to_one(client_id, error_response)
 
+
 def encode(message_type, data):
 
     def error(data_arr):
@@ -113,7 +119,9 @@ def encode(message_type, data):
                     "CURRENT_CHILD_FITNESS": data_arr[4],
                     "CURRENT_CHILD": data_arr[5],
                     "NUM_VARIABLES": data_arr[6],
-                    "NUM_CLAUSES": data_arr[7]
+                    "NUM_CLAUSES": data_arr[7],
+                    "TRUE_CLAUSES_BEST_INDIVIDUAL": data_arr[8],
+                    "TRUE_CLAUSES_CURRENT_CHILD": data_arr[9]
                 }
             }
         }

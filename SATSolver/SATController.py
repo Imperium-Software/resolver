@@ -1,10 +1,9 @@
 import threading
 import abc
 import time
-from SATSolver.GA import GA
-from SATSolver.GA import GAStop
-from SATSolver.server import BColors
-from datetime import datetime
+from GA import GA
+from GA import GAStop
+from server import BColors
 
 
 class SingletonMixin(object):
@@ -46,7 +45,7 @@ class SATController(Observer, SingletonMixin):
         self.ga_thread = None
 
     def update(self, arg):
-        from RequestHandler import encode
+        from SATSolver.RequestHandler import encode
         self._generation_count = arg
         encoded_message = encode("PROGRESS", [[self._generation_count, self.GA.max_generations],
                                               [self.time_started],
@@ -55,7 +54,9 @@ class SATController(Observer, SingletonMixin):
                                               [self.GA.current_child_fitness],
                                               [str(self.GA.current_child)],
                                               [self.GA.numberOfVariables],
-                                              [self.GA.numberOfClauses]]
+                                              [self.GA.numberOfClauses],
+                                              [self.GA.true_clauses(self.GA.best_individual)],
+                                              [self.GA.true_clauses(self.GA.current_child)]]
                                  )
         if self.server_thread is not None:
             self.server_thread.push_to_all(encoded_message)
@@ -98,7 +99,7 @@ class SATController(Observer, SingletonMixin):
                 print(BColors.FAIL + "Could not find a solution in the given amount of generations." + BColors.ENDC)
                 print('The best solution found is: ' + str(result))
             if self.server_thread is not None:
-                from RequestHandler import encode
+                from SATSolver.RequestHandler import encode
                 encoded_message = encode("FINISHED", [
                     result.fitness == 0,
                     result.fitness,
@@ -128,7 +129,7 @@ class SATController(Observer, SingletonMixin):
                 print(BColors.FAIL + "Could not find a solution, solving stopped by client." + BColors.ENDC)
                 print('The best solution found is: ' + str(result))
             if self.server_thread is not None:
-                from RequestHandler import encode
+                from SATSolver.RequestHandler import encode
                 encoded_message = encode("FINISHED", [
                     result.fitness == 0,
                     result.fitness,
@@ -141,8 +142,6 @@ class SATController(Observer, SingletonMixin):
 
                 self.GA = None
 
-
-
     def parse_formula(self, raw_formula, local=True):
         """
         Takes a list of lines read from the input file and
@@ -150,9 +149,9 @@ class SATController(Observer, SingletonMixin):
         # Read all the lines from the file that aren't comments
         if local:
             lines = [line.replace("\n", "") for line in raw_formula if line[0] != "c" and line.strip() != ""]
-            numberOfVariables, numberOfClauses = int(lines[0].split()[2]), int(lines[0].split()[3])
+            number_of_variables, number_of_clauses = int(lines[0].split()[2]), int(lines[0].split()[3])
         else:
-            numberOfVariables, numberOfClauses = int(raw_formula[0].split()[2]), int(raw_formula[0].split()[3])
+            number_of_variables, number_of_clauses = int(raw_formula[0].split()[2]), int(raw_formula[0].split()[3])
             lines = raw_formula
         formula = []
 
@@ -166,7 +165,8 @@ class SATController(Observer, SingletonMixin):
                 end_of_clause = False
                 while line < len(lines) and not end_of_clause:
                     # Split the line and append a list of all integers, excluding 0, to clause
-                    clause.append([int(variable.strip()) for variable in lines[line].split() if int(variable.strip()) != 0])
+                    clause.append([int(variable.strip()) for variable in lines[line].split()
+                                   if int(variable.strip()) != 0])
                     # If this line ended with a 0, we reached the end of the clause
                     if int(lines[line].split()[-1].strip()) == 0:
                         end_of_clause = True
@@ -178,6 +178,4 @@ class SATController(Observer, SingletonMixin):
                 formula.append(tuple([item for sublist in clause for item in sublist]))
         except Exception as e:
             raise Exception(str(line) + ' ' + str(e))
-        return formula, numberOfVariables, numberOfClauses
-
-
+        return formula, number_of_variables, number_of_clauses

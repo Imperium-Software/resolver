@@ -7,26 +7,37 @@ import copy
 import random
 import operator
 from decimal import Decimal
-from SATSolver.individual import Individual, Factory
+from individual import Individual, Factory
 
 
 class GAStop(Exception):
     """This exception should be raised when GA should stop"""
 
 
+class InputError(Exception):
+    """This exception should be raised when invalid input parameters are provided
+    i.e. don't meet constraints for input."""
+
+
 class GA:
-    def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length, max_false, rec, k,
-                 max_generations=1000, population_size=100, sub_population_size=15, crossover_operator=0,
-                 max_flip=10000, is_rvcf=False, is_diversification=False, method=None):
+    def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length=None, max_false=5, rec=10,
+                 k=None, max_generations=1000, population_size=100, sub_population_size=15, crossover_operator=0,
+                 max_flip=10000, is_rvcf=False, is_diversification=False):
 
         self.formula = formula
         self.numberOfClauses = int(number_of_clauses)
         self.numberOfVariables = int(number_of_variables)
         # Creating member variables for each of the parameters
+        if not max_generations > 1:
+            raise InputError("Input Error: max_generations > 1.")
         self.max_generations = int(max_generations)
         # TODO: Test for minimum possible size. It is at least 2
+        if not population_size > 0:
+            raise InputError("Input Error: population_size > 0.")
         self.population_size = int(population_size)
         # TODO: Set sub-population size default to some percentage - May NOT be smaller than 2 because of crossover
+        if not sub_population_size > 0 or not sub_population_size <= population_size:
+            raise InputError("Input Error: population_size >= sub_population_size > 0.")
         self.sub_population_size = int(sub_population_size)
 
         # Alias one of the crossover operators as a method called crossover_operator
@@ -38,17 +49,40 @@ class GA:
             self.crossover_operator = self.fluerent_and_ferland
 
         # TODO: Check that length is not greater than the population length
+        if crossover_operator not in [0, 1, 2]:
+            raise InputError("Input Error: crossover_operator element of {0,1,2}.")
+        self.crossover_operator = int(crossover_operator)
+        if tabu_list_length is None:
+            # If no value specified - default value of 10% of number of variables.
+            tabu_list_length = int(10.0/100.0 * number_of_variables)
+        else:
+            if not int(tabu_list_length) > 0:
+                raise InputError("Input Error: tabu_list_length > 0.")
         self.tabu_list_length = int(tabu_list_length)
+        if not max_flip > 0:
+            raise InputError("Input Error: max_flips > 0.")
         self.max_flip = int(max_flip)
+        if is_rvcf not in [0, 1]:
+            raise InputError("Input Error: is_rvcf element of {0,1}.")
         self.is_rvcf = bool(is_rvcf)
+        if is_diversification not in [0, 1]:
+            raise InputError("Input Error: is_diversification element of {0,1}.")
         self.is_diversification = bool(is_diversification)
+        if not int(max_false) > 0:
+            raise InputError("Input Error: max_false > 0.")
         self.max_false = int(max_false)
+        if not int(rec) > 0:
+            raise InputError("Input Error: rec > 0.")
         self.rec = int(rec)
+        if k is None:
+            # If no value specified - default value of 10% of number of variables.
+            k = int(10.0/100.0 * number_of_variables)
+        else:
+            if not int(k) > 0:
+                raise InputError("Input Error: k > 0.")
         self.k = int(k)
-        self.method = method
         self._observers = set()
         self._generation_counter = None
-        # TODO: Remove these 2 attributes. Best individual is always population[0]
         self.best_individual_fitness = None
         self.best_individual = None
         self.current_child_fitness = None
@@ -148,6 +182,20 @@ class GA:
         individual.fitness = num_unsatisfied_clauses
         return num_unsatisfied_clauses
 
+    def true_clauses(self, individual):
+        """
+        The function returns a string of zeros and ones indicating which clauses are true and false.
+
+        :return: string of zeros and ones.
+        """
+        return_string = ''
+        for clause in self.formula:
+            if self.sat(individual, clause):
+                return_string += str(1)
+            else:
+                return_string += str(0)
+        return return_string
+
     def improvement(self, individual, index):
         """
         The function computes the improvement (difference in unsatisfiable clauses) obtained by the flip of the ith
@@ -229,6 +277,7 @@ class GA:
                         best_pos = abs(clause[i])
                 if maximum_improvement != 0:
                     z.set(best_pos, x.get(best_pos))
+                    z.set_defined(best_pos)
                     z.flip(best_pos)
 
         # Truth maintenance - See section 4.2 of the paper
@@ -283,6 +332,8 @@ class GA:
         # Iterate through each of the positions (atoms) of the individual.
         for position in range(1, len(assignment.data) + 1):
             # A copy of the original individual is made and the particular position of the copy is flipped.
+            if position > 102:
+                falseValue = False
             temp = copy.deepcopy(assignment)
             temp.flip(position)
             # If the move is not in the tabu list and the number of unsatisfied clauses in the copy is
@@ -297,14 +348,14 @@ class GA:
                     positions = []
                     best_sigma = gain
                     positions.append(position)
-                # If the gain calculated is equal to the best gain calculated so far, we simply append the position.     
+                # If the gain calculated is equal to the best gain calculated so far, we simply append the position.
                 elif gain == best_sigma:
                     positions.append(position)
             # This will only fire in the case that the we have not yet managed to find neither an individual who wasn't
             # in the tabu list nor one with a better evaluation in each iteration of the for loop above.
             elif best_sigma == Decimal('-Infinity'):
                 positions.append(position)
-        # Return a position that is randomly selected in those which have the maximum sigma 
+        # Return a position that is randomly selected in those which have the maximum sigma
         # i.e. out of those elements in the positions list.
         # Also return the positions list for the purposes of testing
         return random.choice(positions), positions
@@ -317,22 +368,116 @@ class GA:
         :param choose_function: A function object
         :return: An individual that conforms to the Tabu restrictions.
         """
-
+        if self.is_diversification:
+            forbidden_flips = {}
         self.tabu = self.tabu[:self.tabu_list_length]
         self.best = individual_in
         num_flips = 0
         while (self.evaluate(self.best) != 0) and (self.max_flip > num_flips):
             # index = self.choose(individual_in)
             index = choose_function(individual_in)
-            individual_temp = copy.deepcopy(individual_in)
+            # as long as this flip is not in the tabu we set individual_temp to indavidual_in anyway. So I have removed
+            # the deep coppy on the next line to improve performance and altered all lines up to the second if statement
+            # testing for diversification to individual_in
+            # individual_temp = copy.deepcopy(individual_in)
             if not index[0] in self.tabu:
-                individual_temp.flip(index[0])
-                if self.evaluate(individual_temp) < self.evaluate(self.best):
-                    self.best = individual_temp
+                individual_in.flip(index[0])
+                if self.evaluate(individual_in) < self.evaluate(self.best):
+                    self.best = individual_in
                 num_flips += 1
-                individual_in = individual_temp
-            if self.is_diversification:
-                self.tabu_with_diversification(individual_in)
+
+                # This is for diversifiaction
+                if self.is_diversification:
+                    # Increment all bits that have been flipped to make a Max_false clause positive
+                    temp_flips = copy.deepcopy(forbidden_flips);
+                    for index2 in temp_flips.items():
+                        # index2 is a returned tuple from the forbidden_flips, which records the index and the amount of
+                        # times it has been flipped. The index thus of forbidden_filips is thus the index 0 of the
+                        # returned tuple. That is why there is a dereference inside a dereference.
+                        forbidden_flips[index2[0]] += 1
+                        # Check if pos has been flipped k times since last flip and remove it if it has
+                        # this frees that variable up to be flipped next time it is maximal in a max_false clause
+                        if forbidden_flips[index2[0]] == self.k:
+                            del forbidden_flips[index2[0]]
+
+                # individual_in = individual_temp
+                if self.is_diversification:
+                    temp_individual_in = copy.deepcopy(individual_in)
+                    i = 0
+                    for divers_clause in self.formula:
+                        if not self.sat(temp_individual_in, divers_clause):
+                            self.false_counts[i] += 1
+
+                            # if this clause has reached or exceeded max_false counts, making it a stumble clause
+                            if self.false_counts[i] >= self.max_false:
+                                try:
+                                    value = max(divers_clause, key=lambda c: self.improvement(temp_individual_in, abs(c)))
+                                except ValueError as e:
+                                    raise e
+                                pos = abs(value)
+
+                                # for checking which of the clauses are turned false after diversification flip
+                                individual_temp = copy.deepcopy(temp_individual_in)
+                                # Check if pos has been flipped before
+                                # flips this one stubborn bit and refuse to flip it back before k flips.
+                                if pos not in forbidden_flips.keys():
+                                    # set to 0 and not 1 because it means that if k is 5 only on flip 6 can
+                                    # pos be flipped
+                                    temp_individual_in.flip(pos)
+                                    temp_flips = copy.deepcopy(forbidden_flips);
+                                    for index4 in temp_flips.items():
+                                        forbidden_flips[index4[0]] += 1
+                                        # Check if pos has been flipped k times since last flip and remove it if it has
+                                        # this frees that variable up to be flipped next time it is maximal in a max_false clause
+                                        if forbidden_flips[index4[0]] == self.k:
+                                            del forbidden_flips[index4[0]]
+                                    forbidden_flips[pos] = 0
+                                    # flips this clause to being positive only if the maximal bit was flipped. a loop could
+                                    # be set into the structure to say if the maximal bit cant be flipped due to not having
+                                    # had enough flips then the next maximul could be flipped.
+                                    self.false_counts[i] = 0
+
+                                for _ in range(self.rec):
+
+                                    now_false_clauses = [f_clause for f_clause in self.formula
+                                                         if not self.sat(temp_individual_in, f_clause)
+                                                         and self.sat(individual_temp, f_clause)]
+                                    for nested_clause in now_false_clauses:
+                                        temp_clause = [c for c in nested_clause if c not in forbidden_flips.keys()]
+
+                                        if len(temp_clause) > 0:
+                                            try:
+
+                                                value = max(temp_clause, key=lambda c: self.improvement(temp_individual_in,c))
+                                            except ValueError as e:
+                                                raise e
+                                            pos = abs(value)
+                                            # removing this structure as it is checket int the setting of temp_clause
+                                            # if pos not in forbidden_flips.keys():
+
+                                            # set to 0 and not 1 because it means that if k is 5 only on flip 6 can
+                                            # pos be flipped
+                                            temp_individual_in.flip(pos)
+                                            # increment all remaining forbidden flips as a flip has taken place
+                                            temp_flips = copy.deepcopy(forbidden_flips);
+                                            for index3 in temp_flips.items():
+                                                forbidden_flips[index3[0]] += 1
+                                                # Check if pos has been flipped k times since last flip and remove it if it has
+                                                # this frees that variable up to be flipped next time it is maximal in a max_false clause
+                                                if forbidden_flips[index3[0]] == self.k:
+                                                    del forbidden_flips[index3[0]]
+                                            forbidden_flips[pos] = 0
+                                            # not sure if a secondary maximal should be taken for the false clause.
+
+                                if self.evaluate(temp_individual_in) < self.evaluate(self.best):
+                                    self.best = temp_individual_in
+                        i = i + 1
+                    # NB! NB! NB! This is somewhat confusing and isnt clear in the paper. After all the processing has
+                    # been done on the individual for diversification Im assuming that the individual_in has to be set
+                    # to the resulting individual even if it a worse individual. My reason for this is because it would
+                    # mean tracking multiple states of forbidden flips per formula. if it must only be updated after an
+                    # improvement then an if statement must happen here.
+                    individual_in = temp_individual_in
         return self.best
 
     def choose_rvcf(self, individual_in):
@@ -375,24 +520,41 @@ class GA:
         :return: The weight value.
         """
 
-        c_ones = [clause for clause in self.formula if (index in clause or -index in clause) and
-                  (individual.get(index) == 1)]
-        c_zeros = [clause for clause in self.formula if (index in clause or -index in clause) and
-                   (individual.get(index) == 0)]
+        # Truth values aren't being considered only actual values. I.E. -index in clause must be == 0 to be added to the
+        # c_ones list of tuples as per the paper page 13: "val(X; a) is the truth value of the literal a for the
+        # assignment X", which is further supported up by the truth degree function depending on the number of true
+        # atoms in the clause as it doesnt make sense to evaluate the truth degree for clauses where a negated index
+        # equates to a false clause, it also means that as it stands the other list (c_zeros) will always be empty.
+
+        # c_ones = [clause for clause in self.formula if (index in clause or -index in clause) and
+        #           (individual.get(abs(index)) == 1)]
+        # c_zeros = [clause for clause in self.formula if (index in clause or -index in clause) and
+        #            (individual.get(abs(index)) == 0)]
+
+        c_ones = [clause for clause in self.formula
+                  if (index in clause and individual.get(abs(index)) == 1)
+                  or (-index in clause and individual.get(abs(index)) == 0)]
+        c_zeros = [clause for clause in self.formula
+                   if (index in clause and individual.get(abs(index)) == 0)
+                   or (-index in clause and individual.get(abs(index)) == 1)]
 
         length_c_ones = len(c_ones)
         length_c_zeros = len(c_zeros)
 
-        sum_ones = sum(self.degree(individual, c) for c in c_ones)
-        sum_zeros = sum(self.degree(individual, c) for c in c_zeros)
+        # moved this into if statements to reduce computation that might not be needed as I dont know if
+        # short circuiting applies
+        # sum_ones = sum(self.degree(individual, c) for c in c_ones)
+        # sum_zeros = sum(self.degree(individual, c) for c in c_zeros)
 
         # To cater for the case where the length is 0
         ratio_ones = 0
         ratio_zeros = 0
         if length_c_ones > 0:
+            sum_ones = sum(self.degree(individual, c) for c in c_ones)
             ratio_ones = sum_ones / length_c_ones
 
         if length_c_zeros > 0:
+            sum_zeros = sum(self.degree(individual, c) for c in c_zeros)
             ratio_zeros = sum_zeros / length_c_zeros
 
         return ratio_ones + ratio_zeros
@@ -407,16 +569,21 @@ class GA:
         :return: A numerical value representing the degree.
         """
 
-        list_of_literals = []
+        #can this not just use a simple int counter variable?
+        # list_of_literals = []
+        degree = 0
         for literal in clause:
             if literal > 0:
                 if individual.get(literal) == 1:
-                    list_of_literals.append(literal)
+                    # list_of_literals.append(literal)
+                    degree += 1
             else:
                 if individual.get(abs(literal)) == 0:
-                    list_of_literals.append(literal)
+                    # list_of_literals.append(literal)
+                    degree += 1
 
-        return len(list_of_literals)
+        # return len(list_of_literals)
+        return degree
 
     def tabu_with_diversification(self, individual):
         """
@@ -440,9 +607,9 @@ class GA:
         for clause in false_clauses:
             self.check_flip(individual_temp, clause, forbidden_flips)
             for _ in range(self.rec):
-                non_false_clauses = [self.formula[i] for i in range(len(self.formula))
+                now_false_clauses = [self.formula[i] for i in range(len(self.formula))
                                      if self.sat(individual_temp, clause) and not self.sat(individual, clause)]
-                for nested_clause in non_false_clauses:
+                for nested_clause in now_false_clauses:
                     self.check_flip(individual_temp, nested_clause, forbidden_flips)
         return individual_temp
 
@@ -497,6 +664,11 @@ class GA:
         # Initial sort of the population. This also calls evaluate and therefore every individual has a stored
         # fitness value
         self.population.sort(key=self.evaluate)
+        individual_counter = 0
+        while individual_counter < self.population_size:
+            self.population.append(Individual(self.numberOfVariables, False))
+            individual_counter = individual_counter + 1
+
         return
 
     def is_satisfied(self):
@@ -602,4 +774,5 @@ class GA:
     @generation_counter.setter
     def generation_counter(self, arg):
         self._generation_counter = arg
-        self._notify()
+        if arg > 0:
+            self._notify()
