@@ -29,18 +29,19 @@ class GA:
         self.numberOfVariables = int(number_of_variables)
         # Creating member variables for each of the parameters
         if not max_generations > 1:
-            raise InputError("Input Error: max_generations > 1.")
+            raise InputError("Input Error! The maximum number of generations must be > 1!")
         self.max_generations = int(max_generations)
         # TODO: Test for minimum possible size. It is at least 2
         if not int(population_size) >= 2:
-            raise InputError("Input Error: population_size >= 2.")
+            raise InputError("Input Error! The population size of individuals must be >= 2!")
         self.population_size = int(population_size)
         # TODO: Set sub-population size default to some percentage - May NOT be smaller than 2 because of crossover
         if not sub_population_size >= 2 or not sub_population_size <= int(population_size):
-            raise InputError("Input Error: population_size >= sub_population_size >= 2.")
+            raise InputError("Input Error! population_size >= sub_population_size >= 2!")
         self.sub_population_size = int(sub_population_size)
         if crossover_operator not in [0, 1, 2]:
-            raise InputError("Input Error: crossover_operator element of {0,1,2}.")
+            raise InputError("Input Error! The parameter for the crossover operator is an element of {0,1,2} --> "
+                             "{Corrective Clause, Corrective Clause with Truth Maintenance, Fluerent and Ferland}!")
         self.crossover_operator = int(crossover_operator)
         # TODO: Check that length is not greater than the variables length
         if tabu_list_length is None:
@@ -48,29 +49,32 @@ class GA:
             tabu_list_length = int(10.0/100.0 * number_of_variables)
         else:
             if not int(tabu_list_length) > 0 or not int(tabu_list_length) <= int(number_of_variables):
-                raise InputError("Input Error: number_of_variables >= tabu_list_length > 0.")
+                raise InputError("Input Error! number_of_variables >= tabu_list_length > 0!")
         self.tabu_list_length = int(tabu_list_length)
         if not max_flip > 0:
-            raise InputError("Input Error: max_flips > 0.")
+            raise InputError("Input Error! The parameter for maximum flips (during tabu search) must be > 0!")
         self.max_flip = int(max_flip)
         if is_rvcf not in [0, 1]:
-            raise InputError("Input Error: is_rvcf element of {0,1}.")
+            raise InputError("Input Error! The parameter for 'is rvcf' (refinement of the variable choice to flip) is "
+                             "an element of {0,1} --> {False, True}!")
         self.is_rvcf = bool(is_rvcf)
         if is_diversification not in [0, 1]:
-            raise InputError("Input Error: is_diversification element of {0,1}.")
+            raise InputError("Input Error! The parameter for 'is diversification' is an"
+                             " element of {0,1} --> {False, True}!")
         self.is_diversification = bool(is_diversification)
         if not int(max_false) > 0:
-            raise InputError("Input Error: max_false > 0.")
+            raise InputError("Input Error! The parameter for maximum false (appearances of a stumble clause)"
+                             " must be > 0!")
         self.max_false = int(max_false)
         if not int(rec) > 0:
-            raise InputError("Input Error: rec > 0.")
+            raise InputError("Input Error! The parameter rec (Recursion Count) must be > 0!")
         self.rec = int(rec)
         if k is None:
             # If no value specified - default value of 10% of number of variables.
             k = int(10.0/100.0 * number_of_variables)
         else:
             if not int(k) > 0:
-                raise InputError("Input Error: k > 0.")
+                raise InputError("Input Error! The parameter k (Flip Constraint) must be > 0!")
         self.k = int(k)
         self._observers = set()
         self._generation_counter = None
