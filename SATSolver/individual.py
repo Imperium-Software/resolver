@@ -14,7 +14,11 @@ class Individual:
     def __init__(self, length=0, defined=False, value=None):
 
         """ Creates a bit string of a certain length, using a certain underlying
-        implementation.  """
+        implementation.
+
+        :param parents: A 2-tuple of the parents to initialise this child from
+
+        """
 
         self.length = length
         self.fitness = 0

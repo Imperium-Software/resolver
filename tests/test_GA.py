@@ -3,10 +3,10 @@ import os
 myPath = os.path.dirname(os.path.abspath(__file__))
 print(myPath)
 sys.path.insert(0, myPath + '/../SATSolver')
-from SATSolver.GA import GA
+from GA import GA
 from unittest import TestCase
-from bitarray import bitarray
-from SATSolver.individual import Individual
+from BitVector import BitVector
+from individual import Individual
 
 class TestGA(TestCase):
 
