@@ -276,7 +276,6 @@ class GA:
                         best_pos = abs(clause[i])
                 if maximum_improvement != 0:
                     z.set(best_pos, x.get(best_pos))
-                    z.set_defined(best_pos)
                     z.flip(best_pos)
 
         # Truth maintenance - See section 4.2 of the paper
@@ -388,7 +387,7 @@ class GA:
                 # This is for diversifiaction
                 if self.is_diversification:
                     # Increment all bits that have been flipped to make a Max_false clause positive
-                    temp_flips = copy.deepcopy(forbidden_flips);
+                    temp_flips = copy.deepcopy(forbidden_flips)
                     for index2 in temp_flips.items():
                         # index2 is a returned tuple from the forbidden_flips, which records the index and the amount of
                         # times it has been flipped. The index thus of forbidden_filips is thus the index 0 of the
@@ -423,7 +422,7 @@ class GA:
                                     # set to 0 and not 1 because it means that if k is 5 only on flip 6 can
                                     # pos be flipped
                                     temp_individual_in.flip(pos)
-                                    temp_flips = copy.deepcopy(forbidden_flips);
+                                    temp_flips = copy.deepcopy(forbidden_flips)
                                     for index4 in temp_flips.items():
                                         forbidden_flips[index4[0]] += 1
                                         # Check if pos has been flipped k times since last flip and remove it if it has
@@ -458,7 +457,7 @@ class GA:
                                             # pos be flipped
                                             temp_individual_in.flip(pos)
                                             # increment all remaining forbidden flips as a flip has taken place
-                                            temp_flips = copy.deepcopy(forbidden_flips);
+                                            temp_flips = copy.deepcopy(forbidden_flips)
                                             for index3 in temp_flips.items():
                                                 forbidden_flips[index3[0]] += 1
                                                 # Check if pos has been flipped k times since last flip and remove it if it has

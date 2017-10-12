@@ -11,7 +11,7 @@ import random
 class Individual:
     """ Encapsulates an Individual in the GA. """
 
-    def __init__(self, length=0, value=None):
+    def __init__(self, length=0, value=None, parents=None):
 
         """ Creates a bit string of a certain length, using a certain underlying
         implementation.
@@ -25,9 +25,16 @@ class Individual:
         self.isCacheValid = False
         self.data = bitarray(length)
 
-        for i in range(1, length+1):
-            if bool(random.getrandbits(1)):
-                self.flip(i)
+        if parents is not None:
+            for i in range(1, length+1):
+                if (bool(random.getrandbits(1))):
+                    self.set(i, parents[0].get(i))
+                else:
+                    self.set(i, parents[1].get(i))
+        else:
+            for i in range(1, length+1):
+                if bool(random.getrandbits(1)):
+                    self.flip(i)
 
     def __str__(self):
 
@@ -75,5 +82,5 @@ class Factory:
     def create(length, amount):
         """ Creates an array of individuals. """
 
-        array = [Individual(length, True) for _ in range(amount)]
+        array = [Individual(length=length) for _ in range(amount)]
         return array
