@@ -42,8 +42,12 @@ def decode(data, server, client_id):
                 else:
                     raw_formula_array = json_data["SOLVE"]["raw_input"]
 
-                    json_data["SOLVE"]["formula"], json_data["SOLVE"]["number_of_variables"], json_data["SOLVE"][
-                        "number_of_clauses"] = controller.parse_formula(raw_formula_array, False)
+                    try:
+                        json_data["SOLVE"]["formula"], json_data["SOLVE"]["number_of_variables"], json_data["SOLVE"][
+                            "number_of_clauses"] = controller.parse_formula(raw_formula_array, False)
+                    except Exception:
+                        raise RequestHandlerError("Parsing of .cnf file failed. "
+                                                    "Please check the DIMACS format for errors.")
                     del json_data["SOLVE"]["raw_input"]
                     controller.create_ga(json_data["SOLVE"])
                     controller.ga_thread = Thread(target=controller.start_ga)

@@ -82,7 +82,7 @@ def main(argv):
         try:
             controller.create_ga(options)
         except InputError as ie:
-            print("".join(ie.args))
+            print(ie)
             if port_number is not None:
                 # Close Server
                 pass
