@@ -53,7 +53,7 @@ class TestGA(TestCase):
 
     def test_evaluate(self):
         reader = self.FormulaReader("../examples/trivial.cnf")
-        ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
+        ga = GA(reader.formula, 9, 5, 9, 5, 5, 5)
         ind = Individual(9)
         ind.data = bitarray("111111111")
         ind.isCacheValid = False
@@ -67,14 +67,14 @@ class TestGA(TestCase):
 
     def test_evaluate_unsolvable(self):
         reader = self.FormulaReader("../examples/trivial3.cnf")
-        ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
+        ga = GA(reader.formula, 9, 5, 1, 5, 5, 5)
         ind = Individual(9)
         ind.isCacheValid = False
         self.assertTrue(ga.evaluate(ind) != 0, "Evaluate says unsolvable formula is solved.")
 
     def test_improvement(self):
         reader = self.FormulaReader("../examples/trivial.cnf")
-        ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
+        ga = GA(reader.formula, 9, 5, 4, 5, 5, 5)
         ind = Individual(9)
         ind.data = bitarray("000100000")
         self.assertEqual(ga.improvement(ind, 1), 1)
@@ -172,7 +172,7 @@ class TestGA(TestCase):
         # TEST 2 - All positions are tabu and best individual is guaranteed to be better................................
 
         file_reader = self.FormulaReader("../examples/trivial2.cnf")
-        ga_implementation = GA(file_reader.formula, 1, 3, 5, 5, 5, 5)
+        ga_implementation = GA(file_reader.formula, 1, 3, 2, 5, 5, 5)
         ga_implementation.tabu = ga_implementation.tabu[:ga_implementation.tabu_list_length]
 
         for index in range(1, 4, 1):
@@ -278,7 +278,7 @@ class TestGA(TestCase):
         self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [6])
 
         file_reader = self.FormulaReader("../examples/trivial2.cnf")
-        ga_implementation = GA(file_reader.formula, 1, 3, 5, 5, 5, 5)
+        ga_implementation = GA(file_reader.formula, 1, 3, 3, 5, 5, 5)
         ind.data = bitarray("000")
         self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [1, 2, 3])
 
@@ -329,7 +329,7 @@ class TestGA(TestCase):
 
     def test_is_satisfied(self):
         reader = self.FormulaReader("../examples/trivial.cnf")
-        ga = GA(reader.formula, 9, 5, 10, 5, 5, 5)
+        ga = GA(reader.formula, 9, 5, 4, 5, 5, 5)
         ind = Individual(9)
         ind.data = bitarray("000000000")
         ind.isCacheValid = False
