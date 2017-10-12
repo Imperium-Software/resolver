@@ -151,6 +151,9 @@ function navigate(filename) {
         $("#advanced").modal();
         $("#connected-indicator")[0].style.fill = conn.connected ? "lime" : "red";
 
+        if (generations.generations == 0) {
+            $("#progress").hide();
+        }
 
         // Progress circle
 
@@ -244,47 +247,6 @@ function navigate(filename) {
             }
         });
 
-        generations = new Vue({
-            el: "#generations",
-            data: {
-                generations: generations.generations,
-                max_generations: generations.max_generations
-            }
-        });
-
-        time_elapsed = new Vue({
-            el: "#time",
-             data: {
-              elapsed: time_elapsed.elapsed,
-                 start: time_elapsed.start,
-                 finish: time_elapsed.finish
-             }
-         });
-         
-         best_individual = new Vue({
-             el: "#fitness",
-             data: {
-               fitness: best_individual.fitness,
-               individual: best_individual.individual,
-               array : best_individual.array
-             }
-         });
-         
-         current_child = new Vue({
-             data: {
-               fitness: current_child.fitness,
-               individual: current_child,
-               array : current_child.array
-             }
-         });
-         
-         formula_info = new Vue({
-             el: "#formula-info",
-             data: {
-                 num_clauses: formula_info.num_clauses,
-                 num_variables: formula_info.num_variables
-             }
-         });
     })
 }
 
