@@ -20,7 +20,7 @@ class InputError(Exception):
 
 
 class GA:
-        def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length=None, max_false=5, rec=10,
+    def __init__(self, formula, number_of_clauses, number_of_variables, tabu_list_length=None, max_false=5, rec=10,
                  k=None, max_generations=1000, population_size=100, sub_population_size=15, crossover_operator=0,
                  max_flip=10000, is_rvcf=False, is_diversification=False):
 
