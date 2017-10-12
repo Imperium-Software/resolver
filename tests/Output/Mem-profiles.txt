@@ -1,0 +1,133 @@
+10 flips
+
+                            types |   # objects |   total size
+================================= | =========== | ============
+                     <class 'list |        3044 |    166.82 KB
+                      <class 'str |        3046 |    142.60 KB
+                     <class 'type |           5 |      3.17 KB
+                      <class 'int |         228 |      3.15 KB
+                     <class 'dict |          12 |      1.77 KB
+                     <class 'code |           6 |    504     B
+                  <class 'weakref |           6 |    264     B
+                    <class 'tuple |           6 |    156     B
+                function (encode) |           2 |    144     B
+                function (decode) |           2 |    144     B
+                      <class 'set |           1 |    116     B
+            function (store_info) |           1 |     72     B
+           <class 'abc.SignalDict |           2 |     72     B
+           function (getregentry) |           1 |     72     B
+  function (getpreferredencoding) |           1 |     72     B
+
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+25 flips
+
+                            types |   # objects |   total size
+================================= | =========== | ============
+                     <class 'list |        3044 |    166.82 KB
+                      <class 'str |        3046 |    142.60 KB
+                     <class 'type |           5 |      3.17 KB
+                      <class 'int |         228 |      3.15 KB
+                     <class 'dict |          12 |      1.77 KB
+                     <class 'code |           6 |    504     B
+                  <class 'weakref |           6 |    264     B
+                    <class 'tuple |           6 |    156     B
+                function (decode) |           2 |    144     B
+                function (encode) |           2 |    144     B
+                      <class 'set |           1 |    116     B
+            function (store_info) |           1 |     72     B
+           <class 'abc.SignalDict |           2 |     72     B
+  function (getpreferredencoding) |           1 |     72     B
+           function (getregentry) |           1 |     72     B
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+50 flips
+
+                            types |   # objects |   total size
+================================= | =========== | ============
+                     <class 'list |        3044 |    166.82 KB
+                      <class 'str |        3046 |    142.60 KB
+                     <class 'type |           5 |      3.17 KB
+                      <class 'int |         228 |      3.15 KB
+                     <class 'dict |          12 |      1.77 KB
+                     <class 'code |           6 |    504     B
+                  <class 'weakref |           6 |    264     B
+                    <class 'tuple |           6 |    156     B
+                function (decode) |           2 |    144     B
+                function (encode) |           2 |    144     B
+                      <class 'set |           1 |    116     B
+           function (getregentry) |           1 |     72     B
+  function (getpreferredencoding) |           1 |     72     B
+            function (store_info) |           1 |     72     B
+           <class 'abc.SignalDict |           2 |     72     B
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+65 flips
+
+                            types |   # objects |   total size
+================================= | =========== | ============
+                     <class 'list |        3044 |    166.82 KB
+                      <class 'str |        3046 |    142.60 KB
+                     <class 'type |           5 |      3.17 KB
+                      <class 'int |         228 |      3.15 KB
+                     <class 'dict |          12 |      1.77 KB
+                     <class 'code |           6 |    504     B
+                  <class 'weakref |           6 |    264     B
+                    <class 'tuple |           6 |    156     B
+                function (encode) |           2 |    144     B
+                function (decode) |           2 |    144     B
+                      <class 'set |           1 |    116     B
+  function (getpreferredencoding) |           1 |     72     B
+            function (store_info) |           1 |     72     B
+           function (getregentry) |           1 |     72     B
+           <class 'abc.SignalDict |           2 |     72     B
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+100 flips
+
+                            types |   # objects |   total size
+================================= | =========== | ============
+                     <class 'list |        3044 |    166.82 KB
+                      <class 'str |        3046 |    142.60 KB
+                     <class 'type |           5 |      3.17 KB
+                      <class 'int |         228 |      3.15 KB
+                     <class 'dict |          12 |      1.77 KB
+                     <class 'code |           6 |    504     B
+                  <class 'weakref |           6 |    264     B
+                    <class 'tuple |           6 |    156     B
+                function (decode) |           2 |    144     B
+                function (encode) |           2 |    144     B
+                      <class 'set |           1 |    116     B
+           function (getregentry) |           1 |     72     B
+  function (getpreferredencoding) |           1 |     72     B
+            function (store_info) |           1 |     72     B
+           <class 'abc.SignalDict |           2 |     72     B
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+5000 flips
+
+                            types |   # objects |   total size
+================================= | =========== | ============
+                     <class 'list |        3044 |    166.82 KB
+                      <class 'str |        3046 |    142.60 KB
+                      <class 'int |         233 |      3.22 KB
+                     <class 'type |           5 |      3.17 KB
+                     <class 'dict |          12 |      1.77 KB
+                     <class 'code |           6 |    504     B
+                  <class 'weakref |           6 |    264     B
+                    <class 'tuple |           6 |    156     B
+                function (encode) |           2 |    144     B
+                function (decode) |           2 |    144     B
+                      <class 'set |           1 |    116     B
+           function (getregentry) |           1 |     72     B
+  function (getpreferredencoding) |           1 |     72     B
+            function (store_info) |           1 |     72     B
+           <class 'abc.SignalDict |           2 |     72     B
+
+
+Ran 1 test in 9316.321s
