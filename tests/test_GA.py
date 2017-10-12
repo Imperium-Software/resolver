@@ -53,7 +53,7 @@ class TestGA(TestCase):
 
     def test_evaluate(self):
         reader = self.FormulaReader("../examples/trivial.cnf")
-        ga = GA(reader.formula, 9, 5, 9, 5, 5, 5)
+        ga = GA(reader.formula, 9, 5, 5, 5, 5, 5)
         ind = Individual(9)
         ind.data = bitarray("111111111")
         ind.isCacheValid = False
