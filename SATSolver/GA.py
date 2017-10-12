@@ -42,13 +42,13 @@ class GA:
         if crossover_operator not in [0, 1, 2]:
             raise InputError("Input Error: crossover_operator element of {0,1,2}.")
         self.crossover_operator = int(crossover_operator)
-        # TODO: Check that length is not greater than the population length
+        # TODO: Check that length is not greater than the variables length
         if tabu_list_length is None:
             # If no value specified - default value of 10% of number of variables.
             tabu_list_length = int(10.0/100.0 * number_of_variables)
         else:
-            if not int(tabu_list_length) > 0 or not int(tabu_list_length) <= int(population_size):
-                raise InputError("Input Error: population_size >= tabu_list_length > 0.")
+            if not int(tabu_list_length) > 0 or not int(tabu_list_length) <= int(number_of_variables):
+                raise InputError("Input Error: number_of_variables >= tabu_list_length > 0.")
         self.tabu_list_length = int(tabu_list_length)
         if not max_flip > 0:
             raise InputError("Input Error: max_flips > 0.")
