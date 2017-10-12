@@ -222,7 +222,7 @@ class GA:
         :return: The generated individual z
         """
 
-        z = Individual(self.numberOfVariables, self.method, parents=(x, y))
+        z = Individual(self.numberOfVariables, parents=(x, y))
         clauses = [i for i in range(self.numberOfClauses) if
                    not self.sat(x, self.formula[i]) and not self.sat(y, self.formula[i])]
         for index in clauses:
@@ -264,7 +264,7 @@ class GA:
         :return: The generated individual z
         """
 
-        z = Individual(self.numberOfVariables, self.method, parents=(x, y))
+        z = Individual(self.numberOfVariables, parents=(x, y))
         for clause in self.formula:
             best_pos = 0
             maximum_improvement = 0
@@ -305,7 +305,7 @@ class GA:
         :return: The generated individual z.
         """
 
-        z = Individual(self.numberOfVariables, self.method, parents=(x, y))
+        z = Individual(self.numberOfVariables, parents=(x, y))
         for clause in self.formula:
             if self.sat(x, clause) and not self.sat(y, clause):
                 for i in range(len(clause)):
