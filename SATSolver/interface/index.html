@@ -149,19 +149,19 @@
 	                  <div>
 	                  <ul class="collapsible" data-collapsible="accordion">
 	                    <li>
-	                      <div class="collapsible-header">Hyper-parameters</div>
+	                          <div class="collapsible-header">Hyper-parameters</div>
 	                      <div class="collapsible-body">
 
 
 	                        <div class="row">
 	                          <div class="input-field col s6 tooltip">
-	                            <input id="tabu_list_length" type="number" value=10>
+	                            <input id="tabu_list_length" type="number" value=10 onkeypress="return event.charCode >= 48">
 	                            <label for="tabu_list_length">Tabu List Length</label>
 	                            <span class="tooltiptext">The length of the algorithm's "memory".</span>
 	                          </div>
 
 	                          <div class="input-field col s6 tooltip">
-	                            <input id="max_false" type="number" value=5>
+	                            <input id="max_false" type="number" value=5 onkeypress="return event.charCode >= 48">
 	                            <label for="max_false">Max False</label>
 	                            <span class="tooltiptext">How many times a clause must be false to be considered a "stumble-clause".</span>
 	                          </div>
@@ -170,13 +170,13 @@
 
 	                        <div class="row" style="margin-bottom: 0em;">
 	                          <div class="input-field col s6 tooltip">
-	                            <input id="rec" type="number" value=5>
+	                            <input id="rec" type="number" value=5 onkeypress="return event.charCode >= 48">
 	                            <label for="rec">Recursion Count (<i>Rec</i>)</label>
 	                            <span class="tooltiptext">The amount the algorithm is allowed to recurse.</span>
 	                          </div>
 
 	                          <div class="input-field col s6 tooltip">
-	                            <input id="k" type="number" value=5>
+	                            <input id="k" type="number" value=5 onkeypress="return event.charCode >= 48">
 	                            <label for="k">Flip Constraint (<i>K</i>)</label>
 	                            <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
 	                          </div>
@@ -192,12 +192,12 @@
 	                            <h5>Advanced Settings</h5>
 	                            <div class="row" style="margin-bottom: 0em; margin-top: 0em;">
 	                              <div class="input-field col s6 tooltip">
-	                                <input id="max_generations" type="number">
+	                                <input id="max_generations" type="number" onkeypress="return event.charCode >= 48">
 	                                <label for="max_generations">Max Generations</label>
 	                                <span class="tooltiptext">The maximum number of times evolution will iterate.</span>
 	                              </div>
 	                              <div class="input-field col s6 tooltip">
-	                                <input id="max_flip" type="number">
+	                                <input id="max_flip" type="number" onkeypress="return event.charCode >= 48">
 	                                <label for="max_flip">Max Flips</label>
 	                                <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
 	                              </div>
@@ -205,12 +205,12 @@
 
 	                            <div class="row" style="margin-bottom: 0em; margin-top: 0em;">
 	                              <div class="input-field col s6 tooltip">
-	                                <input id="population_size" type="number">
+	                                <input id="population_size" type="number" onkeypress="return event.charCode >= 48">
 	                                <label for="population_size">Population Size</label>
 	                                <span class="tooltiptext">The maximum number of individuals at any given time.</span>
 	                              </div>
 	                              <div class="input-field col s6 tooltip">
-	                                <input id="sub_population_size" type="number">
+	                                <input id="sub_population_size" type="number" onkeypress="return event.charCode >= 48">
 	                                <label for="sub_population_size">Sub-population Size</label>
 	                                <span class="tooltiptext">How long an atom in a stumble-clause is prevented from flipping</span>
 	                              </div>
@@ -223,7 +223,7 @@
 	                              <div class="input-field SAT-dark-blue">
 	                                <select id="method">
 	                                <option value="" disabled selected>Implementation method</option>
-	                                <option value="bitvector">BitVector</option>
+	                            <option value="bitvector">BitVector</option>
 	                                <option value="bitarray">bitarray</option>
 	                              </select>
 	                                <!-- <span class="tooltiptext">Underlying implementation method.</span> -->
