@@ -746,7 +746,7 @@ class GA:
             self.replace(child)
 
             # Increase the generation
-            self.generation_counter += 1
+            self.generation_counter = self.generation_counter + 1
 
         return self.population[0]
 
