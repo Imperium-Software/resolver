@@ -42,7 +42,8 @@ class GA:
         if crossover_operator not in [0, 1, 2]:
             raise InputError("Input Error! The parameter for the crossover operator is an element of {0,1,2} --> "
                              "{Corrective Clause, Corrective Clause with Truth Maintenance, Fluerent and Ferland}!")
-        self.crossover_operator = int(crossover_operator)
+        crossover_options = [self.corrective_clause, self.corrective_clause_with_truth_maintenance, self.fluerent_and_ferland]
+        self.crossover_operator = crossover_options[crossover_operator]
         # TODO: Check that length is not greater than the variables length
         if tabu_list_length is None:
             # If no value specified - default value of 10% of number of variables.
