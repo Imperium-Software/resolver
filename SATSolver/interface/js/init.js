@@ -195,7 +195,6 @@ conn.on('data', function(data) {
         time_elapsed.start = finishedArray["TIME_STARTED"];
         time_elapsed.finish = finishedArray["TIME_FINISHED"];
         chart.update();
-
         let status_title = $('#status-title');
         if (finishedArray["SUCCESSFUL"] === true) {
             status_title.addClass('success');
@@ -249,12 +248,14 @@ conn.on('close', function() {
   conn.connected = false;
 });
 
+
 var chart;
+var default_chart;
 $(document).ready(function () {
     $('#progress').hide();
     let accent_colour = $('button').css('backgroundColor');
     let ctx = document.getElementById('fitness-chart').getContext('2d');
-    chart = new Chart(ctx, {
+    default_chart = new Chart(ctx, {
         // The type of chart we want to create
         type: 'line',
 
@@ -308,6 +309,7 @@ $(document).ready(function () {
             }
         }
     });
+    chart = default_chart;
 });
 
 window.setInterval(function() {
@@ -356,6 +358,17 @@ function reset() {
     let ctx = canvas.getContext('2d');
     ctx.clearRect(0,0, canvas.width, canvas.height); // resize to parent width
     chart.reset();
+    chart = default_chart;
+    chart['data']['datasets'][0]['data'] = [];
+    chart['data']['datasets'][1]['data'] = [];
+    chart.update();
+
+    $('#status').addClass('hide');
+    $('#answer-container').hide();
+    $('#progress').hide();
+    $('#status-title').removeClass('success');
+    $('#status-title').removeClass('failed');
+
 }
 
 function circularHeat(child_data, best_data, numSegments) {

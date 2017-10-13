@@ -770,5 +770,5 @@ class GA:
     @generation_counter.setter
     def generation_counter(self, arg):
         self._generation_counter = arg
-        if arg > 0:
+        if arg >= 0:
             self._notify()

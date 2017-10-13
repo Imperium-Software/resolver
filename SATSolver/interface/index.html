@@ -84,6 +84,10 @@
 	            </div>
 	          </div>
 
+				<div class="row">
+					<div class="col s6">Newest Child Clauses</div>
+					<div class="col s6">Fittest Individual Clauses</div>
+				</div>
 	          <div class="row">
 	            <div class="col s6" id="child-chart"></div>
 	            <div class="col s6" id="best-chart"></div>
@@ -230,7 +234,7 @@
 	                            </div>
 
 	                            <div class="row" style="margin-bottom: 0em; margin-top: 0em;">
-	                            <div class="col s12">
+	                            <div class="col s12" style="display: none">
 	                            	<!-- nice to have tool tips but its causing readability issues -->
 	                              <!-- <div class="input-field tooltip gray SAT-dark-blue"> -->
 	                              <div class="input-field SAT-dark-blue">
@@ -250,7 +254,6 @@
 	                                <option value="corrective-clause">Corrective Clause</option>
 	                                <option value="cctm">CCTM</option>
 	                                <option value="fleurent-and-ferland">Fleurent and Ferland</option>
-	                                <option value="uniform">Uniform Crossover</option>
 	                              </select>
 	                            </div>
 	                            </div>
@@ -268,7 +271,7 @@
 	                          </div>
 	                          </div>
 	                          <div class="modal-footer">
-	                            <a href="#!" class="modal-action modal-close waves-effect btn btn-flat">Close</a>
+	                            <a href="#!" class="modal-action modal-close waves-effect btn btn-flat white-text">Close</a>
 	                          </div>
 
 	                        </div>
@@ -278,7 +281,7 @@
 	                    </li>
 	                  </ul>
 	              	  </div>
-	                  <button onclick='make_request("SOLVE"); return false' class='btn'>Start</button>
+	                  <button onclick='make_request("SOLVE"); return false' class='btn white'>Start</button>
 	                <!-- </form> -->
 	              </div>
 	            </li>

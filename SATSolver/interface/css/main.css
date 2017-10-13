@@ -259,3 +259,7 @@ h5>small {
 .dragtimetable-table {
     width: 80%;
 }
+
+.modal-content {
+    overflow-x: hidden;
+}
