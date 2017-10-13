@@ -199,17 +199,19 @@ conn.on('data', function(data) {
         let status_title = $('#status-title');
         if (finishedArray["SUCCESSFUL"] === true) {
             status_title.addClass('success');
+            $('#solution-desc').text('Solution:');
             status_title.html('Successfully found a solution.');
+            $('#answer-clauses-form').hide();
         } else {
             status_title.addClass('failed');
             status_title.html('Could not find a solution.');
+            $('#solution-desc').text('Best Solution Found:');
+            $('#answer-clauses-form').show();
         }
 
         $('#status').removeClass('hide');
-
-        let answer = $('#answer');
-        answer.removeClass('hide');
-        answer.html(finishedArray["INDIVIDUAL"]);
+        $('#answer-container').show();
+        $('#answer').val(finishedArray["INDIVIDUAL"]);
 
         console.log(current_child.array[0]);
         console.log(best_individual.array[0]);
