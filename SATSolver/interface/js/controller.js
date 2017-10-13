@@ -247,6 +247,14 @@ function navigate(filename) {
             }
         });
 
+        generations = new Vue({
+            el: "#generations",
+            data: {
+                generations: generations.generations,
+                max_generations: generations.max_generations
+            }
+        });
+
     })
 }
 

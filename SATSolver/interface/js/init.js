@@ -194,6 +194,7 @@ conn.on('data', function(data) {
         best_individual.fitness = finishedArray["FITNESS"];
         time_elapsed.start = finishedArray["TIME_STARTED"];
         time_elapsed.finish = finishedArray["TIME_FINISHED"];
+        var true_clauses = finishedArray["TRUE_CLAUSES"];
         chart.update();
         let status_title = $('#status-title');
         if (finishedArray["SUCCESSFUL"] === true) {
@@ -206,6 +207,16 @@ conn.on('data', function(data) {
             status_title.html('Could not find a solution.');
             $('#solution-desc').text('Best Solution Found:');
             $('#answer-clauses-form').show();
+
+            true_clauses = true_clauses.split('');
+            var true_clauses_num = '';
+            for (var i = 0; i < true_clauses.length; i++) {
+                if (true_clauses[i] === '0') {
+                    true_clauses_num += i + ', ' ;
+                }
+            }
+            true_clauses_num = true_clauses_num.slice(0, -2);
+            $('#answer-clauses').val(true_clauses_num);
         }
 
         $('#status').removeClass('hide');

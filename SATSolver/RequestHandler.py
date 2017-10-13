@@ -136,7 +136,8 @@ def encode(message_type, data):
                     "GENERATION": data_arr[2],
                     "TIME_STARTED": data_arr[3],
                     "TIME_FINISHED": data_arr[4],
-                    "INDIVIDUAL": data_arr[5]
+                    "INDIVIDUAL": data_arr[5],
+                    "TRUE_CLAUSES": data_arr[6]
                 }
             }
         }

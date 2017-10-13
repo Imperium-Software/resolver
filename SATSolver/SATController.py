@@ -117,7 +117,8 @@ class SATController(Observer, SingletonMixin):
                     [self._generation_count, self.GA.max_generations],
                     self.time_started,
                     self.time_finished,
-                    str(result)
+                    str(result),
+                    self.GA.true_clauses(result)
                 ])
                 time.sleep(0.1)
                 self.server_thread.push_to_all(encoded_message)
@@ -147,7 +148,8 @@ class SATController(Observer, SingletonMixin):
                     [self._generation_count, self.GA.max_generations],
                     self.time_started,
                     self.time_finished,
-                    str(self.GA.best_individual)
+                    str(self.GA.best_individual),
+                    self.GA.true_clauses(self.GA.best_individual)
                 ])
                 self.server_thread.push_to_all(encoded_message)
 
