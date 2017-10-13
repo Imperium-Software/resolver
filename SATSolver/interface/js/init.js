@@ -188,7 +188,7 @@ conn.on('data', function(data) {
       try {
         let progressObject = JSON.parse(data);
         let finishedArray = progressObject["RESPONSE"]["FINISHED"];
-        perc.percentage = (progressArray["NUM_CLAUSES"][0]-finishedArray["FITNESS"][0]) / progressArray["NUM_CLAUSES"][0];
+        // perc.percentage = (progressArray["NUM_CLAUSES"][0]-finishedArray["FITNESS"][0]) / progressArray["NUM_CLAUSES"][0];
         generations.generations = finishedArray["GENERATION"][0];
         generations.max_generations = finishedArray["GENERATION"][1];
         best_individual.fitness = finishedArray["FITNESS"];
@@ -340,7 +340,6 @@ window.setInterval(function() {
 }, 5000);
 
 function reset() {
-    console.log("Here");
     time_elapsed.start = 0;
     time_elapsed.finish = 0;
     generations.max_generations = 0;

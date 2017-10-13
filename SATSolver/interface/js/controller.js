@@ -151,30 +151,9 @@ function navigate(filename) {
         $("#advanced").modal();
         $("#connected-indicator")[0].style.fill = conn.connected ? "lime" : "red";
 
-        // timetable
-        let timetable_ctx = DragTimetable.create($("#timetable")[0], {
-            timeHeaderSize: '150px', // width of the time header column 
-            taskAreaSize: '100px', // width of the task column 
-            quarterHourAreaSize: '15px', // height of a 15 minute segment 
-            hourStart: 8, // starting time of timetable, 0 to 23 
-            hourEnd: 16, // ending time of timetable, 0 to 23 
-            clickThreshold: 200
-        });
-
-        timetable_ctx.addTask({
-            id: 1, // unique id for task 
-            start: 9, // starting time for task 
-            end: 11, // ending time for task 
-            text: 'Important Meeting'
-        }, true);
-
-        timetable_ctx.addTask({
-            id: 2, // unique id for task 
-            start: 11, // starting time for task 
-            end: 12, // ending time for task 
-            text: 'Lecture'
-        }, true);
-
+        if (generations.generations == 0) {
+            $("#progress").hide();
+        }
 
         // Progress circle
 
@@ -213,8 +192,6 @@ function navigate(filename) {
         new_progress_bar.animate(perc.percentage);
         progress_bar = new_progress_bar;
 
-            
-
         // Re-render percentage
 
         perc = new Vue({
@@ -245,40 +222,30 @@ function navigate(filename) {
             }
         });
 
-        var best_individual = new Vue({
+        best_individual = new Vue({
             el: "#fitness",
             data: {
-              fitness: 0,
-              individual: null
+              fitness: best_individual.fitness,
+              individual: best_individual.individual
             }
         });
 
-        var current_child = new Vue({
+        current_child = new Vue({
             data: {
-              fitness: 0,
-              individual: null,
+              fitness: current_child.fitness,
+              individual: current_child.individual,
               array : current_child.array
 
             }
         });
 
-        var formula_info = new Vue({
+        formula_info = new Vue({
             el: "#formula-info",
             data: {
-                num_clauses: 0,
-                num_variables: 0
+                num_clauses: formula_info.num_clauses,
+                num_variables: formula_info.num_variables
             }
         });
-
-        var generations = new Vue({
-            el: "#generations",
-            data: {
-                generations: 0,
-                max_generations: 1000
-            }
-        });
-
-        var g
 
     })
 }
