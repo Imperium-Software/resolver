@@ -21,7 +21,7 @@ class Individual:
         """
 
         self.length = length
-        self.fitness = 1
+        self.fitness = 100
         self.isCacheValid = False
         self.data = bitarray(length)
 
