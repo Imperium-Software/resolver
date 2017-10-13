@@ -142,10 +142,8 @@ conn.on('data', function(data) {
         formula_info.num_variables = progressArray["NUM_VARIABLES"][0];
 
 
-        if ($('#progress').is(":hidden")) {
-            $('.setup').collapsible('close', 0);
-            $('#progress').slideDown(2000);
-        }
+          $('#progress').show();
+          $('#main-card').hide();
 
         if (progressArray["CURRENT_CHILD"] !== "None") {
             new_child = progressArray["TRUE_CLAUSES_CURRENT_CHILD"][0].split('').map((item) => {
@@ -172,11 +170,11 @@ conn.on('data', function(data) {
             circularHeat(current_child.array, best_individual.array, new_child.length);
         }
 
-        if (!chart.data.labels.includes(progressArray["GENERATION"][0])) {
-          chart.data.labels.push(progressArray["GENERATION"][0]);
-          chart.data.datasets[0].data.push(progressArray["BEST_INDIVIDUAL_FITNESS"][0]);
-          chart.data.datasets[1].data.push(progressArray["CURRENT_CHILD_FITNESS"][0]);
-          chart.update();
+        if (!graph_chart.data.labels.includes(progressArray["GENERATION"][0])) {
+          graph_chart.data.labels.push(progressArray["GENERATION"][0]);
+          graph_chart.data.datasets[0].data.push(progressArray["BEST_INDIVIDUAL_FITNESS"][0]);
+          graph_chart.data.datasets[1].data.push(progressArray["CURRENT_CHILD_FITNESS"][0]);
+          graph_chart.update();
         }
       } catch(e) {
         $("#connected-indicator")[0].style.fill = "yellow";
@@ -195,7 +193,7 @@ conn.on('data', function(data) {
         time_elapsed.start = finishedArray["TIME_STARTED"];
         time_elapsed.finish = finishedArray["TIME_FINISHED"];
         var true_clauses = finishedArray["TRUE_CLAUSES"];
-        chart.update();
+        graph_chart.update();
         let status_title = $('#status-title');
         if (finishedArray["SUCCESSFUL"] === true) {
             status_title.addClass('success');
@@ -222,6 +220,8 @@ conn.on('data', function(data) {
         $('#status').removeClass('hide');
         $('#answer-container').show();
         $('#answer').val(finishedArray["INDIVIDUAL"]);
+        $('#stop-button').hide();
+        $('#back-button').show();
 
         console.log(current_child.array[0]);
         console.log(best_individual.array[0]);
@@ -260,13 +260,19 @@ conn.on('close', function() {
 });
 
 
-var chart;
-var default_chart;
+var graph_chart;
 $(document).ready(function () {
     $('#progress').hide();
-    let accent_colour = $('button').css('backgroundColor');
-    let ctx = document.getElementById('fitness-chart').getContext('2d');
-    default_chart = new Chart(ctx, {
+    graph_chart = default_chart();
+});
+
+function default_chart() {
+    $('#fitness-chart').remove();
+    $('#chart-container').append('<canvas id="fitness-chart"><canvas>');
+    var accent_colour = $('button').css('backgroundColor');
+    var ctx = document.getElementById('fitness-chart').getContext('2d');
+    console.log('sdgf');
+    var default_chart_var = new Chart(ctx, {
         // The type of chart we want to create
         type: 'line',
 
@@ -320,8 +326,9 @@ $(document).ready(function () {
             }
         }
     });
-    chart = default_chart;
-});
+
+    return default_chart_var;
+}
 
 window.setInterval(function() {
     var calculated_elapsed;
@@ -363,22 +370,18 @@ function reset() {
     current_child.individual = null;
     formula_info.num_variables = 0;
     formula_info.num_clauses = 0;
-    chart.data.datasets[0].data = [];
-    chart.data.datasets[1].data = [];
-    let canvas = document.querySelector('#fitness-chart');
-    let ctx = canvas.getContext('2d');
-    ctx.clearRect(0,0, canvas.width, canvas.height); // resize to parent width
-    chart.reset();
-    chart = default_chart;
-    chart['data']['datasets'][0]['data'] = [];
-    chart['data']['datasets'][1]['data'] = [];
-    chart.update();
+
+    graph_chart = default_chart();
+    graph_chart.update();
 
     $('#status').addClass('hide');
     $('#answer-container').hide();
     $('#progress').hide();
+    $('#main-card').show();
     $('#status-title').removeClass('success');
     $('#status-title').removeClass('failed');
+    $('#stop-button').show();
+    $('#back-button').hide();
 
 }
 

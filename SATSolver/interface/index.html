@@ -42,11 +42,19 @@
     <br>
     <div class="row">
     	<div class="container col s10 offset-s1">
-	      <div class="col s12"">
+	      <div class="col s12">
 	      	<div class="card" id="progress">
 	        <br>
 	        <div class="container">
-	          <h4>Progress</h4>
+				<div class="row" id="progress-title-row">
+					<div class="col s6">
+						<h4>Progress</h4>
+					</div>
+	            	<div class="col s6 right-align">
+	              		<button id="stop-button" class="btn" onclick="make_request('STOP')">Stop</button>
+						<button id="back-button" class="btn" onclick="reset()" style="display: none">Back</button>
+	            	</div>
+		  		</div>
 	          <hr>
 	          <div id="status" class="row hide">
 	            <div class="col s12">
@@ -112,11 +120,6 @@
 				</form>
 	          <br/>
 	        </div>
-			<div class="row">
-	            <div class="col s4 offset-s10">
-	              <button class="btn" onclick="make_request('STOP')">Stop</button>
-	            </div>
-		  	</div>
 			<br>
 	       
 	      </div>
@@ -146,7 +149,7 @@
 	                  <!-- File CNF Input -->
 	                  <div id='input-cnf-file' class="file-field input-field" hidden>
 	                    <div class="btn">
-	                      <span>File</span>
+	                      <span>Choose File</span>
 	                      <input id='selected-file' type="file">
 	                    </div>
 	                    <div class="file-path-wrapper">

@@ -94,7 +94,6 @@ function make_request(type) {
     try {
         var request;
         if (type === 'SOLVE') {
-            reset();
             request = construct_request('SOLVE');
             console.log(request);
             conn.write(request);
@@ -361,4 +360,6 @@ fitness_chart.addEventListener('contextmenu', function (e) {
     e.preventDefault();
     menu.popup(remote.getCurrentWindow());
 }, false);
+
+
 

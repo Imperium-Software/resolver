@@ -263,3 +263,7 @@ h5>small {
 .modal-content {
     overflow-x: hidden;
 }
+
+#progress-title-row {
+    margin-bottom: 0;
+}
