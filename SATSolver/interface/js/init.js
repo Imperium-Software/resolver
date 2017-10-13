@@ -359,8 +359,6 @@ function reset() {
 function circularHeat(child_data, best_data, numSegments) {
     let chart = circularHeatChart(numSegments).range(["white",
     getComputedStyle(document.body).getPropertyValue('--theme-four')]);
-    console.log(child_data);
-    console.log(best_data);
     d3.select('#child-chart').selectAll('svg').data(child_data).enter().append('svg').call(chart);
     d3.select('#best-chart').selectAll('svg').data(best_data).enter().append('svg').call(chart);
 }

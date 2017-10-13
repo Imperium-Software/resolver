@@ -688,7 +688,8 @@ class GA:
         :return: void (NONE)
         """
         # Change this to get rid of the sort - Do an insertion sort
-        self.population.sort(key=operator.attrgetter("fitness"))
+        # self.population.sort(key=operator.attrgetter("fitness"))
+        self.population.sort(key=self.evaluate)
         self.best_individual_fitness = self.population[0].fitness
         self.best_individual = self.population[0]
         if self.population[0].fitness > child.fitness:
