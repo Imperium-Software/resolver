@@ -1,5 +1,6 @@
 import sys
 import os
+
 myPath = os.path.dirname(os.path.abspath(__file__))
 print(myPath)
 sys.path.insert(0, myPath + '/../SATSolver')
@@ -10,7 +11,6 @@ from bitarray import bitarray
 
 
 class TestGA(TestCase):
-
     class FormulaReader:
 
         def __init__(self, filename):
@@ -61,16 +61,6 @@ class TestGA(TestCase):
         ind.data = bitarray("111111110")
         ind.isCacheValid = False
         self.assertEqual(ga.evaluate(ind), 2)
-        ind.data = bitarray("111111110")
-        ind.isCacheValid = False
-        self.assertEqual(ga.evaluate(ind), 2)
-
-    def test_evaluate_unsolvable(self):
-        reader = self.FormulaReader("../examples/trivial3.cnf")
-        ga = GA(reader.formula, 9, 5, 1, 5, 5, 5)
-        ind = Individual(9)
-        ind.isCacheValid = False
-        self.assertTrue(ga.evaluate(ind) != 0, "Evaluate says unsolvable formula is solved.")
 
     def test_improvement(self):
         reader = self.FormulaReader("../examples/trivial.cnf")
@@ -263,7 +253,7 @@ class TestGA(TestCase):
                 self.assertEqual(1, 0)
         finally:
             tracker.print_diff()
-        # .............................................................................................................
+            # .............................................................................................................
 
     def test_choose_rvcf(self):
 
