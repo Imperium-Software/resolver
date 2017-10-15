@@ -1,10 +1,13 @@
 {
-  "name": "SATSolver",
-  "version": "0.0.1",
+  "name": "Resolver",
+  "version": "1.0.0",
   "description": "The interface for the SAT solving application",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "build": "electron-packager . Resolver --overwrite --platform=darwin --arch=x64 --version=1.0.0 --icon=icon.icns --prune=true --out=release-builds && cp solver release-builds/Resolver-darwin-x64/Resolver.app/Contents/Resources/solver",
+    "create-installer-mac": "electron-installer-dmg release-builds/Resolver-darwin-x64/Resolver.app Resolver --out=release-builds --overwrite --icon=icon.icns"
   },
   "author": "Imperium",
   "license": "ISC",
@@ -19,6 +22,8 @@
     "vue": "^2.4.1"
   },
   "devDependencies": {
-    "electron": "1.4.15"
+    "electron": "1.4.15",
+    "electron-installer-dmg": "^0.2.1",
+    "electron-packager": "^9.1.0"
   }
 }
