@@ -22,7 +22,7 @@ function createWindow () {
   }));
 
   // Open the DevTools.
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -44,6 +44,9 @@ var child;
 app.on('ready', function() {
   createWindow();
   child = spawn(process.resourcesPath + '/solver', {detached: true});
+  child.stdout.on('data', function (data) {
+    console.log('stdout: ' + data.toString());
+  });
 });
 
 // Quit when all windows are closed.
