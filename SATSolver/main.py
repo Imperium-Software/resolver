@@ -91,4 +91,8 @@ def main(argv):
 
 
 if __name__ == '__main__':
+    import os
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    print(dir_path)
+    sys.path.append(dir_path)
     sys.exit(main(sys.argv[1:]))
