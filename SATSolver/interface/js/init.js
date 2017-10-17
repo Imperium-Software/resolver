@@ -121,10 +121,9 @@ var be_disconnect = false;
 
 function disconnect() {
     console.log('Disconnecting...');
-    conn.emit('close', '');
-    $("#connected-indicator")[0].style.fill = "red";
     be_disconnect = true;
-    conn.connected = false;
+    conn.send('CLOSE#');
+    $("#connected-indicator")[0].style.fill = "red";
     $('#disconnect').addClass('disabled');
     $('#connect').removeClass('disabled');
 }
