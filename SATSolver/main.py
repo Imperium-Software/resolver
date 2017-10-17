@@ -6,7 +6,7 @@ from GA import InputError
 
 
 default_port = 55555
-default_host = "localhost"
+default_host = ""
 
 
 def main(argv):

@@ -108,11 +108,41 @@ var generations = new Vue({
 
 conn = new net.Socket();
 
-conn.connect(55555, '127.0.0.1', function() {
+var HOST = '127.0.0.1';
+var PORT = '55555';
+
+conn.connect(PORT, HOST, function() {
     console.log('Connected');
     $("#connected-indicator")[0].style.fill = "lime";
     conn.connected = true;
 });
+
+var be_disconnect = false;
+
+function disconnect() {
+    console.log('Disconnecting...');
+    conn.emit('close', '');
+    $("#connected-indicator")[0].style.fill = "red";
+    be_disconnect = true;
+    conn.connected = false;
+    $('#disconnect').addClass('disabled');
+    $('#connect').removeClass('disabled');
+}
+
+function connect(_HOST, _PORT) {
+    HOST = _HOST;
+    PORT = _PORT;
+    console.log('Connecting on ' + HOST + ':' + PORT);
+    conn = new net.Socket();
+    conn.connect(PORT, HOST, function() {
+        console.log('Connected');
+        $("#connected-indicator")[0].style.fill = "lime";
+        conn.connected = true;
+    });
+    be_disconnect = false;
+    $('#disconnect').removeClass('disabled');
+    $('#connect').addClass('disabled');
+}
 
 conn.on('data', function(data) {
   data = data.slice(0, -1);
@@ -271,7 +301,6 @@ function default_chart() {
     $('#chart-container').append('<canvas id="fitness-chart"><canvas>');
     var accent_colour = $('button').css('backgroundColor');
     var ctx = document.getElementById('fitness-chart').getContext('2d');
-    console.log('sdgf');
     var default_chart_var = new Chart(ctx, {
         // The type of chart we want to create
         type: 'line',
@@ -350,8 +379,8 @@ window.setInterval(function() {
 }, 1);
 
 window.setInterval(function() {
-    if (conn.connected === false) {
-        conn.connect(55555, '127.0.0.1', function() {
+    if (conn.connected === false && !be_disconnect) {
+        conn.connect(PORT, HOST, function() {
             console.log('Connected');
             $("#connected-indicator")[0].style.fill = "lime";
             conn.connected = true;
