@@ -3,3 +3,7 @@ node_modules/
 __pycache__/
 .cache/
 docs/build
+
+SATSolver/interface/release-builds/Resolver-darwin-x64/
+
+SATSolver/interface/run_build\.sh

@@ -132,6 +132,24 @@ class SATController(Observer, SingletonMixin):
                 time_elapsed = str(time_elapsed / 1000) + 's'
             else:
                 time_elapsed = str(time_elapsed) + 'ms'
+
+            if self.GA.best_individual is None:
+                print(BColors.FAIL + "Could not find a solution, solving stopped by client." + BColors.ENDC)
+                if self.server_thread is not None:
+                    from SATSolver.RequestHandler import encode
+                    encoded_message = encode("FINISHED", [
+                        False,
+                        None,
+                        [0, 0],
+                        self.time_started,
+                        self.time_finished,
+                        '',
+                        ''
+                    ])
+                    self.server_thread.push_to_all(encoded_message)
+                self.GA = None
+                return
+
             result = self.GA.best_individual
             if result.fitness == 0:
                 print(BColors.OKGREEN + "Successfully found a solution in " +

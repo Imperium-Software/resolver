@@ -108,7 +108,7 @@ var generations = new Vue({
 
 conn = new net.Socket();
 
-var HOST = '127.0.0.1';
+var HOST = 'localhost';
 var PORT = '55555';
 
 conn.connect(PORT, HOST, function() {
@@ -121,9 +121,12 @@ var be_disconnect = false;
 
 function disconnect() {
     console.log('Disconnecting...');
-    be_disconnect = true;
-    conn.send('CLOSE#');
-    $("#connected-indicator")[0].style.fill = "red";
+    try {
+        conn.write('CLOSE#');
+        be_disconnect = true;
+    } catch (e) {
+        console.log(e);
+    }
     $('#disconnect').addClass('disabled');
     $('#connect').removeClass('disabled');
 }
@@ -132,7 +135,6 @@ function connect(_HOST, _PORT) {
     HOST = _HOST;
     PORT = _PORT;
     console.log('Connecting on ' + HOST + ':' + PORT);
-    conn = new net.Socket();
     conn.connect(PORT, HOST, function() {
         console.log('Connected');
         $("#connected-indicator")[0].style.fill = "lime";
@@ -156,6 +158,7 @@ conn.on('data', function(data) {
 
   function progress() {
       try {
+          graph_chart.update();
         progressObject = JSON.parse(data);
         progressArray = progressObject["RESPONSE"]["PROGRESS"];
         perc.percentage = (progressArray["NUM_CLAUSES"][0]-progressArray["BEST_INDIVIDUAL_FITNESS"][0]) / progressArray["NUM_CLAUSES"][0];
@@ -166,6 +169,7 @@ conn.on('data', function(data) {
         current_child.fitness = progressArray["CURRENT_CHILD_FITNESS"][0];
         current_child.individual = progressArray["CURRENT_CHILD"][0];
         time_elapsed.start = progressArray["TIME_STARTED"][0];
+        time_elapsed.finish = 0;
 
         formula_info.num_clauses = progressArray["NUM_CLAUSES"][0];
         formula_info.num_variables = progressArray["NUM_VARIABLES"][0];
@@ -185,7 +189,7 @@ conn.on('data', function(data) {
             best_individual.array[0].push.apply(best_individual.array[0], new_best);
             $("#child-chart").html('');
             $("#best-chart").html('');
-
+             console.log('Here');
             // Data culling
 
             if (current_child.array[0].length > 10*new_child.length) {
@@ -257,7 +261,9 @@ conn.on('data', function(data) {
 
       } catch(e) {
         $("#connected-indicator")[0].style.fill = "yellow";
-        console.log(e)
+        console.log(e);
+        $('#stop-button').hide();
+        $('#back-button').show();
       }
   }
 
@@ -286,6 +292,8 @@ conn.on('close', function() {
   console.log('Connection closed');
   $("#connected-indicator")[0].style.fill = "red";
   conn.connected = false;
+  $('#disconnect').addClass('disabled');
+  $('#connect').removeClass('disabled');
 });
 
 
@@ -383,6 +391,8 @@ window.setInterval(function() {
             console.log('Connected');
             $("#connected-indicator")[0].style.fill = "lime";
             conn.connected = true;
+            $('#disconnect').removeClass('disabled');
+            $('#connect').addClass('disabled');
         });
     }
 }, 5000);

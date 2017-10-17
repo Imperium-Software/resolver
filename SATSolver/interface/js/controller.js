@@ -257,6 +257,7 @@ function navigate(filename) {
         });
 
     })
+    reset();
 }
 
 function theme_change() {

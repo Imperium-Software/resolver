@@ -46,7 +46,8 @@ class ClientThread(Thread):
                     total_msg += msg_chunk
                 if total_msg == "CLOSE#":
                     self.kill()
-                self.server_thread.process_message_from_client(total_msg, self.thread_id)
+                else:
+                    self.server_thread.process_message_from_client(total_msg, self.thread_id)
         except socket.error:
             return
 
