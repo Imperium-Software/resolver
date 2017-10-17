@@ -139,6 +139,8 @@ $('#circle').circleProgress({
 });
 
 function navigate(filename) {
+    console.log(process.resourcesPath + '/app/' + filename);
+    // filename = process.resourcesPath + '/app/' + filename;
     fs.readFile(filename, 'utf8', (err, data) => {
         document.getElementById('base').innerHTML = data;
         document.body.classList.add('loaded');
