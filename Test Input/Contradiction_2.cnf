@@ -1,0 +1,12 @@
+c FILE: trivial2.cnf
+c
+c DESCRIPTION: Trivial unsolvable
+c
+c
+p cnf 3 6
+1 0
+-1 0
+2 0
+-2 0
+3 0
+-3 0

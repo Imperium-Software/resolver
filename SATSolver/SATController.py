@@ -47,6 +47,17 @@ class SATController(Observer, SingletonMixin):
     def update(self, arg):
         from SATSolver.RequestHandler import encode
         self._generation_count = arg
+
+        if self.GA.best_individual is None:
+            best_true_clauses = ''
+        else:
+            best_true_clauses = self.GA.true_clauses(self.GA.best_individual)
+
+        if self.GA.current_child is None:
+            new_true_clauses = ''
+        else:
+            new_true_clauses = self.GA.true_clauses(self.GA.current_child)
+
         encoded_message = encode("PROGRESS", [[self._generation_count, self.GA.max_generations],
                                               [self.time_started],
                                               [self.GA.best_individual_fitness],
@@ -55,8 +66,8 @@ class SATController(Observer, SingletonMixin):
                                               [str(self.GA.current_child)],
                                               [self.GA.numberOfVariables],
                                               [self.GA.numberOfClauses],
-                                              [self.GA.true_clauses(self.GA.best_individual)],
-                                              [self.GA.true_clauses(self.GA.current_child)]]
+                                              [best_true_clauses],
+                                              [new_true_clauses]]
                                  )
         if self.server_thread is not None:
             self.server_thread.push_to_all(encoded_message)
@@ -106,7 +117,8 @@ class SATController(Observer, SingletonMixin):
                     [self._generation_count, self.GA.max_generations],
                     self.time_started,
                     self.time_finished,
-                    str(result)
+                    str(result),
+                    self.GA.true_clauses(result)
                 ])
                 time.sleep(0.1)
                 self.server_thread.push_to_all(encoded_message)
@@ -120,6 +132,24 @@ class SATController(Observer, SingletonMixin):
                 time_elapsed = str(time_elapsed / 1000) + 's'
             else:
                 time_elapsed = str(time_elapsed) + 'ms'
+
+            if self.GA.best_individual is None:
+                print(BColors.FAIL + "Could not find a solution, solving stopped by client." + BColors.ENDC)
+                if self.server_thread is not None:
+                    from SATSolver.RequestHandler import encode
+                    encoded_message = encode("FINISHED", [
+                        False,
+                        None,
+                        [0, 0],
+                        self.time_started,
+                        self.time_finished,
+                        '',
+                        ''
+                    ])
+                    self.server_thread.push_to_all(encoded_message)
+                self.GA = None
+                return
+
             result = self.GA.best_individual
             if result.fitness == 0:
                 print(BColors.OKGREEN + "Successfully found a solution in " +
@@ -136,7 +166,8 @@ class SATController(Observer, SingletonMixin):
                     [self._generation_count, self.GA.max_generations],
                     self.time_started,
                     self.time_finished,
-                    str(self.GA.best_individual)
+                    str(self.GA.best_individual),
+                    self.GA.true_clauses(self.GA.best_individual)
                 ])
                 self.server_thread.push_to_all(encoded_message)
 

@@ -93,17 +93,23 @@ function construct_request(type) {
 function make_request(type) {
     try {
         var request;
-        if (type === 'SOLVE') {
-            reset();
-            request = construct_request('SOLVE');
-            console.log(request);
-            conn.write(request);
-            terminal.text = "";
-            error_log.text = "";
-        } else if (type === 'STOP') {
-            request = construct_request('STOP');
-            console.log(request);
-            conn.write(request);
+        if (conn.connected == false) {
+            alert('You are not connected to any server.');
+        } else {
+            if (type === 'SOLVE') {
+                request = construct_request('SOLVE');
+                reset();
+                console.log(request);
+                conn.write(request);
+                terminal.text = "";
+                error_log.text = "";
+            } else if (type === 'STOP') {
+                $('#back-button').show();
+                $('#stop-button').hide();
+                request = construct_request('STOP');
+                console.log(request);
+                conn.write(request);
+            }
         }
     } catch (e) {
         console.log(e);
@@ -140,6 +146,8 @@ $('#circle').circleProgress({
 });
 
 function navigate(filename) {
+    console.log(process.resourcesPath + '/app/' + filename);
+    filename = process.resourcesPath + '/app/' + filename;
     fs.readFile(filename, 'utf8', (err, data) => {
         document.getElementById('base').innerHTML = data;
         document.body.classList.add('loaded');
@@ -154,6 +162,9 @@ function navigate(filename) {
         if (generations.generations == 0) {
             $("#progress").hide();
         }
+
+        $('#host').val(HOST);
+        $('#port').val(PORT);
 
         // Progress circle
 
@@ -247,7 +258,16 @@ function navigate(filename) {
             }
         });
 
+        generations = new Vue({
+            el: "#generations",
+            data: {
+                generations: generations.generations,
+                max_generations: generations.max_generations
+            }
+        });
+
     })
+    reset();
 }
 
 function theme_change() {
@@ -353,4 +373,6 @@ fitness_chart.addEventListener('contextmenu', function (e) {
     e.preventDefault();
     menu.popup(remote.getCurrentWindow());
 }, false);
+
+
 

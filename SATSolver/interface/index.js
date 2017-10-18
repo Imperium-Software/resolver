@@ -6,6 +6,7 @@ const url = require('url');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
+var spawn = require('child_process').spawn;
 
 function createWindow () {
   // Create the browser window.
@@ -21,7 +22,7 @@ function createWindow () {
   }));
 
   // Open the DevTools.
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -39,15 +40,21 @@ function createWindow () {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+var child;
+app.on('ready', function() {
+  createWindow();
+  child = spawn(process.resourcesPath + '/solver', {detached: true});
+  child.stdout.on('data', function (data) {
+    console.log('stdout: ' + data.toString());
+  });
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  process.kill(-child.pid);
+  app.quit();
 });
 
 app.on('activate', () => {

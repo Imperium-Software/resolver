@@ -1,0 +1,73 @@
+#post-card ul>li {
+    list-style-type: disc;
+}
+
+#post-card ul {
+    margin-left: 20px;
+    margin-top: 2px;
+}
+
+#post-card h1 {
+    font-size: 40px;
+    margin-bottom: 5px;
+}
+
+#post-card h2 {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+#post-card h3 {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.code {
+    background-color: #F5F5F5;
+    padding: 20px;
+    margin-bottom: 10px;
+    margin-top: 5px;
+    font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif;
+}
+
+.code .row {
+    margin: 0;
+}
+
+.code .btn {
+    background-color: #283240;
+}
+
+.code .red-code, .small-code .red-code {
+    color: #F37259;
+}
+
+.code .blue-code, .small-code .blue-code {
+    color: cadetblue;
+}
+
+.code .key-code, .small-code .key-code {
+    color: #636A75;
+}
+
+.small-code {
+    background-color: #F5F5F5;
+    font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif;
+}
+
+.row .inner-code {
+    margin-top: 10px;
+    padding: 20px;
+    background-color: #DEDEDE;
+}
+
+#cnf-textarea {
+    min-height: 170px;
+    margin-top: 20px;
+}
+
+.card .card-content .aside {
+    font-size: 12px;
+    color: darkgray;
+    margin-top: 10px;
+}

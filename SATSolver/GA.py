@@ -29,15 +29,15 @@ class GA:
         self.numberOfVariables = int(number_of_variables)
         # Creating member variables for each of the parameters
         if not max_generations > 1:
-            raise InputError("Input Error! The maximum number of generations must be > 1!")
+            raise InputError("Input Error! The maximum number of generations must be > 1.")
         self.max_generations = int(max_generations)
         # TODO: Test for minimum possible size. It is at least 2
         if not int(population_size) >= 2:
-            raise InputError("Input Error! The population size of individuals must be >= 2!")
+            raise InputError("Input Error! The population size of individuals must be >= 2.")
         self.population_size = int(population_size)
         # TODO: Set sub-population size default to some percentage - May NOT be smaller than 2 because of crossover
         if not sub_population_size >= 2 or not sub_population_size <= int(population_size):
-            raise InputError("Input Error! population_size >= sub_population_size >= 2!")
+            raise InputError("Input Error! population size >= sub population_size.")
         self.sub_population_size = int(sub_population_size)
         if crossover_operator not in [0, 1, 2]:
             raise InputError("Input Error! The parameter for the crossover operator is an element of {0,1,2} --> "
@@ -50,7 +50,7 @@ class GA:
             tabu_list_length = int(10.0/100.0 * number_of_variables)
         else:
             if not int(tabu_list_length) > 0 or not int(tabu_list_length) <= int(number_of_variables):
-                raise InputError("Input Error! number_of_variables >= tabu_list_length > 0!")
+                raise InputError("Input Error! number of variables >= tabu list length.")
         self.tabu_list_length = int(tabu_list_length)
         if not max_flip > 0:
             raise InputError("Input Error! The parameter for maximum flips (during tabu search) must be > 0!")
@@ -747,7 +747,7 @@ class GA:
             self.replace(child)
 
             # Increase the generation
-            self.generation_counter += 1
+            self.generation_counter = self.generation_counter + 1
 
         return self.population[0]
 
@@ -770,5 +770,5 @@ class GA:
     @generation_counter.setter
     def generation_counter(self, arg):
         self._generation_counter = arg
-        if arg > 0:
+        if arg >= 0:
             self._notify()

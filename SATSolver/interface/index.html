@@ -42,11 +42,19 @@
     <br>
     <div class="row">
     	<div class="container col s10 offset-s1">
-	      <div class="col s12 l6"">
+	      <div class="col s12">
 	      	<div class="card" id="progress">
 	        <br>
 	        <div class="container">
-	          <h4>Progress</h4>
+				<div class="row" id="progress-title-row">
+					<div class="col s6">
+						<h4>Progress</h4>
+					</div>
+	            	<div class="col s6 right-align">
+	              		<button id="stop-button" class="btn" onclick="make_request('STOP')">Stop</button>
+						<button id="back-button" class="btn" onclick="reset()" style="display: none">Back</button>
+	            	</div>
+		  		</div>
 	          <hr>
 	          <div id="status" class="row hide">
 	            <div class="col s12">
@@ -84,27 +92,39 @@
 	            </div>
 	          </div>
 
+				<div class="row">
+					<div class="col s6 center-align">Newest Child Clauses</div>
+					<div class="col s6 center-align">Fittest Individual Clauses</div>
+				</div>
 	          <div class="row">
 	            <div class="col s6" id="child-chart"></div>
 	            <div class="col s6" id="best-chart"></div>
 	          </div>
 
-	          <div class="input-field row">
-	            <h5>Solution:</h5>
-	            <p id="answer" class="hide left-align"></p>
-	          </div>
-	          <div class="row">
-	            <div class="col s4 offset-s8">
-	              <button class="btn" onclick="make_request('STOP')">Stop</button>
-	            </div>
-	          </div>
+	          <div id="answer-container" class="input-field row" style="display: none">
+				<form class="col s12">
+				  <div class="row">
+				  	<h5 id="solution-desc">Solution:</h5>
+					<div class="input-field">
+					  <input id="answer" type="text">
+					</div>
+				  </div>
+				</form>
+			  	<form id="answer-clauses-form" class="col s12" style="display: none">
+				  <div class="row">
+				  	<h5>Unsatisfied Clauses:</h5>
+					<div class="input-field">
+					  <input id="answer-clauses" type="text">
+					</div>
+				  </div>
+				</form>
 	          <br/>
 	        </div>
+			<br>
 	       
 	      </div>
 	      </div>
 	       <br/>
-	    	<div class="col s12 l5 offset-l1">
 	      <div class="card" id="main-card">
 	         <!-- this is the moved form to attemtp to fix styling -->
 	         <form>
@@ -129,7 +149,7 @@
 	                  <!-- File CNF Input -->
 	                  <div id='input-cnf-file' class="file-field input-field" hidden>
 	                    <div class="btn">
-	                      <span>File</span>
+	                      <span>Choose File</span>
 	                      <input id='selected-file' type="file">
 	                    </div>
 	                    <div class="file-path-wrapper">
@@ -217,7 +237,7 @@
 	                            </div>
 
 	                            <div class="row" style="margin-bottom: 0em; margin-top: 0em;">
-	                            <div class="col s12">
+	                            <div class="col s12" style="display: none">
 	                            	<!-- nice to have tool tips but its causing readability issues -->
 	                              <!-- <div class="input-field tooltip gray SAT-dark-blue"> -->
 	                              <div class="input-field SAT-dark-blue">
@@ -237,7 +257,6 @@
 	                                <option value="corrective-clause">Corrective Clause</option>
 	                                <option value="cctm">CCTM</option>
 	                                <option value="fleurent-and-ferland">Fleurent and Ferland</option>
-	                                <option value="uniform">Uniform Crossover</option>
 	                              </select>
 	                            </div>
 	                            </div>
@@ -255,7 +274,7 @@
 	                          </div>
 	                          </div>
 	                          <div class="modal-footer">
-	                            <a href="#!" class="modal-action modal-close waves-effect btn btn-flat">Close</a>
+	                            <a href="#!" class="modal-action modal-close waves-effect btn btn-flat white-text">Close</a>
 	                          </div>
 
 	                        </div>
@@ -265,7 +284,7 @@
 	                    </li>
 	                  </ul>
 	              	  </div>
-	                  <button onclick='make_request("SOLVE"); return false' class='btn'>Start</button>
+	                  <button onclick='make_request("SOLVE"); return false' class='btn white'>Start</button>
 	                <!-- </form> -->
 	              </div>
 	            </li>
@@ -291,7 +310,6 @@
 	        </div>
 	        <!-- this form is for moved for to try fix styling -->
 	      </form>
-	      </div>
 	      </div>
 	    </div>
     </div>

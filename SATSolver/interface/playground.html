@@ -4,6 +4,7 @@
     <link rel="stylesheet" type="text/css" href="css/materialize.min.css">
     <link rel="stylesheet" type="text/css" href="css/current-theme-init.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/playground.css">
   </head>
   <body onload="document.body.classList.add('loaded')">
     <ul id="slide-out" class="side-nav SAT-roayal-blue">
@@ -35,76 +36,263 @@
       </div>
     </nav>
     <br>
-    <div class="container">
-      <div class="container">
-        <div class="row">
-          <div class="card">
-            <div class="card-content">
-              <span class="card-title">What is SAT?</span>
-              <p>Definition of SAT.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+            <div class="container">
 
-      <div class="container">
-        <div class="row">
-          <div class="card">
-            <div class="card-content">
-              <span class="card-title">Genetic Algorithms!</span>
-              <p>Genetic algorithms are computer programs that use the principle 
-                of evolution to find a solution to complex problems.</p>
-              <div align="center">
-                <img src="https://d30y9cdsu7xlg0.cloudfront.net/png/14696-200.png" alt="dna">
-              </div>
-              
-            </div>
-          </div>
-        </div>
-      </div>
+            <div class="row">
+                <div class="col s12">
+                    <div class="card first-card">
+                        <div id="post-card" class="card-content">
+                            <h1 class="center-align">The Boolean Satisfiability Problem [SAT] and SAT Solvers</h1>
+                            <p class="center-align">by IMPERIUM</p>
+                            <br>
+                            <br>
+                            <p>This is a quick sum-up and a beginner guide to the Boolean Satisfiability Problem. This
+                                guide is a summary of a blog post by Archy Wilhes on
+                                <a href="http://0a.io" target="_blank" a>0a.io</a>. Please check out the
+                                <a target="_blank" href="http://0a.io/boolean-satisfiability-problem-or-sat-in-5-minutes/">
+                                    blog post</a> if you would like a more indepth explanation on SAT and SAT solvers. </p>
 
-      <div class="container">
-        <div class="row">
-          <div class="card">
-            <div class="card-content">
-              <span class="card-title">Sudoku</span>
-              <div align="center">
-              
-                <button class="btn">Find a solution!</button><br><br>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Sudoku_Puzzle_by_L2G-20050714_standardized_layout.svg/250px-Sudoku_Puzzle_by_L2G-20050714_standardized_layout.svg.png" alt="">
+                            <h2>What is the Boolean Satisfiability Problem?</h2>
+                            <p>The Boolean Satisfiability Problem (SAT) is the problem of determining if a propositional
+                                statement is satisfiable. A propositional statement is satisfiable when it is possible
+                                to assign some true-false values for the variables in such a way that the statement is
+                                true, else the statement is unsatisfiable. It's something like trying to flip a bunch of
+                                switches to find the setting that makes a light bulb turn on.</p>
 
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                            <br>
+                            <p>A propositional statement is simply made up of:</p>
+                            <ul>
+                                <li>variables</li>
+                                <li>brackets</li>
+                                <li>and the following 3 symbols</li>
+                                <ol>
+                                    <li>¬ meaning not</li>
+                                    <li>∧ meaning and</li>
+                                    <li>∨ meaning or</li>
+                                </ol>
+                            </ul>
 
-      <div class="container">
-        <div class="row">
-          <div class="card">
-            <div class="card-content">
-              <span class="card-title">Timetabling</span>
-              <div align="center">
-                <button class="btn">Find a solution!</button>
-                <div align="center" id="timetable"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                            <p>Some examples of statements using these three symbols:</p>
+                            <div class="code">
+                                <p><span class="red-code">¬</span><span class="key-code">FALSE</span> = <span class="key-code">TRUE</span></p>
+                                <p><span class="key-code">False</span> <span class="red-code">∧</span> <span class="key-code">True</span> = <span class="key-code">False</span></p>
+                                <p><span class="key-code">False</span> <span class="red-code">∨</span> <span class="key-code">True</span> = <span class="key-code">TRUE</span></p>
+                            </div>
+                            <p>These symbols are also known as logical connectives. They are arranged in order of precedence above.</p>
 
-      <div class="container">
-        <div class="row">
-          <div class="card">
-            <div class="card-content">
-              <span class="card-title">Boolean Algebra</span>
-              <div align="center">
-                
-              </div>
+                            <br>
+                            <p>Here is a example of a propositional statement. See if you can find an assignment for the variables a, b, c and d to make the propositional statement true. To see a solution, click the solve button.</p>
+                            <div class="code">
+                                <div class="row valign-wrapper">
+                                    <div class="col s10 valign-wrapper">
+                                        <p><span class="blue-code">d</span> <span class="red-code">∨</span> (<span class="blue-code">a</span> <span class="red-code">∧</span> <span class="blue-code">b</span> <span class="red-code">∨</span> <span class="red-code">¬</span><span class="blue-code">c</span>)</p>
+                                    </div>
+                                </div>
+                                <div id="problem1" class="row inner-code" style="display: none">
+                                    <p class="time">Successfully found a solution in ms</p>
+                                    <p class="answer"><b>A</b> solution:   <span class="blue-code">a</span>: <span class="key-code a">TRUE</span>, <span class="blue-code">b</span>: <span class="key-code b">TRUE</span>, <span class="blue-code">c</span>: <span class="key-code c">TRUE</span>, <span class="blue-code">d</span>: <span class="key-code d">FALSE</span></p>
+                                </div>
+                            </div>
+
+                            <br>
+                            <p>You may have noticed that we explicitly say <b>a</b> solution. This is because there may be
+                                multiple solutions to one propositional statement. Here are three solutions to the statement above:</p>
+                            <div class="code">
+                                <p><span class="blue-code">a</span>: <span class="key-code">TRUE</span>, <span class="blue-code">b</span>: <span class="key-code">TRUE</span>, <span class="blue-code">c</span>: <span class="key-code">TRUE</span>, <span class="blue-code">d</span>: <span class="key-code">FALSE</span></p>
+                                <p><span class="blue-code">a</span>: <span class="key-code">FALSE</span>, <span class="blue-code">b</span>: <span class="key-code">FALSE</span>, <span class="blue-code">c</span>: <span class="key-code">TRUE</span>, <span class="blue-code">d</span>: <span class="key-code">FALSE</span></p>
+                                <p><span class="blue-code">a</span>: <span class="key-code">FALSE</span>, <span class="blue-code">b</span>: <span class="key-code">FALSE</span>, <span class="blue-code">c</span>: <span class="key-code">FALSE</span>, <span class="blue-code">d</span>: <span class="key-code">TRUE</span></p>
+                            </div>
+
+                            <br>
+                            <p>Here is another example of a propositional statement. See if you can find an assignment
+                                for the variables to make the statement true:</p>
+                            <div class="code">
+                                <div class="row valign-wrapper">
+                                    <div class="col s10 valign-wrapper">
+                                        <p><span class="blue-code">d</span> <span class="red-code">∨</span> (<span class="blue-code">a</span> <span class="red-code">∧</span> <span class="blue-code">b</span> <span class="red-code">∧</span> (<span class="blue-code">c</span> <span class="red-code">∨</span> <span class="blue-code">d</span> <span class="red-code">∧</span> <span class="red-code">¬</span><span class="blue-code">a</span>))</p>
+                                    </div>
+                                </div>
+                                <div id="problem2" class="row inner-code" style="display: none">
+                                        <p class="time">Successfully found a solution in ms</p>
+                                        <p class="answer"><b>A</b> solution:   <span class="blue-code">a</span>: <span class="key-code a">TRUE</span>, <span class="blue-code">b</span>: <span class="key-code b">TRUE</span>, <span class="blue-code">c</span>: <span class="key-code c">TRUE</span>, <span class="blue-code">d</span>: <span class="key-code d">FALSE</span></p>
+                                </div>
+                            </div>
+
+                            <br>
+                            <p>Here is yet another example, go ahead and try to find an assignment for the variables (hint this is a trick question): </p>
+                            <div class="code">
+                                <div class="row valign-wrapper">
+                                    <div class="col s10 valign-wrapper">
+                                        <p><span class="blue-code">a</span> <span class="red-code">∧</span> <span class="red-code">¬</span><span class="blue-code">a</span> <span class="red-code">∧</span> <span class="blue-code">b</span> <span class="red-code">∧</span> <span class="blue-code">c</span> <span class="red-code">∧</span> <span class="blue-code">d</span></p>
+                                    </div>
+                                </div>
+                                <div id="problem3" class="row inner-code" style="display: none">
+                                        <p class="time">Successfully found a solution in ms</p>
+                                        <p class="answer"><b>A</b> solution:   <span class="blue-code">a</span>: <span class="key-code a">TRUE</span>, <span class="blue-code">b</span>: <span class="key-code b">TRUE</span>, <span class="blue-code">c</span>: <span class="key-code c">TRUE</span>, <span class="blue-code">d</span>: <span class="key-code d">FALSE</span></p>
+                                </div>
+                            </div>
+                            <br>
+                            <p>It is not satisfiable! This is because there is no value we can assign to <span class="small-code"><span class="blue-code">a</span></span>
+                                such that
+                                <span class="small-code"><span class="blue-code">a</span> <span class="red-code">∧</span> <span class="red-code">¬</span><span class="blue-code">a</span></span>
+                                would yield true and therefore
+                                it is impossible for the whole statement is true.</p>
+
+                            <br>
+                            <h2>Conjunctive Normal Form</h2>
+                            <p>
+                                Before we get to SAT solvers we need to figure out how to represent propositional
+                                statements in a way that a SAT solver can understand it. This is where Conjunctive Normal
+                                Form (CNF) comes in. CNF is used as input for SAT solvers.
+                            </p>
+
+                            <br>
+                            <p>
+                                A formula in conjunctive normal form consists of:
+                            </p>
+                            <ul>
+                                <li>clauses joined by ∧ (and)</li>
+                                <li>each clause, in turn consists of variables joined by ∨ (or)</li>
+                                <li>A variable can be preceded by a ¬ (not) to negate a variable.</li>
+                            </ul>
+
+                            <p>
+                                Here is example of a CNF:
+                            </p>
+                            <div class="code">
+                                <p>
+                                    (<span class="blue-code">a</span> <span class="red-code">∨</span> </span><span class="blue-code">b</span> <span class="red-code">∨</span> <span class="blue-code">c</span>) <span class="red-code">∧</span>
+                                    (<span class="red-code">¬</span><span class="blue-code">a</span> <span class="red-code">∨</span> </span><span class="red-code">¬</span><span class="blue-code">b</span> <span class="red-code">∨</span> <span class="blue-code">c</span>) <span class="red-code">∧</span>
+                                    (<span class="blue-code">a</span> <span class="red-code">∨</span> </span><span class="red-code">¬</span><span class="blue-code">b</span> <span class="red-code">∨</span> <span class="blue-code">c</span>) <span class="red-code">∧</span>
+                                    (<span class="red-code">¬</span><span class="blue-code">a</span> <span class="red-code">∨</span> </span><span class="blue-code">b</span> <span class="red-code">∨</span> <span class="red-code">¬</span><span class="blue-code">c</span>)
+                                </p>
+                            </div>
+
+                            <br>
+                            <p>
+                                But you might be asking why CNF. Here are two reasons why:
+                            </p>
+                            <ol>
+                                <li>
+                                    Input-related reason: Electronic circuit logic can be converted to CNF in linear time
+                                    and space.
+                                </li>
+                                <li>
+                                    Solver-related: Most SAT solver variants can understand CNF. This is because it is
+                                    easy to detect conflicts, it is easy to remember assignments that don't work, and
+                                    its easy to be translated into simple data structures.
+                                </li>
+                            </ol>
+                            <br>
+                            <p>
+                                Now you might want to start making your own CNFs and using a SAT solver to solve them,
+                                right? Great! There is just one more thing, though the above propositional statement is
+                                in CNF form this is not quite how inputs for SAT solvers look like. The format most SAT
+                                solvers use is called the DIMACS CNF.
+                            </p>
+                            <br>
+                            <p>
+                                Here is the above CNF formatted in DIMACS CNF format:
+                            </p>
+                            <div class="code">
+                                <p>p cnf 3 4</p>
+                                <p>1 2 3 0</p>
+                                <p>-1 -2 3 0</p>
+                                <p>1 -2 -3 0</p>
+                                <p>-1 2 -3 0</p>
+                                </p>
+                            </div>
+
+                            <p>Lets break it down:</p>
+                            <ul>
+                                <li>
+                                    The first line is the problem line, hence it starts with a p. It tells us three
+                                    things about the problem:
+                                    <ol>
+                                        <li>The problem is in conjunctive normal form indicted by the cnf.</li>
+                                        <li>The problem has 3 variables indicated by the 3.</li>
+                                        <li>The problem has 4 clauses indicated by the 4.</li>
+                                    </ol>
+                                </li>
+                                <li>Each proceeding line is a clause made up of variables represented as integers.
+                                    Each variable is separated by a space and a negated variable is represented as a
+                                    negative integer.
+                                </li>
+                                <li>
+                                    Each clause is also terminated with a <span class="small-code">0</span>. This allows
+                                    more than one clause appear on the same line.
+                                </li>
+                            </ul>
+
+                            <p>
+                                This is enough for you to make your own DIMACS CNF, but there are a few more details
+                                which we did not mention here. If you would like to learn more about CNFs check out
+                                <a href="http://people.sc.fsu.edu/~jburkardt/data/cnf/cnf.html" target="_blank">this
+                                great article</a> about CNF Files.
+                            </p>
+
+                            <br>
+                            <h2>SAT Solvers</h2>
+                            <p>
+                                So what is a SAT solver? A SAT solver is a algorithm that can solve some, but not all
+                                instances of SAT. There are two classifications of SAT solvers:
+                                <ol>
+                                    <li>Complete</li>
+                                    <li>Incomplete</li>
+                                </ol>
+                            </p>
+                            <p>
+                                A complete SAT solver will always tell you if a problem is satisfiable or unsatisfiable.
+                            </p>
+                            <p>
+                                Incomplete SAT solvers, on the other hand, are less reliable. They may be unable to
+                                prove unsatisfiability (when it’s impossible for the formula to yield true), or unable
+                                to find a solution when the formula is satisfiable. Incomplete SAT solvers are a lot
+                                more useful in scenarios when the instances of SAT cannot be solved by complete
+                                algorithms in reasonable time.
+                            </p>
+                            <br>
+                            <p>
+                                To compare the performance between different SAT solvers, we give them a large set of
+                                formulas and see how well each performs. The set of formulas is often referred to as a
+                                benchmark instance. A solver previously lost to another solver may do better if
+                                different type of benchmark instances are used.
+                            </p>
+                            <br>
+                            <p>
+                                Many modern SAT solvers are based on the original DPLL algorithm designed in the 60’s
+                                which is a complete algorithm. Our SAT solver is not based on the original DPLL algorithm,
+                                but instead uses genetic algorithms (GA) to find an answer. In summary it guesses the first
+                                assignment then evaluates how good the assignment is with a scoring function, the GA then
+                                tries to evolve assignments with better scores. Our GA SAT solver is a incomplete SAT solver.
+                                If you would like to know why it is not complete or just learn more about GA SAT solvers
+                                please read the academic article which our SAT solver is based on.
+                            </p>
+
+                            <br>
+                            <h2>Conclusion</h2>
+                            <p>
+                                Though we only scratched the surface of SAT and SAT solving it should be enough for you
+                                to get started. If you would like to submit your own CNF to be solved you can do it
+                                <a href="solve_sat.html">here</a>.
+                            </p>
+                            <h3>Further Reading:</h3>
+                            <ol>
+                                <li><a href="https://cacm.acm.org/magazines/2014/3/172516-boolean-satisfiability/fulltext" target="_blank">Boolean Satisfiability: Theory and Engineering (2014)</a></li>
+                                <li><a href="http://www.princeton.edu/~chaff/publication/cade_cav_2002.pdf" target="_blank">The Quest for Efficient Boolean Satisfiability Solvers (2002)</a></li>
+                                <li><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.489.8416&rep=rep1&type=pdf" target="_blank">The SAT Phase Transition (1994) </a></li>
+                                <li><a href="http://www.cs.cornell.edu/gomes/papers/satsolvers-kr-handbook.pdf" target="_blank">Satisfiability Solvers</a></li>
+                                <li><a href="http://www.cs.toronto.edu/~fbacchus/csc2512/Lectures/2013Readings/Skallah_Empirical_Study_SAT_Solvers.pdf" target="_blank">Empirical Study of the Anatomy of Modern Sat Solvers </a></li>
+                                <li><a href="https://www.amazon.com/gp/product/1586039296/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1586039296&linkCode=as2&tag=0aarhe-20&linkId=4SB427BUQ5LKHOFJ" target="_blank">Handbook of Satisfiability</a></li>
+                                <li><a href="http://www.cs.toronto.edu/~chechik/courses03/csc2108/algorithms-for-satisfiability.pdf" target="_blank">Algorithms for the Satisfiability Problem: A Survey (1996)</a></li>
+                                <li><a href="https://www.amazon.com/gp/product/3319092839/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=3319092839&linkCode=as2&tag=0aarhe-20&linkId=ZKNKEH4TF3DC6R7R" target="_blank">Theory and Applications of Satisfiability Testing - SAT 2014</a></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
+
         </div>
-      </div>
     </body>
     <script src="node_modules/hammerjs/hammer.js"></script>
     <script src='js/materialize.min.js' type="text/javascript"></script>

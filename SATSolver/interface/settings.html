@@ -45,17 +45,17 @@
             <div class="card-title">Connection</div>
             <div class="row">
               <div class="input-field col s6">
-                <input type="text" name="" value="localhost">
+                <input id="host" type="text" name="" value="localhost">
               </div>
               <div class="input-field col s6">
-                <input type="number" name="" value="55555">
+                <input id="port" type="number" name="" value="55555">
               </div>
             </div>
 
             <div class="row">
 
-              <button id="disconnect" class="btn disabled">Connect</button>
-              <button id="disconnect" class="btn">Disconnect</button>
+              <button id="connect" class="btn disabled" onclick="connect($('#host').val(), $('#port').val())">Connect</button>
+              <button id="disconnect" class="btn" onclick="disconnect()">Disconnect</button>
 
             </div>
           </div>
