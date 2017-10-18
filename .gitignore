@@ -7,3 +7,9 @@ docs/build
 SATSolver/interface/release-builds/Resolver-darwin-x64/
 
 SATSolver/interface/run_build\.sh
+
+SATSolver/main\.spec
+
+SATSolver/dist/
+
+SATSolver/build/

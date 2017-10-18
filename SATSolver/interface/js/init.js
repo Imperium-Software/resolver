@@ -10,6 +10,8 @@ const {
   MenuItem
 } = require('electron').remote;
 
+var is_processing_message = false;
+
 var progress_bar = new ProgressBar.Circle('#progress-circle', {
   color: '#FFF',
   strokeWidth: 15,
@@ -108,7 +110,7 @@ var generations = new Vue({
 
 conn = new net.Socket();
 
-var HOST = '52.210.109.195';
+var HOST = '127.0.0.1';
 var PORT = '55555';
 
 conn.connect(PORT, HOST, function() {
@@ -188,6 +190,7 @@ function process_message(data) {
             new_best = progressArray["TRUE_CLAUSES_BEST_INDIVIDUAL"][0].split('').map((item) => {
                 return parseInt(item, 10);
             });
+
             current_child.array[0].push.apply(current_child.array[0], new_child);
             best_individual.array[0].push.apply(best_individual.array[0], new_best);
             $("#child-chart").html('');
@@ -291,18 +294,26 @@ function process_message(data) {
   progress_bar.animate(perc.percentage);
 }
 
-var re = new RegExp('[^#]');
 function process_data(data) {
     conn.data += data;
-    if (re.exec(conn.data)) {
-        process_message(conn.data.slice(0, conn.data.indexOf('#')+1));
-        conn.data = conn.data.slice(conn.data.indexOf('#')+1, conn.data.length);
+    if (!is_processing_message) {
+        is_processing_message = true;
+        while (conn.data.indexOf('#') !== -1) {
+            process_message(conn.data.slice(0, conn.data.indexOf('#')+1));
+            conn.data = conn.data.slice(conn.data.indexOf('#')+1, conn.data.length);
+        }
+        is_processing_message = false;
     }
+
 }
 
 conn.on('data', function(data) {
-    // process_data(data);
-    process_message(data);
+    if (HOST === "127.0.0.1" || HOST.toLowerCase() === "localhost") {
+        process_message(data);
+    } else {
+        process_data(data);
+    }
+    // process_message(data);
 });
 
 conn.on('close', function() {
@@ -426,8 +437,10 @@ function reset() {
     generations.generations = 0;
     best_individual.fitness = 0;
     best_individual.individual = null;
+    best_individual.array = [[]];
     current_child.fitness = 0;
     current_child.individual = null;
+    current_child.array = [[]];
     formula_info.num_variables = 0;
     formula_info.num_clauses = 0;
 

@@ -98,6 +98,7 @@ function make_request(type) {
         } else {
             if (type === 'SOLVE') {
                 request = construct_request('SOLVE');
+                reset();
                 console.log(request);
                 conn.write(request);
                 terminal.text = "";
@@ -146,7 +147,7 @@ $('#circle').circleProgress({
 
 function navigate(filename) {
     console.log(process.resourcesPath + '/app/' + filename);
-    // filename = process.resourcesPath + '/app/' + filename;
+    filename = process.resourcesPath + '/app/' + filename;
     fs.readFile(filename, 'utf8', (err, data) => {
         document.getElementById('base').innerHTML = data;
         document.body.classList.add('loaded');
@@ -161,6 +162,9 @@ function navigate(filename) {
         if (generations.generations == 0) {
             $("#progress").hide();
         }
+
+        $('#host').val(HOST);
+        $('#port').val(PORT);
 
         // Progress circle
 
