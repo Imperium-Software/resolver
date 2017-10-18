@@ -108,13 +108,14 @@ var generations = new Vue({
 
 conn = new net.Socket();
 
-var HOST = 'localhost';
+var HOST = '52.210.109.195';
 var PORT = '55555';
 
 conn.connect(PORT, HOST, function() {
     console.log('Connected');
     $("#connected-indicator")[0].style.fill = "lime";
     conn.connected = true;
+    conn.data = "";
 });
 
 var be_disconnect = false;
@@ -139,14 +140,16 @@ function connect(_HOST, _PORT) {
         console.log('Connected');
         $("#connected-indicator")[0].style.fill = "lime";
         conn.connected = true;
+        conn.data = "";
     });
     be_disconnect = false;
     $('#disconnect').removeClass('disabled');
     $('#connect').addClass('disabled');
 }
 
-conn.on('data', function(data) {
+function process_message(data) {
   data = data.slice(0, -1);
+
   console.log('Received: ' + data);
   terminal.text += "\n" + data;
 
@@ -189,7 +192,7 @@ conn.on('data', function(data) {
             best_individual.array[0].push.apply(best_individual.array[0], new_best);
             $("#child-chart").html('');
             $("#best-chart").html('');
-             console.log('Here');
+             // console.log('Here');
             // Data culling
 
             if (current_child.array[0].length > 10*new_child.length) {
@@ -286,14 +289,32 @@ conn.on('data', function(data) {
 
   options[message_type](data);
   progress_bar.animate(perc.percentage);
+}
+
+var re = new RegExp('[^#]');
+function process_data(data) {
+    conn.data += data;
+    if (re.exec(conn.data)) {
+        process_message(conn.data.slice(0, conn.data.indexOf('#')+1));
+        conn.data = conn.data.slice(conn.data.indexOf('#')+1, conn.data.length);
+    }
+}
+
+conn.on('data', function(data) {
+    // process_data(data);
+    process_message(data);
 });
 
 conn.on('close', function() {
   console.log('Connection closed');
   $("#connected-indicator")[0].style.fill = "red";
   conn.connected = false;
+  conn.data = "";
   $('#disconnect').addClass('disabled');
   $('#connect').removeClass('disabled');
+  $('#back-button').show();
+  time_elapsed.finish = (new Date).getTime();
+  $('#stop-button').hide();
 });
 
 
@@ -389,6 +410,7 @@ window.setInterval(function() {
     if (conn.connected === false && !be_disconnect) {
         conn.connect(PORT, HOST, function() {
             console.log('Connected');
+            conn.data = "";
             $("#connected-indicator")[0].style.fill = "lime";
             conn.connected = true;
             $('#disconnect').removeClass('disabled');
