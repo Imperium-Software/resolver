@@ -161,7 +161,7 @@ class TestGA(TestCase):
 
         # TEST 2 - All positions are tabu and best individual is guaranteed to be better................................
 
-        file_reader = self.FormulaReader("../examples/trivial2.cnf")
+        file_reader = self.FormulaReader("../Test Input/trivial2.cnf")
         ga_implementation = GA(file_reader.formula, 1, 3, 2, 5, 5, 5)
         ga_implementation.tabu = ga_implementation.tabu[:ga_implementation.tabu_list_length]
 
@@ -224,7 +224,7 @@ class TestGA(TestCase):
         #     self.assertEqual(1, 0)
         # # .............................................................................................................
         # # Test 5 - Real non diversification.....................................................................................
-        # file_reader = self.FormulaReader("../examples/par16-4-c.cnf")
+        # file_reader = self.FormulaReader("../Test Input/Large Problems/par16-4-c.cnf")
         # ga_implementation = GA(file_reader.formula, 1292, 324, 10, 5, 5, 5, max_flip=20)
         # ind = Individual(324)
         # val1 = ga_implementation.evaluate(ind)
@@ -241,7 +241,7 @@ class TestGA(TestCase):
         tracker = SummaryTracker()
 
         try:
-            file_reader = self.FormulaReader("../examples/par16-4-c.cnf")
+            file_reader = self.FormulaReader("../Test Input/Large Problems/par16-4-c.cnf")
             ga_implementation = GA(file_reader.formula, 1292, 324, 10, 5, 5, 5, max_flip=50, is_diversification=True)
             ind = Individual(324)
             val1 = ga_implementation.evaluate(ind)
@@ -267,7 +267,7 @@ class TestGA(TestCase):
         # A test
         self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [6])
 
-        file_reader = self.FormulaReader("../examples/trivial2.cnf")
+        file_reader = self.FormulaReader("../Test Input/trivial2.cnf")
         ga_implementation = GA(file_reader.formula, 1, 3, 3, 5, 5, 5)
         ind.data = bitarray("000")
         self.assertEqual(ga_implementation.choose_rvcf(ind)[1], [1, 2, 3])
