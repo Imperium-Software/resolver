@@ -52,7 +52,7 @@ class TestGA(TestCase):
         self.assertEqual(GA.sat(ind, [-6, -4]), False)
 
     def test_evaluate(self):
-        reader = self.FormulaReader("../examples/trivial.cnf")
+        reader = self.FormulaReader("../Test Input/trivial1.cnf")
         ga = GA(reader.formula, 5, 9, 5, 9, 5, 5)
         ind = Individual(9)
         ind.data = bitarray("111111111")
@@ -63,7 +63,7 @@ class TestGA(TestCase):
         self.assertEqual(ga.evaluate(ind), 2)
 
     def test_improvement(self):
-        reader = self.FormulaReader("../examples/trivial.cnf")
+        reader = self.FormulaReader("../Test Input/trivial1.cnf")
         ga = GA(reader.formula, 9, 5, 4, 5, 5, 5)
         ind = Individual(9)
         ind.data = bitarray("000100000")
@@ -74,7 +74,7 @@ class TestGA(TestCase):
 
     def test_corrective_clause(self):
         # Read the trivial example and create a GA instance
-        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../Test Input/trivial1.cnf")
         ga = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # Create two individuals for which we know what the outcome should be
         first_parent = Individual(9)
@@ -94,7 +94,7 @@ class TestGA(TestCase):
 
     def test_corrective_clause_with_truth_maintenance(self):
         # Read the trivial example and create a GA instance
-        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../Test Input/trivial1.cnf")
         ga = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # Create two individuals for which we know what the outcome should be
         first_parent = Individual(9)
@@ -116,7 +116,7 @@ class TestGA(TestCase):
 
     def test_fluerent_and_ferland(self):
         # Read the trivial example and create a GA instance
-        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../Test Input/trivial1.cnf")
         ga = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # Create two individuals for which we know what the outcome should be
         first_parent = Individual(9)
@@ -137,7 +137,7 @@ class TestGA(TestCase):
     def test_standard_tabu_choose(self):
         # TEST 1 - All positions are tabu and best is the same as the individual........................................
         # An instance of the GA class which will be used to test the standard_tabu_choose function
-        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../Test Input/trivial1.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # The tabu list is set to the size which was received as parameter i.e. [5]
         ga_implementation.tabu = ga_implementation.tabu[:ga_implementation.tabu_list_length]
@@ -181,7 +181,7 @@ class TestGA(TestCase):
         # # # Test 1 - Satisfying assignment Passed - Nothing to intensify..................................................
         # # # An instance of the GA class which will be used to test the standard_tabu function
         # #
-        # file_reader = self.FormulaReader("../examples/trivial.cnf")
+        # file_reader = self.FormulaReader("../Test Input/trivial1.cnf")
         # ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # # Creating an individual that will represent the individual we want to intensify using tabu search
         # ind = Individual(9)
@@ -192,7 +192,7 @@ class TestGA(TestCase):
         # self.assertEqual(list(ind.data), list(BitVector(bitlist=[0, 0, 0, 0, 0, 1, 1, 1, 1])))
         # # # .............................................................................................................
         # # # Test 2 - Max Number of Flips is Zero..........................................................................
-        # file_reader = self.FormulaReader("../examples/trivial.cnf")
+        # file_reader = self.FormulaReader("../Test Input/trivial1.cnf")
         # ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, max_flip=0)
         # ind = Individual(9)
         # ind.data = BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])
@@ -200,7 +200,7 @@ class TestGA(TestCase):
         # self.assertEqual(list(ind.data), list(BitVector(bitlist=[1, 1, 1, 1, 1, 1, 1, 1, 1])))
         # # # .............................................................................................................
         # # # Test 3 - No diversification..................................................................................
-        # file_reader = self.FormulaReader("../examples/trivial.cnf")
+        # file_reader = self.FormulaReader("../Test Input/trivial1.cnf")
         # ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, is_diversification=False)
         # ind = Individual(9)
         # ind.data = bitarray(1, 1, 1, 1, 1, 1, 1, 1, 1])
@@ -213,7 +213,7 @@ class TestGA(TestCase):
         #
         # # # .............................................................................................................
         # # # Test 4 - No diversification - complex..................................................................................
-        # file_reader = self.FormulaReader("../examples/trivial.cnf")
+        # file_reader = self.FormulaReader("../Test Input/trivial1.cnf")
         # ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5, is_diversification=False)
         # ind = Individual(9)
         # ind.data = BitVector(bitlist=[0, 0, 0, 1, 1, 0, 0, 0, 0])
@@ -258,7 +258,7 @@ class TestGA(TestCase):
     def test_choose_rvcf(self):
 
         # An instance of the GA class which will be used to test the standard_tabu_choose function
-        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../Test Input/trivial1.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         # Creating an individual that will represent the best individual during a tabu search procedure
         ind = Individual(9)
@@ -274,7 +274,7 @@ class TestGA(TestCase):
 
     def test_weight(self):
 
-        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../Test Input/trivial1.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         ind = Individual(9)
         ind.data = bitarray("000000000")
@@ -293,7 +293,7 @@ class TestGA(TestCase):
         self.assertEqual(GA.degree(ind, [7, 8, -3]), 3)
 
     def test_tabu_with_diversification(self):
-        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../Test Input/trivial1.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         ga_implementation.tabu = [0, 0, 0, 0, 5]
         ind = Individual(9)
@@ -303,7 +303,7 @@ class TestGA(TestCase):
         self.assertEqual(1, 1)
 
     def test_check_flip(self):
-        file_reader = self.FormulaReader("../examples/trivial.cnf")
+        file_reader = self.FormulaReader("../Test Input/trivial1.cnf")
         ga_implementation = GA(file_reader.formula, 5, 9, 5, 5, 5, 5)
         forbidden_flips = {}
         ind = Individual(9)
@@ -318,7 +318,7 @@ class TestGA(TestCase):
         self.assertEqual(1, 1)
 
     def test_is_satisfied(self):
-        reader = self.FormulaReader("../examples/trivial.cnf")
+        reader = self.FormulaReader("../Test Input/trivial1.cnf")
         ga = GA(reader.formula, 9, 5, 4, 5, 5, 5)
         ind = Individual(9)
         ind.data = bitarray("000000000")
