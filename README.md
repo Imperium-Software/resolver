@@ -53,7 +53,7 @@ This project is developed and maintained by:
 The core of this project is an implementation of the [GASAT algorithm](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.108.7124&rep=rep1&type=pdf) by Lardeux et al.
 
 ## Team Resources
-- [Team Website](https://imperium-engineering.com/)
-- [Software Requirements Specification](https://imperium-engineering.com/resolver-requirements-specification.pdf)
+- [Team Website](http://imperium-engineering.com/)
+- [Software Requirements Specification](http://imperium-engineering.com/resolver-requirements-specification.pdf)
 - [Architectural Design Specifications](http://imperium-engineering.com/resolver-architectural-documentation.pdf)
 - [Software Testing Report](http://imperium-engineering.com/resolver-testing-report.pdf)
