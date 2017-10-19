@@ -53,11 +53,7 @@ This project is developed and maintained by:
 The core of this project is an implementation of the [GASAT algorithm](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.108.7124&rep=rep1&type=pdf) by Lardeux et al.
 
 ## Team Resources
-- [Team Website](https://imperium-software.github.io/)
-- [Slack](https://imperium-se.slack.com)
-- [Project Briefing Documentation](http://cs.up.ac.za/files/COS301/Download/1905/)
-- [Requirements Documentation](https://www.overleaf.com/9687894kqqdwgmqymsx)
-- [Requirements Documentation PDF](https://dearvolt.com/imperium/software-requirements-specification.pdf)
-- [Architectural Design Specifications](https://github.com/Imperium-Software/resolver/wiki/Architectural-Design-Specifications)
-- [Latest Testing Report](https://drive.google.com/file/d/0B9BjYGq76aeBNnk1NUx4ek5zMWM/view?usp=sharing)
-- [CS Group Page](http://cs.up.ac.za/teams/pages/manage/147/5)
+- [Team Website](https://imperium-engineering.com/)
+- [Software Requirements Specification](https://imperium-engineering.com/resolver-requirements-specification.pdf)
+- [Architectural Design Specifications](http://imperium-engineering.com/resolver-architectural-documentation.pdf)
+- [Software Testing Report](http://imperium-engineering.com/resolver-testing-report.pdf)
